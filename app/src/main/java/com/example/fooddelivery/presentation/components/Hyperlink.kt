@@ -1,10 +1,11 @@
-package com.example.fooddelivery.presentation
+package com.example.fooddelivery.presentation.components
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -17,10 +18,10 @@ import com.example.compose.seed
 @Composable
 fun Hyperlink(
     text: String,
-    hyperlinks: List<String> = listOf(),
-) {
-    val hyperlink = "https://example.com"
-    val hyperLinkText = "Terms & Conditions"
+    url: String = "https://example.com",
+    hyperLinkText: String
+): AnnotatedString {
+//    val url = "https://example.com"
     val annotatedString = buildAnnotatedString {
         append(text)
         val startIndex = text.indexOf(hyperLinkText)
@@ -31,7 +32,7 @@ fun Hyperlink(
             ), start = startIndex, end = endIndex
         )
         addStringAnnotation(
-            tag = "URL", annotation = hyperlink, start = startIndex, end = endIndex
+            tag = "URL", annotation = url, start = startIndex, end = endIndex
         )
 
         addStyle(
@@ -55,4 +56,6 @@ fun Hyperlink(
             textAlign = TextAlign.Center,
         )
     )
+
+    return annotatedString
 }
