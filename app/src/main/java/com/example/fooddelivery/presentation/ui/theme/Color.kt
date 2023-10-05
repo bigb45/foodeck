@@ -68,4 +68,5 @@ val facebook_color = Color(0xFF3B5998)
 
 val seed = Color(0xFFF05193)
 
-val gray = Color(0xFFF2F2F7)
+val gray6 = Color(0xFFF2F2F7)
+val gray2 = Color(0xFFAEAEB2)
