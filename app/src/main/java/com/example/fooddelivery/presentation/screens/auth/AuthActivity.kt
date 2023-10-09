@@ -1,4 +1,4 @@
-package com.example.fooddelivery.presentation.screens
+package com.example.fooddelivery.presentation.screens.auth
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.example.fooddelivery.presentation.nav.Navigation
+import com.example.fooddelivery.presentation.nav.AuthNavigation
 import com.example.fooddelivery.presentation.screens.auth.email_login.LoginViewModel
 import com.example.fooddelivery.presentation.screens.auth.signup.SignupViewModel
 import com.example.fooddelivery.presentation.ui.theme.FoodDeliveryTheme
@@ -26,7 +26,7 @@ class AuthActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    Navigation(
+                    AuthNavigation(
                         signupViewModel,
                         loginViewModel,
                     )

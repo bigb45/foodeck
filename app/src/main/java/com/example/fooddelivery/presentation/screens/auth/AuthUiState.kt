@@ -1,7 +1,7 @@
 package com.example.fooddelivery.presentation.screens.auth
 
 import com.example.fooddelivery.util.FieldError
-
+// TODO: convert data class to sealed interface, handle different login states (success, failure, unauthorized)
 data class AuthUiState(
 
     val username: String = "",

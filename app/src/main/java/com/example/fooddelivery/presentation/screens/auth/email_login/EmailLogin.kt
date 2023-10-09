@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -35,9 +37,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.compose.gray6
-import com.example.fooddelivery.presentation.components.Hyperlink
 import com.example.fooddelivery.presentation.components.CustomButton
 import com.example.fooddelivery.presentation.components.CustomOutlinedButton
+import com.example.fooddelivery.presentation.components.Hyperlink
 import com.example.fooddelivery.presentation.screens.auth.signup.getStringResourceFromFieldError
 import com.example.fooddelivery.presentation.ui.theme.FoodDeliveryTheme
 import com.example.fooddelivery.util.AuthEvent
@@ -49,23 +51,20 @@ fun EmailLogin(navController: NavController, viewModel: LoginViewModel) {
     val uiState by viewModel.loginUiState.collectAsState()
     FoodDeliveryTheme {
 
-        Scaffold(modifier = Modifier
-            .fillMaxSize(), topBar = {
+        Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
             TopAppBar(title = {
                 Text(
-                    "Create an Account",
-                    style = typography.titleMedium
+                    "Create an Account", style = typography.titleMedium
                 )
-            },
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            navController.navigateUp()
-                        },
-                    ) {
-                        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = null)
-                    }
-                })
+            }, navigationIcon = {
+                IconButton(
+                    onClick = {
+                        navController.navigateUp()
+                    },
+                ) {
+                    Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = null)
+                }
+            })
         }) {
             Column(
                 modifier = Modifier
@@ -94,12 +93,13 @@ fun EmailLogin(navController: NavController, viewModel: LoginViewModel) {
 
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(16.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth()
                     ) {
 
 
                         OutlinedTextField(
+                            shape = RoundedCornerShape(16),
+
                             value = uiState.email,
                             supportingText = {
                                 Text(getStringResourceFromFieldError(uiState.emailError))
@@ -108,7 +108,7 @@ fun EmailLogin(navController: NavController, viewModel: LoginViewModel) {
                             onValueChange = { newEmail ->
                                 viewModel.notifyChange(AuthEvent.EmailChanged(newEmail))
                             },
-                            label = { Text("Email") },
+                            label = { Text("Email", color = colorScheme.outline) },
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth()
 
@@ -117,6 +117,8 @@ fun EmailLogin(navController: NavController, viewModel: LoginViewModel) {
 
                         var passwordVisible by remember { mutableStateOf(false) }
                         OutlinedTextField(
+                            shape = RoundedCornerShape(16),
+
                             value = uiState.password,
                             isError = uiState.passwordError.isError,
                             supportingText = {
@@ -125,7 +127,7 @@ fun EmailLogin(navController: NavController, viewModel: LoginViewModel) {
                             onValueChange = { newPassword ->
                                 viewModel.notifyChange(AuthEvent.PasswordChanged(newPassword))
                             },
-                            label = { Text("Password") },
+                            label = { Text("Password", color = colorScheme.outline) },
                             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                             singleLine = true,
 
@@ -158,8 +160,7 @@ fun EmailLogin(navController: NavController, viewModel: LoginViewModel) {
                 ) {
                     CustomButton(
                         onClick = { /*TODO validate user input and save to info. use view-model with use-cases*/ },
-                        modifier = Modifier
-                            .fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth(),
                         text = "Login",
                         enabled = true
                     )

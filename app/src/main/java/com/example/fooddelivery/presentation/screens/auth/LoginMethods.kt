@@ -16,7 +16,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -34,6 +33,7 @@ import com.example.compose.facebook_color
 import com.example.compose.google_color
 import com.example.compose.seed
 import com.example.fooddelivery.R
+import com.example.fooddelivery.presentation.components.CustomOutlinedButton
 import com.example.fooddelivery.presentation.components.Hyperlink
 import com.example.fooddelivery.presentation.ui.theme.FoodDeliveryTheme
 
@@ -105,22 +105,15 @@ fun LoginMethods(navController: NavController) {
                 )
 
 
-                OutlinedButton(modifier = Modifier
+                CustomOutlinedButton(modifier = Modifier
                     .padding(top = 20.dp, bottom = 20.dp)
                     .fillMaxWidth()
                     .height(62.dp),
-                    shape = RoundedCornerShape(16.dp),
+                    text = "Create an account",
+                    enabled = true,
                     onClick = {
                         navController.navigate("create_account")
-                    }) {
-                    Text(
-                        text = "Create an account",
-                        Modifier.padding(8.dp), style = TextStyle(
-                            fontSize = 17.sp,
-                            fontWeight = FontWeight(700),
-                            textAlign = TextAlign.Center)
-                    )
-                }
+                    })
 
                 Hyperlink(
                     text = "By signing up, you are agreeing to our Terms & Conditions",

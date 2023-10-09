@@ -29,7 +29,21 @@ val Typography = Typography(
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp
     ),
-    titleLarge =  TextStyle(
+   bodyMedium = TextStyle(
+       fontSize = 17.sp,
+       lineHeight = 22.sp,
+       fontFamily = inter,
+       fontWeight = FontWeight(400),
+       color = Color(0xFFFFFFFF),
+   ),
+   bodySmall = TextStyle(
+       fontSize = 12.sp,
+       lineHeight = 16.sp,
+       fontFamily = inter,
+       fontWeight = FontWeight(400),
+       color = Color(0xFFFFFFFF),
+   ),
+    titleLarge = TextStyle(
         fontSize = 20.sp,
         lineHeight = 24.sp,
         fontFamily = inter,
@@ -43,7 +57,15 @@ val Typography = Typography(
         fontFamily = inter,
         fontWeight = FontWeight(700),
         color = Color(0xFF000000),
+    ),
+    titleSmall = TextStyle(
+        fontSize = 17.sp,
+        lineHeight = 22.sp,
+        fontFamily = inter,
+        fontWeight = FontWeight(400),
+        color = Color(0xFFFFFFFF),
     )
+
 
     /* Other default text styles to override
     titleLarge = TextStyle(
@@ -62,3 +84,4 @@ val Typography = Typography(
     )
     */
 )
+

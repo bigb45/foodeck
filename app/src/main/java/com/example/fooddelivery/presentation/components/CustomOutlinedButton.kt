@@ -3,6 +3,7 @@ package com.example.fooddelivery.presentation.components
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -11,6 +12,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fooddelivery.presentation.ui.theme.FoodDeliveryTheme
@@ -39,9 +41,10 @@ fun CustomOutlinedButton(
             Text(
                 text, style = TextStyle(
                     fontSize = 17.sp,
-                    fontWeight = FontWeight(700),
+                    fontWeight = FontWeight.ExtraBold,
                     textAlign = TextAlign.Center,
-                )
+                    color = MaterialTheme.colorScheme.outline,
+                    )
             )
             if (trailingIcon != null) {
                 Icon(imageVector = trailingIcon, contentDescription = null)
@@ -53,3 +56,8 @@ fun CustomOutlinedButton(
 
 }
 
+@Preview(showBackground = true)
+@Composable
+fun CustomOutlinedButtonPreview() {
+    CustomOutlinedButton(enabled = true,  onClick = {}, text = "test")
+}

@@ -13,7 +13,7 @@ import com.example.fooddelivery.presentation.screens.auth.signup.SignupViewModel
 
 
 @Composable
-fun Navigation(signupViewModel: SignupViewModel, loginViewModel: LoginViewModel) {
+fun AuthNavigation(signupViewModel: SignupViewModel, loginViewModel: LoginViewModel) {
     val navController = rememberNavController()
 //    val viewModel = SignupViewModel(EmailValidationUseCase())
     NavHost(navController = navController, startDestination = Screen.LoginScreen.route){
