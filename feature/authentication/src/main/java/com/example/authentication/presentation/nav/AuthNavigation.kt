@@ -13,7 +13,7 @@ import com.example.authentication.presentation.screens.auth.signup.SignupViewMod
 
 
 @Composable
-fun AuthNavigation(signupViewModel: SignupViewModel, loginViewModel: LoginViewModel) {
+fun Navigation(signupViewModel: SignupViewModel, loginViewModel: LoginViewModel) {
     val navController = rememberNavController()
 //    val viewModel = SignupViewModel(EmailValidationUseCase())
     NavHost(navController = navController, startDestination = Screen.LoginScreen.route) {

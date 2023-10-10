@@ -54,7 +54,6 @@ import com.example.compose.md_theme_light_onSurface
 import com.example.compose.md_theme_light_onSurfaceVariant
 import com.example.compose.md_theme_light_onTertiary
 import com.example.compose.md_theme_light_onTertiaryContainer
-import com.example.compose.md_theme_light_onButton
 import com.example.compose.md_theme_light_outline
 import com.example.compose.md_theme_light_outlineVariant
 import com.example.compose.md_theme_light_primaryContainer

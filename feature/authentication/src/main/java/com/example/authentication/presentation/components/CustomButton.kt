@@ -41,7 +41,7 @@ fun CustomButton(
             Text(
                 text, style = TextStyle(
                     fontSize = 17.sp,
-                    fontWeight = FontWeight(900),
+                    fontWeight = FontWeight(700),
                     textAlign = TextAlign.Center,
                 )
             )

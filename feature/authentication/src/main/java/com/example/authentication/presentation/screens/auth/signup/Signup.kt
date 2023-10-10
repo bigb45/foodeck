@@ -1,7 +1,5 @@
-package com.example.authentication.presentation.screens.auth.signup
+package com.example.fooddelivery.presentation.screens.auth.signup
 
-import android.content.Intent
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -20,7 +17,6 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -34,27 +30,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.authentication.presentation.components.CustomButton
-import com.example.authentication.presentation.components.CustomOutlinedButton
-import com.example.authentication.presentation.screens.main_screen.MainActivity
-import com.example.authentication.util.AuthEvent
 import com.example.compose.gray6
-import com.example.core.ui.theme.FoodDeliveryTheme
+import com.example.fooddelivery.presentation.components.CustomButton
+import com.example.fooddelivery.presentation.components.CustomOutlinedButton
+import com.example.fooddelivery.presentation.ui.theme.FoodDeliveryTheme
+import com.example.fooddelivery.util.AuthEvent
+import com.example.fooddelivery.util.FieldError
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Signup(navController: NavController, viewModel: SignupViewModel) {
     val scrollState = rememberScrollState()
     val uiState by viewModel.signupUiState.collectAsState()
-
-    val context = LocalContext.current
-
     FoodDeliveryTheme {
 
         Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
@@ -99,7 +91,6 @@ fun Signup(navController: NavController, viewModel: SignupViewModel) {
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         OutlinedTextField(
-                            shape = RoundedCornerShape(16),
                             value = uiState.username,
                             isError = uiState.usernameError.isError,
                             supportingText = {
@@ -108,7 +99,7 @@ fun Signup(navController: NavController, viewModel: SignupViewModel) {
                             onValueChange = { newUsername ->
                                 viewModel.notifyChange(AuthEvent.UsernameChanged(newUsername))
                             },
-                            label = { Text("Username", color = MaterialTheme.colorScheme.outline) },
+                            label = { Text("Username") },
                             singleLine = true,
 
                             modifier = Modifier
@@ -118,11 +109,8 @@ fun Signup(navController: NavController, viewModel: SignupViewModel) {
 
                     }
 
-//                    TODO: create a ui model and pass it to textfield component and handle input there
 
                     OutlinedTextField(
-                        shape = RoundedCornerShape(16),
-
                         value = uiState.email,
                         supportingText = {
                             Text(getStringResourceFromFieldError(uiState.emailError))
@@ -131,7 +119,7 @@ fun Signup(navController: NavController, viewModel: SignupViewModel) {
                         onValueChange = { newEmail ->
                             viewModel.notifyChange(AuthEvent.EmailChanged(newEmail))
                         },
-                        label = { Text("Email", color = MaterialTheme.colorScheme.outline) },
+                        label = { Text("Email") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
 
@@ -139,8 +127,6 @@ fun Signup(navController: NavController, viewModel: SignupViewModel) {
 
 
                     OutlinedTextField(
-                        shape = RoundedCornerShape(16),
-
                         value = uiState.phoneNumber,
                         onValueChange = { newPhoneNumber ->
                             viewModel.notifyChange(AuthEvent.PhoneNumberChanged(newPhoneNumber))
@@ -149,15 +135,13 @@ fun Signup(navController: NavController, viewModel: SignupViewModel) {
                         supportingText = {
                             Text(getStringResourceFromFieldError(fieldError = uiState.phoneNumberError))
                         },
-                        label = { Text("Phone number", color = MaterialTheme.colorScheme.outline) },
+                        label = { Text("Phone number") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     var passwordVisible by remember { mutableStateOf(false) }
                     OutlinedTextField(
-                        shape = RoundedCornerShape(16),
-
                         value = uiState.password,
                         isError = uiState.passwordError.isError,
                         supportingText = {
@@ -166,7 +150,7 @@ fun Signup(navController: NavController, viewModel: SignupViewModel) {
                         onValueChange = { newPassword ->
                             viewModel.notifyChange(AuthEvent.PasswordChanged(newPassword))
                         },
-                        label = { Text("Password", color = MaterialTheme.colorScheme.outline) },
+                        label = { Text("Password") },
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         singleLine = true,
 
@@ -192,10 +176,7 @@ fun Signup(navController: NavController, viewModel: SignupViewModel) {
                         .padding(23.dp)
                 ) {
                     CustomButton(
-                        onClick = { /*TODO validate user input and save to info use viewmodel with usecases*/
-//                                  navController.navigate("explore")
-                            context.startActivity(Intent(context, MainActivity::class.java))
-                        },
+                        onClick = { /*TODO validate user input and save to info use viewmodel with usecases*/ },
                         modifier = Modifier.fillMaxWidth(),
                         text = "Create an Account",
                         enabled = true
@@ -217,8 +198,7 @@ fun Signup(navController: NavController, viewModel: SignupViewModel) {
 }
 
 @Composable
-fun getStringResourceFromFieldError(fieldError: com.example.authentication.util.FieldError): String {
-    Log.d("conversion error:", fieldError.errorMessage?.message.toString())
-    val id = fieldError.errorMessage?.message ?: return "Unknown error"
+fun getStringResourceFromFieldError(fieldError: FieldError): String {
+    val id = fieldError.errorMessage?.message ?: return ""
     return stringResource(id = id)
 }
