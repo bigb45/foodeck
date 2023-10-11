@@ -10,7 +10,7 @@ class ValidatePasswordUseCase @Inject constructor(private val validateUtil: com.
                 com.example.authentication.util.ValidationResult.EMPTY_PASSWORD
             )
         }
-        if (password.length !in (8..16)) {
+        if (password.length < 8) {
             return com.example.authentication.util.FieldError(
                 true,
                 com.example.authentication.util.ValidationResult.PASSWORD_LENGTH

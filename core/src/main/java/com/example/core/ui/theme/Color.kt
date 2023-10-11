@@ -70,3 +70,4 @@ val seed = Color(0xFFF05193)
 
 val gray6 = Color(0xFFF2F2F7)
 val gray2 = Color(0xFFAEAEB2)
+val gray1 = Color(0xFF8E8E93)

@@ -7,6 +7,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
+    id("com.google.gms.google-services")
 
 }
 
@@ -91,6 +92,11 @@ dependencies {
 //    modules
     implementation(project(":core"))
 
+//    Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
+
+    implementation("com.firebaseui:firebase-ui-auth:7.2.0")
+    implementation("com.facebook.android:facebook-android-sdk:5.0.0")
 
 }
 

@@ -1,6 +1,7 @@
 package com.example.fooddelivery.presentation.screens.auth
 
-import com.example.fooddelivery.util.FieldError
+import com.example.authentication.util.FieldError
+
 
 data class AuthUiState(
 

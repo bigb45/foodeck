@@ -19,6 +19,8 @@ val fontName = GoogleFont("Inter")
 val inter = FontFamily(
     Font(googleFont = fontName, fontProvider = provider)
 )
+val interBold = FontFamily(
+    Font(googleFont = fontName, fontProvider = provider, weight = FontWeight.Bold))
 
 // Set of Material typography styles to start with
 val Typography = Typography(
