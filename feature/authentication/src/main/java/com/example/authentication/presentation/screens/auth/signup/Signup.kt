@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,23 +32,29 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.authentication.presentation.components.CustomPasswordTextField
+import com.example.authentication.presentation.components.CustomTextField
+import com.example.authentication.presentation.components.PrimaryButton
+import com.example.authentication.presentation.screens.auth.signup.SignupViewModel
+import com.example.authentication.util.AuthEvent
+import com.example.authentication.util.FieldError
 import com.example.compose.gray6
-import com.example.fooddelivery.presentation.components.CustomButton
-import com.example.fooddelivery.presentation.components.CustomOutlinedButton
-import com.example.fooddelivery.presentation.ui.theme.FoodDeliveryTheme
-import com.example.fooddelivery.util.AuthEvent
-import com.example.fooddelivery.util.FieldError
+import com.example.compose.seed
+import com.example.core.ui.theme.FoodDeliveryTheme
+import com.example.fooddelivery.presentation.components.SecondaryButton
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Signup(navController: NavController, viewModel: SignupViewModel) {
     val scrollState = rememberScrollState()
     val uiState by viewModel.signupUiState.collectAsState()
-    FoodDeliveryTheme {
+    FoodDeliveryTheme{
 
         Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
             TopAppBar(title = { Text("Create an Account", style = typography.titleMedium) },
@@ -90,80 +97,55 @@ fun Signup(navController: NavController, viewModel: SignupViewModel) {
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        OutlinedTextField(
+                        CustomTextField(
                             value = uiState.username,
+
                             isError = uiState.usernameError.isError,
-                            supportingText = {
-                                Text(getStringResourceFromFieldError(fieldError = uiState.usernameError))
-                            },
+                            errorText = getStringResourceFromFieldError(fieldError = uiState.usernameError),
                             onValueChange = { newUsername ->
                                 viewModel.notifyChange(AuthEvent.UsernameChanged(newUsername))
                             },
-                            label = { Text("Username") },
-                            singleLine = true,
-
-                            modifier = Modifier
-                                .fillMaxWidth()
+                            label = "Username",
 
                         )
 
                     }
 
 
-                    OutlinedTextField(
+                    CustomTextField(
                         value = uiState.email,
-                        supportingText = {
-                            Text(getStringResourceFromFieldError(uiState.emailError))
-                        },
+                        keyboardType = KeyboardType.Email,
+                        errorText = getStringResourceFromFieldError(uiState.emailError),
                         isError = uiState.emailError.isError,
                         onValueChange = { newEmail ->
                             viewModel.notifyChange(AuthEvent.EmailChanged(newEmail))
                         },
-                        label = { Text("Email") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-
+                        label = "Email",
                     )
 
 
-                    OutlinedTextField(
+                    CustomTextField(
                         value = uiState.phoneNumber,
+                        keyboardType = KeyboardType.Phone,
                         onValueChange = { newPhoneNumber ->
                             viewModel.notifyChange(AuthEvent.PhoneNumberChanged(newPhoneNumber))
                         },
                         isError = uiState.phoneNumberError.isError,
-                        supportingText = {
-                            Text(getStringResourceFromFieldError(fieldError = uiState.phoneNumberError))
-                        },
-                        label = { Text("Phone number") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
+                        errorText =
+                           getStringResourceFromFieldError(fieldError = uiState.phoneNumberError),
+                        label = "Phone number"
                     )
 
-                    var passwordVisible by remember { mutableStateOf(false) }
-                    OutlinedTextField(
+                    CustomPasswordTextField(
                         value = uiState.password,
-                        isError = uiState.passwordError.isError,
-                        supportingText = {
-                            Text(getStringResourceFromFieldError(fieldError = uiState.passwordError))
-                        },
-                        onValueChange = { newPassword ->
+                        keyboardType = KeyboardType.Password,
+                        onValueChange =     { newPassword ->
                             viewModel.notifyChange(AuthEvent.PasswordChanged(newPassword))
                         },
-                        label = { Text("Password") },
-                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                        singleLine = true,
 
-                        trailingIcon = {
-                            val icon =
-                                if (passwordVisible && uiState.password.isNotEmpty()) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                            IconButton(onClick = {
-                                passwordVisible = !passwordVisible
-                            }) {
-                                Icon(imageVector = icon, contentDescription = null)
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth(),
+                        label = "Password",
+                        isError = uiState.passwordError.isError,
+                        errorText = getStringResourceFromFieldError(fieldError = uiState.passwordError),
 
                         )
 
@@ -175,13 +157,16 @@ fun Signup(navController: NavController, viewModel: SignupViewModel) {
                         .fillMaxWidth()
                         .padding(23.dp)
                 ) {
-                    CustomButton(
+                    PrimaryButton(
+                        text = "Create an Account",
+                        enabled = true,
                         onClick = { /*TODO validate user input and save to info use viewmodel with usecases*/ },
                         modifier = Modifier.fillMaxWidth(),
-                        text = "Create an Account",
-                        enabled = true
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = seed
+                        )
                     )
-                    CustomOutlinedButton(
+                    SecondaryButton(
                         onClick = {
                             navController.navigateUp()
                         },

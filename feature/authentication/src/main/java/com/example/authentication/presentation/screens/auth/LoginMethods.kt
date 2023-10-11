@@ -16,7 +16,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,12 +29,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.authentication.presentation.components.Hyperlink
+import com.example.authentication.presentation.components.PrimaryButton
 import com.example.compose.facebook_color
 import com.example.compose.google_color
 import com.example.compose.seed
+import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.fooddelivery.R
-import com.example.fooddelivery.presentation.components.Hyperlink
-import com.example.fooddelivery.presentation.ui.theme.FoodDeliveryTheme
+import com.example.fooddelivery.presentation.components.SecondaryButton
 
 
 @Composable
@@ -47,7 +48,6 @@ fun LoginMethods(navController: NavController) {
             modifier = Modifier.fillMaxSize()
 
         ) {
-
             Box {
                 Image(
                     painter = painterResource(id = R.drawable.loginheader),
@@ -83,44 +83,34 @@ fun LoginMethods(navController: NavController) {
                     .verticalScroll(rememberScrollState(), true)
             ) {
 
-                LoginButton(
+                PrimaryButton(
                     text = "Login with Google", onClick = { },
+                    enabled = true,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = google_color
                     ),
                 )
-                LoginButton(
+                PrimaryButton(
                     text = "Login with Facebook", onClick = { },
+                    enabled = true,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = facebook_color
                     ),
                 )
-                LoginButton(
+                PrimaryButton(
                     text = "Login via Email", onClick = {
                                                         navController.navigate("email_login")
                     },
+                    enabled = true,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = seed
                     ),
                 )
 
 
-                OutlinedButton(modifier = Modifier
-                    .padding(top = 20.dp, bottom = 20.dp)
-                    .fillMaxWidth()
-                    .height(62.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    onClick = {
-                        navController.navigate("create_account")
-                    }) {
-                    Text(
-                        text = "Create an account",
-                        Modifier.padding(8.dp), style = TextStyle(
-                            fontSize = 17.sp,
-                            fontWeight = FontWeight(700),
-                            textAlign = TextAlign.Center)
-                    )
-                }
+                SecondaryButton(text = "Create an account", enabled = true, onClick = {
+                    navController.navigate("create_account")
+                })
 
                 Hyperlink(
                     text = "By signing up, you are agreeing to our Terms & Conditions",
@@ -132,33 +122,3 @@ fun LoginMethods(navController: NavController) {
         }
     }
 }
-
-
-@Composable
-fun LoginButton(
-    text: String, onClick: () -> Unit, colors: ButtonColors, trailingIcon: ImageVector? = null
-) {
-    Button(
-        onClick,
-        colors = colors,
-        modifier = Modifier
-            .padding(top = 20.dp, bottom = 20.dp)
-            .fillMaxWidth()
-            .height(62.dp),
-        shape = RoundedCornerShape(16.dp)
-
-    ) {
-        if (trailingIcon != null) androidx.compose.material3.Icon(
-            imageVector = trailingIcon, contentDescription = null
-        )
-        Text(
-            text, Modifier.padding(8.dp), style = TextStyle(
-                fontSize = 17.sp,
-                fontWeight = FontWeight(700),
-                textAlign = TextAlign.Center,
-            )
-        )
-    }
-
-}
-
