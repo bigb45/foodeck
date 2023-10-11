@@ -1,4 +1,4 @@
-package com.example.fooddelivery.presentation.screens.auth.email_login
+package com.example.authentication.presentation.screens.auth.email_login
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,17 +31,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.authentication.presentation.components.CustomPasswordTextField
+import com.example.authentication.presentation.components.CustomTextField
+import com.example.authentication.presentation.components.Hyperlink
+import com.example.authentication.presentation.components.PrimaryButton
+import com.example.authentication.util.AuthEvent
 import com.example.compose.gray6
-import com.example.fooddelivery.presentation.components.Hyperlink
-import com.example.fooddelivery.presentation.components.CustomButton
-import com.example.fooddelivery.presentation.components.CustomOutlinedButton
+import com.example.compose.seed
+import com.example.core.ui.theme.FoodDeliveryTheme
+import com.example.fooddelivery.presentation.components.SecondaryButton
 import com.example.fooddelivery.presentation.screens.auth.signup.getStringResourceFromFieldError
-import com.example.fooddelivery.presentation.ui.theme.FoodDeliveryTheme
-import com.example.fooddelivery.util.AuthEvent
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -99,48 +105,32 @@ fun EmailLogin(navController: NavController, viewModel: LoginViewModel) {
                     ) {
 
 
-                        OutlinedTextField(
+                        CustomTextField(
                             value = uiState.email,
-                            supportingText = {
-                                Text(getStringResourceFromFieldError(uiState.emailError))
-                            },
-                            isError = uiState.emailError.isError,
+                            keyboardType = KeyboardType.Email,
                             onValueChange = { newEmail ->
                                 viewModel.notifyChange(AuthEvent.EmailChanged(newEmail))
                             },
-                            label = { Text("Email") },
-                            singleLine = true,
-                            modifier = Modifier.fillMaxWidth()
+                            label = "Email",
+                            isError = uiState.emailError.isError,
+                            errorText = getStringResourceFromFieldError(uiState.emailError)
+                        )
+
+                        CustomPasswordTextField(
+                            value = uiState.password,
+                            keyboardType = KeyboardType.Password,
+
+                            onValueChange =     { newPassword ->
+                                viewModel.notifyChange(AuthEvent.PasswordChanged(newPassword))
+                            },
+
+                            label = "Password",
+                            isError = uiState.passwordError.isError,
+                            errorText = getStringResourceFromFieldError(fieldError = uiState.passwordError),
 
                         )
 
 
-                        var passwordVisible by remember { mutableStateOf(false) }
-                        OutlinedTextField(
-                            value = uiState.password,
-                            isError = uiState.passwordError.isError,
-                            supportingText = {
-                                Text(getStringResourceFromFieldError(fieldError = uiState.passwordError))
-                            },
-                            onValueChange = { newPassword ->
-                                viewModel.notifyChange(AuthEvent.PasswordChanged(newPassword))
-                            },
-                            label = { Text("Password") },
-                            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                            singleLine = true,
-
-                            trailingIcon = {
-                                val icon =
-                                    if (passwordVisible && uiState.password.isNotEmpty()) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                                IconButton(onClick = {
-                                    passwordVisible = !passwordVisible
-                                }) {
-                                    Icon(imageVector = icon, contentDescription = null)
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-
-                            )
                     }
                     Hyperlink(
                         text = "Forgot Password?",
@@ -156,20 +146,23 @@ fun EmailLogin(navController: NavController, viewModel: LoginViewModel) {
                         .fillMaxWidth()
                         .padding(23.dp)
                 ) {
-                    CustomButton(
+                    PrimaryButton(
+                        text = "Login",
+                        enabled = true,
                         onClick = { /*TODO validate user input and save to info. use view-model with use-cases*/ },
                         modifier = Modifier
                             .fillMaxWidth(),
-                        text = "Login",
-                        enabled = true
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = seed
+                        )
                     )
-                    CustomOutlinedButton(
+                    SecondaryButton(
                         onClick = {
                             navController.navigateUp()
                         },
                         text = "Create an account instead",
                         enabled = true,
-                        modifier = Modifier.fillMaxWidth()
+//                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }

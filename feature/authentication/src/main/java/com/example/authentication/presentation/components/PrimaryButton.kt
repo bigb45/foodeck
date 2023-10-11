@@ -1,48 +1,59 @@
 package com.example.authentication.presentation.components
 
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.compose.gray1
+import com.example.compose.seed
 import com.example.core.ui.theme.FoodDeliveryTheme
+import com.example.core.ui.theme.interBold
 
 
 @Composable
-fun CustomButton(
+fun PrimaryButton(
     text: String,
     enabled: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     leadingIcon: ImageVector? = null,
     trailingIcon: ImageVector? = null,
+    colors: ButtonColors? = null,
 ) {
     FoodDeliveryTheme {
         Button(
             onClick = onClick,
             enabled = enabled,
-            shape = RoundedCornerShape(16),
-            modifier = modifier.height(62.dp)
-
+            shape = RoundedCornerShape(16.dp),
+            colors = colors?: ButtonDefaults.buttonColors(),
+            modifier = modifier
+//                .padding(start = 32.dp, top = 20.dp, end = 32.dp, bottom = 20.dp)
+                .height(62.dp)
+//                .border(width = 1.dp, color = gray1, shape = RoundedCornerShape(16.dp))
+                .fillMaxWidth()
 
         ) {
             if (leadingIcon != null) {
                 Icon(imageVector = leadingIcon, contentDescription = null)
             }
             Text(
-                text, style = TextStyle(
+                text,
+                style = TextStyle(
                     fontSize = 17.sp,
-                    fontWeight = FontWeight(700),
-                    textAlign = TextAlign.Center,
+                    fontFamily = interBold
+
                 )
             )
             if (trailingIcon != null) {
@@ -58,5 +69,9 @@ fun CustomButton(
 @Preview
 @Composable
 fun PrimaryButtonPrev() {
-    CustomButton(text = "test", enabled = true, onClick = { /*TODO*/ })
+    PrimaryButton(
+        text = "test", enabled = true, onClick = { /*TODO*/ }, colors = ButtonDefaults.buttonColors(
+            containerColor = seed
+        )
+    )
 }
