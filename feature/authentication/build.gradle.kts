@@ -96,7 +96,10 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
 
     implementation("com.firebaseui:firebase-ui-auth:7.2.0")
+    implementation("com.google.firebase:firebase-auth-ktx")
+
     implementation("com.facebook.android:facebook-android-sdk:5.0.0")
+
 
 }
 

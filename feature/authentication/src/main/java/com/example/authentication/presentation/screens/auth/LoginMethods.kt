@@ -1,5 +1,6 @@
-package com.example.fooddelivery.presentation.screens.auth
+package com.example.authentication.presentation.screens.auth
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,22 +11,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -37,10 +35,23 @@ import com.example.compose.seed
 import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.fooddelivery.R
 import com.example.fooddelivery.presentation.components.SecondaryButton
+import com.firebase.ui.auth.AuthUI
 
 
 @Composable
-fun LoginMethods(navController: NavController) {
+fun LoginMethods(
+    navController: NavController,
+    onGoogleSignInClick: () -> Unit,
+    state: SignInState,
+) {
+
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = state.signInError) {
+        state.signInError?.let { error ->
+            Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+        }
+    }
     FoodDeliveryTheme {
         Column(
             verticalArrangement = Arrangement.SpaceAround,
@@ -84,7 +95,7 @@ fun LoginMethods(navController: NavController) {
             ) {
 
                 PrimaryButton(
-                    text = "Login with Google", onClick = { },
+                    text = "Login with Google", onClick = onGoogleSignInClick,
                     enabled = true,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = google_color
@@ -98,8 +109,9 @@ fun LoginMethods(navController: NavController) {
                     ),
                 )
                 PrimaryButton(
-                    text = "Login via Email", onClick = {
-                                                        navController.navigate("email_login")
+                    text = "Login via Email",
+                    onClick = {
+                        navController.navigate("email_login")
                     },
                     enabled = true,
                     colors = ButtonDefaults.buttonColors(
@@ -116,7 +128,7 @@ fun LoginMethods(navController: NavController) {
                     text = "By signing up, you are agreeing to our Terms & Conditions",
                     hyperLinkText = "Terms & Conditions",
 
-                )
+                    )
             }
 
         }
