@@ -1,4 +1,4 @@
-package com.example.authentication.presentation.screens.auth.google_signin
+package com.example.authentication.presentation.screens.auth
 
 
 data class SignInResult(

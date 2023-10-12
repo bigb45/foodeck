@@ -1,12 +1,13 @@
-package com.example.authentication.presentation.screens.auth
+package com.example.authentication.presentation.screens.auth.google_login
 
 import androidx.lifecycle.ViewModel
-import com.example.authentication.presentation.screens.auth.google_signin.SignInResult
+import com.example.authentication.presentation.screens.auth.SignInResult
+import com.example.authentication.presentation.screens.auth.SignInState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class AuthViewModel: ViewModel() {
+class GoogleSigninViewModel: ViewModel() {
     private val _state = MutableStateFlow(SignInState())
     val state = _state.asStateFlow()
 
@@ -19,9 +20,10 @@ class AuthViewModel: ViewModel() {
         }
     }
 
-    fun resetState(){
-        _state.update {
-                SignInState()
-        }
-    }
+
+//    fun resetState(){
+//        _state.update {
+//                SignInState()
+//        }
+//    }
 }

@@ -10,6 +10,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -17,7 +18,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.authentication.presentation.nav.Navigation
 import com.example.authentication.presentation.screens.auth.email_login.LoginViewModel
-import com.example.authentication.presentation.screens.auth.google_signin.GoogleAuthUiClient
+import com.example.authentication.presentation.screens.auth.facebook_login.FacebookLoginViewModel
+import com.example.authentication.presentation.screens.auth.google_login.GoogleAuthUiClient
+import com.example.authentication.presentation.screens.auth.google_login.GoogleSigninViewModel
 import com.example.authentication.presentation.screens.auth.signup.SignupViewModel
 import com.example.core.ui.theme.FoodDeliveryTheme
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
@@ -41,19 +44,27 @@ class AuthActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
-        val authViewModel by viewModels<AuthViewModel>()
-
-
         val signupViewModel: SignupViewModel by viewModels()
         val loginViewModel: LoginViewModel by viewModels()
+        val facebookLoginViewModel: FacebookLoginViewModel by viewModels()
         setContent {
             FoodDeliveryTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    val viewModel = viewModel<AuthViewModel>()
-                    val state by viewModel.state.collectAsState()
+                    val googleSignInViewModel = viewModel<GoogleSigninViewModel>()
+                    val state by googleSignInViewModel.state.collectAsState()
+
+                    LaunchedEffect(key1 = Unit){
+                        if(googleAuthUiClient.getSignedInUser() != null){
+//                          TODO:  navigate to main app screen
+                        }
+//                       TODO:  check if signed in by facebook
+                    }
+
+                    LaunchedEffect(key1 = state.isSignInSuccessful){
+//                          TODO:  navigate to main app screen
+                    }
 
                     val launcher =
                         rememberLauncherForActivityResult(contract = ActivityResultContracts.StartIntentSenderForResult(),
@@ -63,13 +74,16 @@ class AuthActivity : ComponentActivity() {
                                         val signInResult = googleAuthUiClient.signInWithIntent(
                                             intent = result.data ?: return@launch
                                         )
-                                        viewModel.onSignInResult(signInResult)
+                                        googleSignInViewModel.onSignInResult(signInResult)
                                     }
                                 }
                             })
 
-                    Navigation(signupViewModel = signupViewModel,
+                    Navigation(
+                        signupViewModel = signupViewModel,
                         loginViewModel = loginViewModel,
+                        facebookLoginViewModel = facebookLoginViewModel,
+                        state = state,
                         onSignInClick = {
                             lifecycleScope.launch {
                                 val signInIntentSender = googleAuthUiClient.signIn()
@@ -81,7 +95,7 @@ class AuthActivity : ComponentActivity() {
 
                             }
                         },
-                        state = state)
+                    )
                 }
             }
         }

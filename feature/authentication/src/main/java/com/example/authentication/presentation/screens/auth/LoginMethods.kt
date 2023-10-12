@@ -35,7 +35,6 @@ import com.example.compose.seed
 import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.fooddelivery.R
 import com.example.fooddelivery.presentation.components.SecondaryButton
-import com.firebase.ui.auth.AuthUI
 
 
 @Composable
@@ -87,7 +86,6 @@ fun LoginMethods(
             Column(
                 verticalArrangement = Arrangement.SpaceEvenly,
                 horizontalAlignment = Alignment.CenterHorizontally,
-
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(start = 24.dp, end = 24.dp, bottom = 16.dp)
@@ -101,8 +99,14 @@ fun LoginMethods(
                         containerColor = google_color
                     ),
                 )
+
                 PrimaryButton(
-                    text = "Login with Facebook", onClick = { },
+                    text = "Login with Facebook",
+                    onClick = {
+//                        val intent = Intent(context, FacebookLogin::class.java)
+//                        startActivity(context, intent, null)
+                        navController.navigate("facebook_login")
+                    },
                     enabled = true,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = facebook_color

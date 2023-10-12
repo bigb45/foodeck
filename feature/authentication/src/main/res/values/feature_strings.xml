@@ -1,5 +1,5 @@
 <resources>
-        <string name="app_name">Feature</string>
+        <string name="app_name">Foodeck</string>
         <string name="empty_email_error">Email cannot be empty</string>
         <string name="empty_password_error">Password cannot be empty</string>
         <string name="wrong_email_pattern_error">Please enter a valid email</string>

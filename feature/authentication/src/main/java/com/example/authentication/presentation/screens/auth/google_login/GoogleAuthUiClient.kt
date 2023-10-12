@@ -1,8 +1,10 @@
-package com.example.authentication.presentation.screens.auth.google_signin
+package com.example.authentication.presentation.screens.auth.google_login
 
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
+import com.example.authentication.presentation.screens.auth.SignInResult
+import com.example.authentication.presentation.screens.auth.UserData
 import com.example.fooddelivery.R
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.BeginSignInRequest.GoogleIdTokenRequestOptions
