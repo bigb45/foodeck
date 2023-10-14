@@ -6,7 +6,7 @@ import com.example.authentication.domain.use_cases.ValidateEmailUseCase
 import com.example.authentication.domain.use_cases.ValidatePasswordUseCase
 import com.example.authentication.domain.use_cases.ValidatePhoneNumberUseCase
 import com.example.authentication.domain.use_cases.ValidateUsernameUseCase
-import com.example.authentication.presentation.screens.auth.AuthUiState
+import com.example.authentication.presentation.screens.auth.AuthState
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +20,7 @@ class SignupViewModel @Inject constructor(
     private val passwordUseCase: ValidatePasswordUseCase,
     private val usernameUseCase: ValidateUsernameUseCase,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(AuthUiState())
+    private val _uiState = MutableStateFlow(AuthState())
 
     val signupUiState = _uiState.asStateFlow()
 

@@ -3,7 +3,7 @@ package com.example.authentication.presentation.screens.auth.google_login
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
-import com.example.authentication.presentation.screens.auth.SignInResult
+import com.example.authentication.presentation.screens.auth.AuthResult
 import com.example.authentication.presentation.screens.auth.UserData
 import com.example.fooddelivery.R
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
@@ -21,32 +21,28 @@ class GoogleAuthUiClient(
 ) {
     private val auth = Firebase.auth
 
-    suspend fun signInWithIntent(intent: Intent): SignInResult {
+    suspend fun signInWithIntent(intent: Intent): AuthResult {
         val credential = oneTapClient.getSignInCredentialFromIntent(intent)
         val googleIdToken = credential.googleIdToken
         val googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)
         return try {
             val user = auth.signInWithCredential(googleCredentials).await().user
-
-            SignInResult(
-
-                data = user?.run {
+            if(user != null){
+                AuthResult.Success(data = user.run {
                     UserData(
                         userId = uid,
-                        username = displayName?: "default user",
+                        username = displayName ?: "default user",
                         profilePictureUrl = photoUrl?.toString(),
                     )
-                },
-                errorMessage = null
+                })
+            }else{
+                return AuthResult.Error("Unable to sign in")
+            }
 
-
-                )
         } catch (e: Exception) {
             e.printStackTrace()
             if (e is CancellationException) throw e
-            SignInResult(
-                null, errorMessage = e.message
-            )
+            AuthResult.Error(errorMessage = e.message ?: "Unknown Error")
         }
     }
 
@@ -65,26 +61,26 @@ class GoogleAuthUiClient(
 
     private fun buildSignInRequest(): BeginSignInRequest {
         return BeginSignInRequest.Builder().setGoogleIdTokenRequestOptions(
-                GoogleIdTokenRequestOptions.builder().setSupported(true)
-                    .setFilterByAuthorizedAccounts(false)
-                    .setServerClientId(context.getString(R.string.default_web_client_id)).build()
-            ).setAutoSelectEnabled(true).build()
+            GoogleIdTokenRequestOptions.builder().setSupported(true)
+                .setFilterByAuthorizedAccounts(false)
+                .setServerClientId(context.getString(R.string.default_web_client_id)).build()
+        ).setAutoSelectEnabled(true).build()
     }
 
-    suspend fun signOut(){
+    suspend fun signOut() {
         try {
             oneTapClient.signOut().await()
             auth.signOut()
-        }catch(e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
-            if(e is CancellationException) throw e
+            if (e is CancellationException) throw e
         }
     }
 
-    fun getSignedInUser(): UserData? = auth.currentUser?.run{
+    fun getSignedInUser(): UserData? = auth.currentUser?.run {
         UserData(
             userId = uid,
-            username = displayName?: "default user",
+            username = displayName ?: "default user",
             profilePictureUrl = photoUrl?.toString()
         )
     }

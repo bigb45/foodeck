@@ -2,21 +2,20 @@ package com.example.authentication.presentation.screens.auth.facebook_login
 
 import android.os.Bundle
 import androidx.lifecycle.ViewModel
-import com.example.authentication.presentation.screens.auth.SignInResult
-import com.example.authentication.presentation.screens.auth.SignInState
+import com.example.authentication.presentation.screens.auth.AuthResult
 import com.example.authentication.presentation.screens.auth.UserData
 import com.facebook.FacebookException
 import com.facebook.GraphRequest
 import com.facebook.login.LoginResult
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.StateFlow
 
 class FacebookLoginViewModel : ViewModel() {
-    private val _loginState = MutableStateFlow(SignInState())
-    val loginState = _loginState.asStateFlow()
-    private val _userData = MutableStateFlow(SignInResult(null, null))
-    val userData = _userData.asStateFlow()
+    private val _signInState = MutableStateFlow<AuthResult>(AuthResult.Loading)
+
+    val signInState: StateFlow<AuthResult> = _signInState
+
+
     fun handleLogInSuccess(result: LoginResult) {
         val graphRequest = GraphRequest.newMeRequest(
             result.accessToken
@@ -26,24 +25,14 @@ class FacebookLoginViewModel : ViewModel() {
                 val username = user.getString("name")
 
                 val profilePictureUrl = "https://graph.facebook.com/$userId/picture?type=large"
-                _userData.update {
-                    SignInResult(
-                        data = UserData(
-                            userId = userId,
-                            username = username,
-                            profilePictureUrl = profilePictureUrl
-                        ),
-                        errorMessage = null
-                    )
 
-                }
-                _loginState.update {
-                    it.copy(
-                        isSignInSuccessful = true,
-                        signInError = null
-
+                _signInState.value = AuthResult.Success(
+                    data = UserData(
+                        userId = userId,
+                        username = username,
+                        profilePictureUrl = profilePictureUrl
                     )
-                }
+                )
             }
         }
         val parameters = Bundle()
@@ -54,20 +43,14 @@ class FacebookLoginViewModel : ViewModel() {
     }
 
     fun cancelLogin() {
-        _loginState.update {
-            it.copy(
-                isSignInSuccessful = false,
-                signInError = "Cancelled by user"
-            )
-        }
+        _signInState.value = AuthResult.Cancelled
     }
 
     fun loginError(exception: FacebookException) {
-        _loginState.update {
-            it.copy(
-                isSignInSuccessful = false,
-                signInError = exception.message
-            )
-        }
+        _signInState.value = AuthResult.Error(errorMessage = exception.message?: "Unknown error.")
+    }
+
+    fun setStateToLoading() {
+        _signInState.value = AuthResult.Loading
     }
 }

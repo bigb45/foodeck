@@ -41,17 +41,11 @@ import com.example.fooddelivery.presentation.components.SecondaryButton
 fun LoginMethods(
     navController: NavController,
     onGoogleSignInClick: () -> Unit,
-    state: SignInState,
 ) {
 
-    val context = LocalContext.current
-
-    LaunchedEffect(key1 = state.signInError) {
-        state.signInError?.let { error ->
-            Toast.makeText(context, error, Toast.LENGTH_LONG).show()
-        }
-    }
     FoodDeliveryTheme {
+
+
         Column(
             verticalArrangement = Arrangement.SpaceAround,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -103,8 +97,6 @@ fun LoginMethods(
                 PrimaryButton(
                     text = "Login with Facebook",
                     onClick = {
-//                        val intent = Intent(context, FacebookLogin::class.java)
-//                        startActivity(context, intent, null)
                         navController.navigate("facebook_login")
                     },
                     enabled = true,

@@ -3,7 +3,10 @@ package com.example.authentication.presentation.screens.auth.email_login
 import androidx.lifecycle.ViewModel
 import com.example.authentication.domain.use_cases.ValidateEmailUseCase
 import com.example.authentication.domain.use_cases.ValidatePasswordUseCase
-import com.example.authentication.presentation.screens.auth.AuthUiState
+import com.example.authentication.presentation.screens.auth.AuthResult
+import com.example.authentication.presentation.screens.auth.AuthState
+import com.example.authentication.presentation.screens.auth.AuthStateTest
+import com.example.authentication.util.AuthEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
@@ -13,26 +16,26 @@ class LoginViewModel @Inject constructor(
     private val emailUseCase: ValidateEmailUseCase,
     private val passwordUseCase: ValidatePasswordUseCase,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(AuthUiState())
+    private val _uiState = MutableStateFlow(AuthState())
     val loginUiState = _uiState
 
-    fun notifyChange(event: com.example.authentication.util.AuthEvent) {
+    fun notifyChange(event: AuthEvent) {
         when (event) {
-            is com.example.authentication.util.AuthEvent.EmailChanged -> {
+            is AuthEvent.EmailChanged -> {
                 _uiState.value = _uiState.value.copy(
                     email = event.newEmail
                 )
                 validateEmail()
             }
 
-            is com.example.authentication.util.AuthEvent.PasswordChanged -> {
+            is AuthEvent.PasswordChanged -> {
                 _uiState.value = _uiState.value.copy(
                     password = event.newPassword
                 )
                 validatePassword()
             }
 
-            com.example.authentication.util.AuthEvent.Submit -> TODO()
+            AuthEvent.Submit -> TODO()
             else -> {
 //                do nothing
             }
