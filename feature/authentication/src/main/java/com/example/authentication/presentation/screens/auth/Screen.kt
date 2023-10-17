@@ -1,4 +1,4 @@
-package com.example.authentication.presentation.screens
+package com.example.authentication.presentation.screens.auth
 
 sealed class Screen(val route: String) {
 

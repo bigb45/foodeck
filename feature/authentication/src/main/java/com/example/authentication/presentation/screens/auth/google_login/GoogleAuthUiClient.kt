@@ -3,8 +3,8 @@ package com.example.authentication.presentation.screens.auth.google_login
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
-import com.example.authentication.presentation.screens.auth.AuthResult
-import com.example.authentication.presentation.screens.auth.UserData
+import com.example.authentication.presentation.screens.auth.data.AuthResult
+import com.example.authentication.presentation.screens.auth.data.UserData
 import com.example.fooddelivery.R
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.BeginSignInRequest.GoogleIdTokenRequestOptions
@@ -45,6 +45,7 @@ class GoogleAuthUiClient(
             AuthResult.Error(errorMessage = e.message ?: "Unknown Error")
         }
     }
+
 
     suspend fun signIn(): IntentSender? {
         val result = try {

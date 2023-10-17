@@ -12,45 +12,39 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.authentication.presentation.screens.auth.data.AuthEvent
 import com.example.authentication.presentation.components.CustomPasswordTextField
 import com.example.authentication.presentation.components.CustomTextField
 import com.example.authentication.presentation.components.Hyperlink
 import com.example.authentication.presentation.components.PrimaryButton
-import com.example.authentication.util.AuthEvent
 import com.example.compose.gray6
 import com.example.compose.seed
 import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.fooddelivery.presentation.components.SecondaryButton
-import com.example.fooddelivery.presentation.screens.auth.signup.getStringResourceFromFieldError
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EmailLogin(navController: NavController, viewModel: LoginViewModel) {
+fun EmailLogin(navController: NavController,) {
+    val viewModel: LoginViewModel = hiltViewModel()
+
     val scrollState = rememberScrollState()
     val uiState by viewModel.loginUiState.collectAsState()
     FoodDeliveryTheme {
@@ -112,8 +106,8 @@ fun EmailLogin(navController: NavController, viewModel: LoginViewModel) {
                                 viewModel.notifyChange(AuthEvent.EmailChanged(newEmail))
                             },
                             label = "Email",
-                            isError = uiState.emailError.isError,
-                            errorText = getStringResourceFromFieldError(uiState.emailError)
+                            error = uiState.emailError,
+
                         )
 
                         CustomPasswordTextField(
@@ -125,8 +119,7 @@ fun EmailLogin(navController: NavController, viewModel: LoginViewModel) {
                             },
 
                             label = "Password",
-                            isError = uiState.passwordError.isError,
-                            errorText = getStringResourceFromFieldError(fieldError = uiState.passwordError),
+                            error = uiState.passwordError,
 
                         )
 

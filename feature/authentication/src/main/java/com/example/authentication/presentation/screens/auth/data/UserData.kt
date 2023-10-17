@@ -1,4 +1,4 @@
-package com.example.authentication.presentation.screens.auth
+package com.example.authentication.presentation.screens.auth.data
 
 data class UserData(
     val userId: String,

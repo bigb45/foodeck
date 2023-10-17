@@ -1,6 +1,11 @@
 package com.example.authentication.presentation.screens.auth
 
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,6 +22,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -26,26 +34,74 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import com.example.authentication.presentation.components.Hyperlink
 import com.example.authentication.presentation.components.PrimaryButton
+import com.example.authentication.presentation.screens.auth.data.AuthResult
+import com.example.authentication.presentation.screens.auth.google_login.GoogleAuthUiClient
+import com.example.authentication.presentation.screens.auth.google_login.GoogleSignInViewModel
 import com.example.compose.facebook_color
 import com.example.compose.google_color
 import com.example.compose.seed
 import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.fooddelivery.R
 import com.example.fooddelivery.presentation.components.SecondaryButton
+import com.google.android.gms.auth.api.identity.Identity
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun LoginMethods(
     navController: NavController,
-    onGoogleSignInClick: () -> Unit,
 ) {
+    val viewModel: GoogleSignInViewModel = hiltViewModel()
+    val state by viewModel.state.collectAsState()
+
+//    Initiate Google sign in
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val googleAuthUiClient by lazy {
+        GoogleAuthUiClient(
+            context = context,
+            oneTapClient = Identity.getSignInClient(context)
+        )
+    }
+    LaunchedEffect(key1 = state) {
+        when (state) {
+            AuthResult.Cancelled -> {}
+            is AuthResult.Error -> {
+//                navController.navigate("sign_in_result")
+                Log.d("google", "error signing in with google")
+
+            }
+
+            is AuthResult.Success -> {
+//                navController.navigate("sign_in_result")
+                Log.d("google", "successfully signed in with google")
+
+            }
+
+            AuthResult.Loading -> {}
+
+            else -> {}
+        }
+    }
+    val launcher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.StartIntentSenderForResult(),
+            onResult = { result ->
+                if (result.resultCode == ComponentActivity.RESULT_OK) {
+                    scope.launch {
+                        val signInResult = googleAuthUiClient.signInWithIntent(
+                            intent = result.data ?: return@launch
+                        )
+                        viewModel.onSignInResult(signInResult)
+                    }
+                }
+            })
 
     FoodDeliveryTheme {
-
-
         Column(
             verticalArrangement = Arrangement.SpaceAround,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -87,7 +143,16 @@ fun LoginMethods(
             ) {
 
                 PrimaryButton(
-                    text = "Login with Google", onClick = onGoogleSignInClick,
+                    text = "Login with Google", onClick = {
+                        scope.launch {
+                            val signInIntentSender = googleAuthUiClient.signIn()
+                            launcher.launch(
+                                IntentSenderRequest.Builder(
+                                    signInIntentSender ?: return@launch
+                                ).build()
+                            )
+                        }
+                    },
                     enabled = true,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = google_color

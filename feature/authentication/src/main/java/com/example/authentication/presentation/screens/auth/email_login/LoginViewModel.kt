@@ -3,10 +3,8 @@ package com.example.authentication.presentation.screens.auth.email_login
 import androidx.lifecycle.ViewModel
 import com.example.authentication.domain.use_cases.ValidateEmailUseCase
 import com.example.authentication.domain.use_cases.ValidatePasswordUseCase
-import com.example.authentication.presentation.screens.auth.AuthResult
-import com.example.authentication.presentation.screens.auth.AuthState
-import com.example.authentication.presentation.screens.auth.AuthStateTest
-import com.example.authentication.util.AuthEvent
+import com.example.authentication.presentation.screens.auth.data.AuthState
+import com.example.authentication.presentation.screens.auth.data.AuthEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
@@ -47,7 +45,7 @@ class LoginViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             emailError = result
         )
-        return result.isError
+        return !result.isError
     }
 
     private fun validatePassword(): Boolean {
@@ -55,7 +53,7 @@ class LoginViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             passwordError = result
         )
-        return result.isError
+        return !result.isError
     }
 
 

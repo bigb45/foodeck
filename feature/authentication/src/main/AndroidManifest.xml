@@ -24,7 +24,7 @@
             android:value="@string/facebook_client_token" />
 
         <activity
-            android:name="com.example.authentication.presentation.screens.AuthActivity"
+            android:name="com.example.authentication.presentation.screens.auth.AuthActivity"
             android:exported="true"
             android:theme="@style/Theme.FoodDelivery"
             android:windowSoftInputMode="adjustResize">

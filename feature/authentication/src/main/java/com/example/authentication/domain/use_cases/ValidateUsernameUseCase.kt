@@ -1,16 +1,18 @@
 package com.example.authentication.domain.use_cases
 
+import com.example.authentication.presentation.screens.auth.data.FieldError
+import com.example.authentication.util.ValidationResult
 import javax.inject.Inject
 
 class ValidateUsernameUseCase @Inject constructor() {
-    operator fun invoke(username: String): com.example.authentication.util.FieldError {
+    operator fun invoke(username: String): FieldError {
 
         if (username.isEmpty()) {
-            return com.example.authentication.util.FieldError(
+            return FieldError(
                 true,
-                com.example.authentication.util.ValidationResult.EMPTY_USERNAME
+                ValidationResult.EMPTY_USERNAME
             )
         }
-        return com.example.authentication.util.FieldError(false, null)
+        return FieldError(false, null)
     }
 }

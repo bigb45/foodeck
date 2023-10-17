@@ -1,6 +1,7 @@
-package com.example.authentication.presentation.screens
+package com.example.authentication.presentation.screens.auth
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -18,8 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.authentication.presentation.nav.AuthNavigation
-import com.example.authentication.presentation.screens.auth.AuthResult
-import com.example.authentication.presentation.screens.auth.SignInResult
+import com.example.authentication.presentation.screens.auth.data.AuthResult
 import com.example.authentication.presentation.screens.auth.email_login.LoginViewModel
 import com.example.authentication.presentation.screens.auth.facebook_login.FacebookLoginViewModel
 import com.example.authentication.presentation.screens.auth.google_login.GoogleAuthUiClient
@@ -43,9 +43,6 @@ class AuthActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val signupViewModel: SignupViewModel by viewModels()
-        val loginViewModel: LoginViewModel by viewModels()
-        val facebookLoginViewModel: FacebookLoginViewModel by viewModels()
         setContent {
 
             FoodDeliveryTheme {
@@ -58,28 +55,33 @@ class AuthActivity : ComponentActivity() {
                     val state by googleSignInViewModel.state.collectAsState()
 
                     LaunchedEffect(key1 = state) {
-                        when(state){
+                        when (state) {
                             AuthResult.Cancelled -> {}
                             is AuthResult.Error -> {
                                 navController.navigate("sign_in_result")
                             }
+
                             is AuthResult.Success -> {
                                 navController.navigate("sign_in_result")
                             }
+
                             AuthResult.Loading -> {}
+
+                            else -> {}
                         }
                     }
 
-                    LaunchedEffect(key1 = Unit){
-                        if(googleAuthUiClient.getSignedInUser() != null) {
-                            googleAuthUiClient.getSignedInUser()?.let {
-//                          TODO:  navigate to main app screen
-                                googleSignInViewModel.setSignedInUser(it)
-                                navController.navigate("sign_in_result")
-                            }
-                        }
-//                       TODO:  check if signed in by facebook
-                    }
+//                    LaunchedEffect(key1 = Unit){
+//                        if(googleAuthUiClient.getSignedInUser() != null) {
+//                            googleAuthUiClient.getSignedInUser()?.let {
+////                          TODO:  navigate to main app screen
+//                                googleSignInViewModel.setSignedInUser(it)
+//                                navController.navigate("sign_in_result")
+//
+//                            }
+//                        }
+////                       TODO:  check if signed in by facebook
+//                    }
 
 
                     val launcher =
@@ -97,26 +99,24 @@ class AuthActivity : ComponentActivity() {
 
                     AuthNavigation(
                         navController = navController,
-                        signupViewModel = signupViewModel,
-                        loginViewModel = loginViewModel,
-                        facebookLoginViewModel = facebookLoginViewModel,
-                        state = state,
-                        signOut = {
-                                  lifecycleScope.launch {
-                                      googleAuthUiClient.signOut()
-                                      navController.popBackStack()
-                                  }
-                        },
-                        onSignInWithGoogleClick = {
-                            lifecycleScope.launch {
-                                val signInIntentSender = googleAuthUiClient.signIn()
-                                launcher.launch(
-                                    IntentSenderRequest.Builder(
-                                        signInIntentSender ?: return@launch
-                                    ).build()
-                                )
-                            }
-                        },
+//                        state = state,
+//                        signOut = {
+//                            lifecycleScope.launch {
+//                                googleAuthUiClient.signOut()
+//                                navController.popBackStack()
+//                                googleSignInViewModel.resetState()
+//                            }
+//                        },
+//                        onSignInWithGoogleClick = {
+//                            lifecycleScope.launch {
+//                                val signInIntentSender = googleAuthUiClient.signIn()
+//                                launcher.launch(
+//                                    IntentSenderRequest.Builder(
+//                                        signInIntentSender ?: return@launch
+//                                    ).build()
+//                                )
+//                            }
+//                        },
                     )
                 }
             }

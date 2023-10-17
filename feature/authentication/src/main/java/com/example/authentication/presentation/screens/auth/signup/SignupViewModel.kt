@@ -2,14 +2,20 @@ package com.example.authentication.presentation.screens.auth.signup
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.example.authentication.presentation.screens.auth.data.AuthEvent
 import com.example.authentication.domain.use_cases.ValidateEmailUseCase
 import com.example.authentication.domain.use_cases.ValidatePasswordUseCase
 import com.example.authentication.domain.use_cases.ValidatePhoneNumberUseCase
 import com.example.authentication.domain.use_cases.ValidateUsernameUseCase
-import com.example.authentication.presentation.screens.auth.AuthState
+import com.example.authentication.presentation.screens.auth.data.AuthResult
+import com.example.authentication.presentation.screens.auth.data.AuthState
+import com.example.authentication.presentation.screens.auth.data.UserData
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
@@ -21,41 +27,82 @@ class SignupViewModel @Inject constructor(
     private val usernameUseCase: ValidateUsernameUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AuthState())
+    private val _authResult: MutableStateFlow<AuthResult> = MutableStateFlow(AuthResult.SignedOut)
+    private val _isFormValid = MutableStateFlow(false)
 
     val signupUiState = _uiState.asStateFlow()
-
-    fun notifyChange(event: com.example.authentication.util.AuthEvent) {
+    val authState: StateFlow<AuthResult> = _authResult
+    val isFormValid: StateFlow<Boolean> = _isFormValid
+    fun notifyChange(event: AuthEvent) {
         when (event) {
-            is com.example.authentication.util.AuthEvent.EmailChanged -> {
+            is AuthEvent.EmailChanged -> {
                 _uiState.value = _uiState.value.copy(
                     email = event.newEmail
                 )
+
                 validateEmail()
             }
 
-            is com.example.authentication.util.AuthEvent.PasswordChanged -> {
+            is AuthEvent.PasswordChanged -> {
                 _uiState.value = _uiState.value.copy(
                     password = event.newPassword
                 )
                 validatePassword()
             }
 
-            is com.example.authentication.util.AuthEvent.PhoneNumberChanged -> {
+            is AuthEvent.PhoneNumberChanged -> {
                 _uiState.value = _uiState.value.copy(
                     phoneNumber = event.newPhoneNumber
                 )
                 validatePhoneNumber()
             }
 
-            is com.example.authentication.util.AuthEvent.UsernameChanged -> {
+            is AuthEvent.UsernameChanged -> {
                 _uiState.value = _uiState.value.copy(
                     username = event.newUsername
                 )
                 validateUsername()
             }
 
-            com.example.authentication.util.AuthEvent.Submit -> TODO()
+            AuthEvent.Submit -> {
+                val newUser = with(_uiState.value) {
+                    NewUserData(
+                        username = username,
+                        email = email,
+                        password = password,
+                        phoneNumber = phoneNumber
+                    )
+                }
+                signUp(newUser)
+            }
         }
+    }
+
+    private fun validateFields(): Boolean {
+        _isFormValid.value =
+            (validateUsername() && validateEmail() && validatePassword() && validatePhoneNumber())
+
+        return _isFormValid.value
+    }
+
+    private fun signUp(userInfo: NewUserData) {
+        val auth = Firebase.auth
+        _authResult.value = AuthResult.Loading
+        auth.createUserWithEmailAndPassword(userInfo.email, userInfo.password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    _authResult.value = AuthResult.Success(
+                        data = UserData(
+                            username = userInfo.username,
+                            userId = task.result.user?.uid ?: "test_id",
+                            profilePictureUrl = null
+                        )
+                    )
+                } else {
+                    _authResult.value = AuthResult.Error("Could not create account")
+                }
+            }
+
     }
 
     private fun validateEmail(): Boolean {
@@ -64,7 +111,7 @@ class SignupViewModel @Inject constructor(
             emailError = result
         )
         Log.d("viewmodel error:", result.errorMessage.toString())
-        return result.isError
+        return !result.isError
     }
 
     private fun validatePassword(): Boolean {
@@ -72,7 +119,7 @@ class SignupViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             passwordError = result
         )
-        return result.isError
+        return !result.isError
     }
 
     private fun validatePhoneNumber(): Boolean {
@@ -80,7 +127,7 @@ class SignupViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             phoneNumberError = result
         )
-        return result.isError
+        return !result.isError
     }
 
     private fun validateUsername(): Boolean {
@@ -88,7 +135,7 @@ class SignupViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             usernameError = result
         )
-        return result.isError
+        return !result.isError
     }
 
 

@@ -1,4 +1,4 @@
-package com.example.fooddelivery.presentation.screens.auth.signup
+package com.example.authentication.presentation.screens.auth.signup
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -12,37 +12,27 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.authentication.presentation.components.CustomPasswordTextField
 import com.example.authentication.presentation.components.CustomTextField
 import com.example.authentication.presentation.components.PrimaryButton
-import com.example.authentication.presentation.screens.auth.signup.SignupViewModel
-import com.example.authentication.util.AuthEvent
-import com.example.authentication.util.FieldError
+import com.example.authentication.presentation.screens.auth.data.AuthEvent
 import com.example.compose.gray6
 import com.example.compose.seed
 import com.example.core.ui.theme.FoodDeliveryTheme
@@ -51,10 +41,13 @@ import com.example.fooddelivery.presentation.components.SecondaryButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Signup(navController: NavController, viewModel: SignupViewModel) {
+fun Signup(navController: NavController) {
+    val viewModel: SignupViewModel = hiltViewModel()
     val scrollState = rememberScrollState()
     val uiState by viewModel.signupUiState.collectAsState()
-    FoodDeliveryTheme{
+    val authResult by viewModel.authState.collectAsState()
+
+    FoodDeliveryTheme {
 
         Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
             TopAppBar(title = { Text("Create an Account", style = typography.titleMedium) },
@@ -97,58 +90,52 @@ fun Signup(navController: NavController, viewModel: SignupViewModel) {
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
+
+
                         CustomTextField(
                             value = uiState.username,
-
-                            isError = uiState.usernameError.isError,
-                            errorText = getStringResourceFromFieldError(fieldError = uiState.usernameError),
+                            error = uiState.usernameError,
                             onValueChange = { newUsername ->
                                 viewModel.notifyChange(AuthEvent.UsernameChanged(newUsername))
                             },
                             label = "Username",
+                        )
 
+
+                        CustomTextField(
+                            value = uiState.email,
+                            keyboardType = KeyboardType.Email,
+                            error = uiState.emailError,
+                            onValueChange = { newEmail ->
+                                viewModel.notifyChange(AuthEvent.EmailChanged(newEmail))
+                            },
+                            label = "Email",
+                        )
+
+                        CustomTextField(
+                            value = uiState.phoneNumber,
+
+                            keyboardType = KeyboardType.Phone,
+                            onValueChange = { newPhoneNumber ->
+                                viewModel.notifyChange(AuthEvent.PhoneNumberChanged(newPhoneNumber))
+                            },
+                            error = uiState.phoneNumberError,
+                            label = "Phone number"
+                        )
+
+                        CustomPasswordTextField(
+                            value = uiState.password,
+                            keyboardType = KeyboardType.Password,
+                            onValueChange = { newPassword ->
+                                viewModel.notifyChange(AuthEvent.PasswordChanged(newPassword))
+                            },
+
+                            label = "Password",
+                            error = uiState.passwordError,
+//                            data = TextFieldData(uiState.password, uiState.passwordError)
                         )
 
                     }
-
-
-                    CustomTextField(
-                        value = uiState.email,
-                        keyboardType = KeyboardType.Email,
-                        errorText = getStringResourceFromFieldError(uiState.emailError),
-                        isError = uiState.emailError.isError,
-                        onValueChange = { newEmail ->
-                            viewModel.notifyChange(AuthEvent.EmailChanged(newEmail))
-                        },
-                        label = "Email",
-                    )
-
-
-                    CustomTextField(
-                        value = uiState.phoneNumber,
-                        keyboardType = KeyboardType.Phone,
-                        onValueChange = { newPhoneNumber ->
-                            viewModel.notifyChange(AuthEvent.PhoneNumberChanged(newPhoneNumber))
-                        },
-                        isError = uiState.phoneNumberError.isError,
-                        errorText =
-                           getStringResourceFromFieldError(fieldError = uiState.phoneNumberError),
-                        label = "Phone number"
-                    )
-
-                    CustomPasswordTextField(
-                        value = uiState.password,
-                        keyboardType = KeyboardType.Password,
-                        onValueChange =     { newPassword ->
-                            viewModel.notifyChange(AuthEvent.PasswordChanged(newPassword))
-                        },
-
-                        label = "Password",
-                        isError = uiState.passwordError.isError,
-                        errorText = getStringResourceFromFieldError(fieldError = uiState.passwordError),
-
-                        )
-
                 }
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -157,10 +144,14 @@ fun Signup(navController: NavController, viewModel: SignupViewModel) {
                         .fillMaxWidth()
                         .padding(23.dp)
                 ) {
+//                    val isFormValid by viewModel.isFormValid.collectAsState()
                     PrimaryButton(
                         text = "Create an Account",
                         enabled = true,
-                        onClick = { /*TODO validate user input and save to info use viewmodel with usecases*/ },
+                        onClick = {
+                            viewModel.notifyChange(AuthEvent.Submit)
+
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = seed
@@ -176,14 +167,7 @@ fun Signup(navController: NavController, viewModel: SignupViewModel) {
                     )
                 }
             }
-
-
         }
     }
 }
 
-@Composable
-fun getStringResourceFromFieldError(fieldError: FieldError): String {
-    val id = fieldError.errorMessage?.message ?: return ""
-    return stringResource(id = id)
-}

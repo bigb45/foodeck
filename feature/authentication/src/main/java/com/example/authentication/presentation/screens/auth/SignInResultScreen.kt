@@ -24,14 +24,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.authentication.presentation.components.PrimaryButton
+import com.example.authentication.presentation.screens.auth.data.AuthResult
 import com.example.fooddelivery.presentation.components.SecondaryButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignInResult(
     navController: NavController,
-    state: AuthResult
 ) {
+    val state: AuthResult = AuthResult.Loading
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("Sign in") }, navigationIcon = {
@@ -55,14 +56,17 @@ fun SignInResult(
                 AuthResult.Loading -> CircularProgressIndicator()
                 is AuthResult.Success -> SuccessState(
                     username = state.data.username,
-                    onClick = {})
+                    onClick = {}
+                    )
+
+                else -> {}
             }
         }
     }
 }
 
 @Composable
-fun SuccessState(username: String, onClick: () -> Unit, ) {
+fun SuccessState(username: String, onClick: () -> Unit) {
     Column(
         verticalArrangement = Arrangement.spacedBy(30.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -84,7 +88,9 @@ fun SuccessState(username: String, onClick: () -> Unit, ) {
         PrimaryButton(
             text = "Continue to Foodeck", enabled = true, onClick = onClick
         )
-
+        SecondaryButton(
+            text = "Sign out", enabled = true, onClick = {  }
+        )
     }
 }
 

@@ -17,3 +17,4 @@ rootProject.name = "FoodDelivery"
 include(":app")
 include(":feature:authentication")
 include(":core")
+include(":core:domain")

@@ -1,4 +1,4 @@
-package com.example.authentication.util
+package com.example.authentication.presentation.screens.auth.data
 
 sealed class AuthEvent {
     data class EmailChanged(val newEmail: String) : AuthEvent()

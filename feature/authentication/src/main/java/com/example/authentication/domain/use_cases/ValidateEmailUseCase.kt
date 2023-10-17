@@ -1,7 +1,7 @@
 package com.example.authentication.domain.use_cases
 
 import android.util.Log
-import com.example.authentication.util.FieldError
+import com.example.authentication.presentation.screens.auth.data.FieldError
 import com.example.authentication.util.ValidationResult
 import javax.inject.Inject
 

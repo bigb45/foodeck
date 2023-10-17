@@ -24,9 +24,9 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.authentication.presentation.screens.auth.data.FieldError
 import com.example.compose.gray2
 import com.example.core.ui.theme.inter
 
@@ -36,10 +36,12 @@ fun CustomTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
-    isError: Boolean,
-    errorText: String,
+    error: FieldError,
+//    make ui state sealed interface (error state or success state)
     keyboardType: KeyboardType = KeyboardType.Text,
 ) {
+    val isError = error.isError
+    val errorText = getStringResourceFromFieldError(fieldError = error)
     var isFocused by remember { mutableStateOf(false) }
     val externalBorderColor = if (isError) {
         colorScheme.error
@@ -101,8 +103,3 @@ fun CustomTextField(
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun prev() {
-    CustomTextField(value = "", onValueChange = {}, label = "Test", isError = false, errorText = "")
-}

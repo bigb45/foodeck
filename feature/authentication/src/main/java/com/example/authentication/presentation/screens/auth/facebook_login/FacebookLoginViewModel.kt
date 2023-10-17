@@ -2,18 +2,21 @@ package com.example.authentication.presentation.screens.auth.facebook_login
 
 import android.os.Bundle
 import androidx.lifecycle.ViewModel
-import com.example.authentication.presentation.screens.auth.AuthResult
-import com.example.authentication.presentation.screens.auth.UserData
+import com.example.authentication.presentation.screens.auth.data.AuthResult
+import com.example.authentication.presentation.screens.auth.data.UserData
 import com.facebook.FacebookException
 import com.facebook.GraphRequest
 import com.facebook.login.LoginResult
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
 
-class FacebookLoginViewModel : ViewModel() {
-    private val _signInState = MutableStateFlow<AuthResult>(AuthResult.Loading)
+@HiltViewModel
+class FacebookLoginViewModel @Inject constructor() : ViewModel() {
+    private val _authResult = MutableStateFlow<AuthResult>(AuthResult.Loading)
 
-    val signInState: StateFlow<AuthResult> = _signInState
+    val authResult: StateFlow<AuthResult> = _authResult
 
 
     fun handleLogInSuccess(result: LoginResult) {
@@ -26,7 +29,7 @@ class FacebookLoginViewModel : ViewModel() {
 
                 val profilePictureUrl = "https://graph.facebook.com/$userId/picture?type=large"
 
-                _signInState.value = AuthResult.Success(
+                _authResult.value = AuthResult.Success(
                     data = UserData(
                         userId = userId,
                         username = username,
@@ -43,14 +46,14 @@ class FacebookLoginViewModel : ViewModel() {
     }
 
     fun cancelLogin() {
-        _signInState.value = AuthResult.Cancelled
+        _authResult.value = AuthResult.Cancelled
     }
 
     fun loginError(exception: FacebookException) {
-        _signInState.value = AuthResult.Error(errorMessage = exception.message?: "Unknown error.")
+        _authResult.value = AuthResult.Error(errorMessage = exception.message?: "Unknown error.")
     }
 
     fun setStateToLoading() {
-        _signInState.value = AuthResult.Loading
+        _authResult.value = AuthResult.Loading
     }
 }

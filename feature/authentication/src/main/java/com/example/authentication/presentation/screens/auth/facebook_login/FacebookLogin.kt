@@ -6,6 +6,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.authentication.presentation.screens.auth.SignInResult
 import com.facebook.CallbackManager
@@ -16,13 +17,14 @@ import com.facebook.login.LoginResult
 
 
 @Composable
-fun FacebookLogin(viewModel: FacebookLoginViewModel, navController: NavController) {
+fun FacebookLogin(navController: NavController) {
     val context = LocalContext.current
+    val viewModel: FacebookLoginViewModel = hiltViewModel()
 
     val callbackManager = CallbackManager.Factory.create()
     val loginManager = LoginManager.getInstance()
 
-    val state by viewModel.signInState.collectAsState()
+    val state by viewModel.authResult.collectAsState()
 
 //  open webpage to log user in
     LaunchedEffect(key1 = Unit) {
@@ -48,6 +50,6 @@ fun FacebookLogin(viewModel: FacebookLoginViewModel, navController: NavControlle
         }
     })
 
-    SignInResult(navController = navController, state = state )
+    SignInResult(navController = navController)
 }
 
