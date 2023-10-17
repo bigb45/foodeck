@@ -65,15 +65,19 @@ class SignupViewModel @Inject constructor(
             }
 
             AuthEvent.Submit -> {
-                val newUser = with(_uiState.value) {
-                    NewUserData(
-                        username = username,
-                        email = email,
-                        password = password,
-                        phoneNumber = phoneNumber
-                    )
+                if(validateFields()){
+                    val newUser = with(_uiState.value) {
+                        NewUserData(
+                            username = username,
+                            email = email,
+                            password = password,
+                            phoneNumber = phoneNumber
+                        )
+                    }
+                    signUp(newUser)
+
                 }
-                signUp(newUser)
+
             }
         }
     }

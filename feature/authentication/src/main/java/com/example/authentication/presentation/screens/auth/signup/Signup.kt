@@ -150,7 +150,6 @@ fun Signup(navController: NavController) {
                         enabled = true,
                         onClick = {
                             viewModel.notifyChange(AuthEvent.Submit)
-
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(
