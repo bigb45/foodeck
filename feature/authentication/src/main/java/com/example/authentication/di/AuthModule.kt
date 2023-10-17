@@ -1,5 +1,6 @@
 package com.example.authentication.di
 
+import com.example.authentication.util.ValidationUtil
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,7 +14,7 @@ object AuthModule {
 
     @Provides
     @Singleton
-    fun provideValidationUtil(): com.example.authentication.util.ValidationUtil {
-        return com.example.authentication.util.ValidationUtil()
+    fun provideValidationUtil(): ValidationUtil {
+        return ValidationUtil()
     }
 }
