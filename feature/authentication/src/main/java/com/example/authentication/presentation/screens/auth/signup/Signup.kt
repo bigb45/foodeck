@@ -1,5 +1,6 @@
 package com.example.authentication.presentation.screens.auth.signup
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,10 +22,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -33,6 +36,7 @@ import com.example.authentication.presentation.components.CustomPasswordTextFiel
 import com.example.authentication.presentation.components.CustomTextField
 import com.example.authentication.presentation.components.PrimaryButton
 import com.example.authentication.presentation.screens.auth.data.AuthEvent
+import com.example.authentication.presentation.screens.auth.data.AuthResult
 import com.example.compose.gray6
 import com.example.compose.seed
 import com.example.core.ui.theme.FoodDeliveryTheme
@@ -46,7 +50,20 @@ fun Signup(navController: NavController) {
     val scrollState = rememberScrollState()
     val uiState by viewModel.signupUiState.collectAsState()
     val authResult by viewModel.authState.collectAsState()
-
+    val context = LocalContext.current
+    LaunchedEffect(key1 = authResult){
+        when(authResult){
+            is AuthResult.Error -> {
+                Toast.makeText(context, (authResult as AuthResult.Error).errorMessage, Toast.LENGTH_SHORT).show()
+            }
+            is AuthResult.Success -> {
+                Toast.makeText(context, "Account created", Toast.LENGTH_SHORT).show()
+            }
+            AuthResult.Loading -> {}
+            AuthResult.SignedOut -> {}
+            AuthResult.Cancelled -> {}
+        }
+    }
     FoodDeliveryTheme {
 
         Scaffold(modifier = Modifier.fillMaxSize(), topBar = {

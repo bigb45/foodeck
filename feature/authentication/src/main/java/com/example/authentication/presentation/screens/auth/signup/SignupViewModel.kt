@@ -10,6 +10,7 @@ import com.example.authentication.domain.use_cases.ValidateUsernameUseCase
 import com.example.authentication.presentation.screens.auth.data.AuthResult
 import com.example.authentication.presentation.screens.auth.data.AuthState
 import com.example.authentication.presentation.screens.auth.data.UserData
+import com.google.firebase.FirebaseError.ERROR_EMAIL_ALREADY_IN_USE
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -92,6 +93,9 @@ class SignupViewModel @Inject constructor(
     private fun signUp(userInfo: NewUserData) {
         val auth = Firebase.auth
         _authResult.value = AuthResult.Loading
+//        check if username available
+//        false: _uistate.usernameError = "already in use"
+//        true: continue
         auth.createUserWithEmailAndPassword(userInfo.email, userInfo.password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -103,7 +107,10 @@ class SignupViewModel @Inject constructor(
                         )
                     )
                 } else {
-                    _authResult.value = AuthResult.Error("Could not create account")
+                    when(task.exception){
+
+                    }
+                    _authResult.value = AuthResult.Error(task.exception?.message ?: "Unknown error")
                 }
             }
 
@@ -114,7 +121,6 @@ class SignupViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             emailError = result
         )
-        Log.d("viewmodel error:", result.errorMessage.toString())
         return !result.isError
     }
 
