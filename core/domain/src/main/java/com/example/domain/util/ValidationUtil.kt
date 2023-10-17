@@ -1,4 +1,4 @@
-package com.example.authentication.util
+package com.example.domain.util
 
 import androidx.annotation.StringRes
 // TODO: fix this issue

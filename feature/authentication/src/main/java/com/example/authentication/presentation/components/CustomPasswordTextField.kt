@@ -34,10 +34,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.authentication.presentation.screens.auth.data.FieldError
-import com.example.authentication.util.ValidationResult
 import com.example.compose.gray2
 import com.example.core.ui.theme.inter
+import com.example.domain.data.FieldError
+import com.example.domain.util.ValidationResult
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,16 +63,15 @@ fun CustomPasswordTextField(
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .border(
-                    width = 1.dp, color = externalBorderColor, shape = RoundedCornerShape(16)
-                )
-                .padding(bottom = 12.dp, top = 8.dp, end = 8.dp, start = 8.dp)
-                .fillMaxWidth()
-                .onFocusChanged {
-                    isFocused = it.isFocused
-                }
+        Box(modifier = Modifier
+            .border(
+                width = 1.dp, color = externalBorderColor, shape = RoundedCornerShape(16)
+            )
+            .padding(bottom = 12.dp, top = 8.dp, end = 8.dp, start = 8.dp)
+            .fillMaxWidth()
+            .onFocusChanged {
+                isFocused = it.isFocused
+            }
 
         ) {
             OutlinedTextField(
@@ -125,6 +124,7 @@ fun getStringResourceFromFieldError(fieldError: FieldError): String {
     val id = fieldError.errorMessage?.message ?: return ""
     return stringResource(id = id)
 }
+
 @Composable
 fun getStringResourceFromFieldError(fieldError: ValidationResult?): String {
     val id = fieldError?.message ?: return ""

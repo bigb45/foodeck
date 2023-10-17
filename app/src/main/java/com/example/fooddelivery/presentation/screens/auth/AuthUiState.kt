@@ -1,6 +1,6 @@
 package com.example.fooddelivery.presentation.screens.auth
 
-import com.example.authentication.presentation.screens.auth.data.FieldError
+import com.example.domain.data.FieldError
 
 
 data class AuthUiState(
@@ -10,9 +10,21 @@ data class AuthUiState(
     val phoneNumber: String = "",
     val password: String = "",
 
-    val usernameError: FieldError = FieldError(false, null),
-    val emailError: FieldError = FieldError(false, null),
-    val phoneNumberError: FieldError = FieldError(false, null),
-    val passwordError: FieldError = FieldError(false, null),
+    val usernameError: com.example.domain.data.FieldError = com.example.domain.data.FieldError(
+        false,
+        null
+    ),
+    val emailError: com.example.domain.data.FieldError = com.example.domain.data.FieldError(
+        false,
+        null
+    ),
+    val phoneNumberError: com.example.domain.data.FieldError = com.example.domain.data.FieldError(
+        false,
+        null
+    ),
+    val passwordError: com.example.domain.data.FieldError = com.example.domain.data.FieldError(
+        false,
+        null
+    ),
 
     )

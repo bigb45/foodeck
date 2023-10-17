@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Feature</string>
+    <string name="empty_email_error">Email cannot be empty</string>
+    <string name="empty_password_error">Password cannot be empty</string>
+    <string name="wrong_email_pattern_error">Please enter a valid email</string>
+    <string name="password_length_error">Password must be between 8 and 16 characters</string>
+    <string name="password_invalid_error">Password must contain both letters and digits</string>
+    <string name="phone_number_invalid_error">Please enter a valid phone number</string>
+    <string name="empty_phone_number_error">Phone number cannot be blank</string>
+    <string name="empty_username_error">Name cannot be empty</string>
+</resources>

@@ -1,6 +1,6 @@
 package com.example.authentication.presentation.screens.auth.data
 
-import com.example.authentication.util.ValidationResult
+import com.example.domain.util.ValidationResult
 
 
 // not working
@@ -22,16 +22,16 @@ data class AuthState(
     val phoneNumber: String = "",
     val password: String = "",
 
-    val usernameError: FieldError = FieldError(
+    val usernameError: com.example.domain.data.FieldError = com.example.domain.data.FieldError(
         false, null
     ),
-    val emailError: FieldError = FieldError(
+    val emailError: com.example.domain.data.FieldError = com.example.domain.data.FieldError(
         false, null
     ),
-    val phoneNumberError: FieldError = FieldError(
+    val phoneNumberError: com.example.domain.data.FieldError = com.example.domain.data.FieldError(
         false, null
     ),
-    val passwordError: FieldError = FieldError(
+    val passwordError: com.example.domain.data.FieldError = com.example.domain.data.FieldError(
         false, null
     ),
 )
@@ -58,7 +58,7 @@ data class AuthState(
 //}
 data class FieldData(
     val isError: Boolean = false,
-    val errorMessage: ValidationResult? = null,
+    val errorMessage: com.example.domain.util.ValidationResult? = null,
     val data: String? = null,
 )
 

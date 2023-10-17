@@ -1,10 +1,11 @@
 package com.example.domain.use_cases
 
-import com.example.authentication.presentation.screens.auth.data.FieldError
-import com.example.authentication.util.ValidationResult
+import com.example.domain.data.FieldError
+import com.example.domain.util.ValidationResult
+import com.example.domain.util.ValidationUtil
 import javax.inject.Inject
 
-class ValidatePhoneNumberUseCase @Inject constructor(private val validationUtil: com.example.authentication.util.ValidationUtil) {
+class ValidatePhoneNumberUseCase @Inject constructor(private val validationUtil: ValidationUtil) {
     operator fun invoke(phoneNumber: String): FieldError {
 
         if (phoneNumber.isEmpty()) {

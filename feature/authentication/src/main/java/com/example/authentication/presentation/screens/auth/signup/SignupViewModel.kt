@@ -2,13 +2,13 @@ package com.example.authentication.presentation.screens.auth.signup
 
 import androidx.lifecycle.ViewModel
 import com.example.authentication.presentation.screens.auth.data.AuthEvent
+import com.example.authentication.presentation.screens.auth.data.AuthResult
+import com.example.authentication.presentation.screens.auth.data.AuthState
+import com.example.authentication.presentation.screens.auth.data.UserData
 import com.example.domain.use_cases.ValidateEmailUseCase
 import com.example.domain.use_cases.ValidatePasswordUseCase
 import com.example.domain.use_cases.ValidatePhoneNumberUseCase
 import com.example.domain.use_cases.ValidateUsernameUseCase
-import com.example.authentication.presentation.screens.auth.data.AuthResult
-import com.example.authentication.presentation.screens.auth.data.AuthState
-import com.example.authentication.presentation.screens.auth.data.UserData
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -20,10 +20,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignupViewModel @Inject constructor(
-    private val emailUseCase: com.example.domain.use_cases.ValidateEmailUseCase,
-    private val phoneNumberUseCase: com.example.domain.use_cases.ValidatePhoneNumberUseCase,
-    private val passwordUseCase: com.example.domain.use_cases.ValidatePasswordUseCase,
-    private val usernameUseCase: com.example.domain.use_cases.ValidateUsernameUseCase,
+    private val emailUseCase: ValidateEmailUseCase,
+    private val phoneNumberUseCase: ValidatePhoneNumberUseCase,
+    private val passwordUseCase: ValidatePasswordUseCase,
+    private val usernameUseCase: ValidateUsernameUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AuthState())
     private val _authResult: MutableStateFlow<AuthResult> = MutableStateFlow(AuthResult.SignedOut)
