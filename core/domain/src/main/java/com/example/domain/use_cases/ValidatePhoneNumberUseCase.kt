@@ -1,8 +1,9 @@
 package com.example.domain.use_cases
 
-import com.example.domain.data.FieldError
-import com.example.domain.util.ValidationResult
-import com.example.domain.util.ValidationUtil
+import com.example.data.util.ValidationResult
+import com.example.data.util.ValidationUtil
+import com.example.data.models.FieldError
+
 import javax.inject.Inject
 
 class ValidatePhoneNumberUseCase @Inject constructor(private val validationUtil: ValidationUtil) {
@@ -10,14 +11,12 @@ class ValidatePhoneNumberUseCase @Inject constructor(private val validationUtil:
 
         if (phoneNumber.isEmpty()) {
             return FieldError(
-                true,
-                ValidationResult.EMPTY_PHONE_NUMBER
+                true, ValidationResult.EMPTY_PHONE_NUMBER
             )
         }
         if (!validationUtil.validatePhoneNumber(phoneNumber)) {
             return FieldError(
-                true,
-                ValidationResult.PHONE_NUMBER_INVALID
+                true, ValidationResult.PHONE_NUMBER_INVALID
             )
         }
         return FieldError(false, null)

@@ -2,8 +2,7 @@ package com.example.authentication.presentation.screens.auth.facebook_login
 
 import android.os.Bundle
 import androidx.lifecycle.ViewModel
-import com.example.authentication.presentation.screens.auth.data.AuthResult
-import com.example.authentication.presentation.screens.auth.data.UserData
+import com.example.data.models.AuthResult
 import com.facebook.FacebookException
 import com.facebook.GraphRequest
 import com.facebook.login.LoginResult
@@ -30,7 +29,7 @@ class FacebookLoginViewModel @Inject constructor() : ViewModel() {
                 val profilePictureUrl = "https://graph.facebook.com/$userId/picture?type=large"
 
                 _authResult.value = AuthResult.Success(
-                    data = UserData(
+                    data = com.example.data.models.UserData(
                         userId = userId,
                         username = username,
                         profilePictureUrl = profilePictureUrl

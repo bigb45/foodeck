@@ -32,15 +32,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.authentication.presentation.components.CustomPasswordTextField
-import com.example.authentication.presentation.components.CustomTextField
-import com.example.authentication.presentation.components.PrimaryButton
+import com.example.core.ui.components.CustomPasswordTextField
+import com.example.core.ui.components.CustomTextField
+import com.example.core.ui.components.PrimaryButton
 import com.example.authentication.presentation.screens.auth.data.AuthEvent
-import com.example.authentication.presentation.screens.auth.data.AuthResult
+import com.example.data.models.AuthResult
 import com.example.compose.gray6
 import com.example.compose.seed
 import com.example.core.ui.theme.FoodDeliveryTheme
-import com.example.fooddelivery.presentation.components.SecondaryButton
+import com.example.core.ui.components.SecondaryButton
 
 
 @OptIn(ExperimentalMaterial3Api::class)

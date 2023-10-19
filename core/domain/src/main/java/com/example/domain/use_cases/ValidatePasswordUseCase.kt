@@ -1,9 +1,9 @@
 package com.example.domain.use_cases
 
 
-import com.example.domain.data.FieldError
-import com.example.domain.util.ValidationResult
-import com.example.domain.util.ValidationUtil
+import com.example.data.models.FieldError
+import com.example.data.util.ValidationResult
+import com.example.data.util.ValidationUtil
 import javax.inject.Inject
 
 class ValidatePasswordUseCase @Inject constructor(private val validateUtil: ValidationUtil) {

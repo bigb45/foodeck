@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Feature</string>
+    <string name="empty_email_error">Email cannot be empty</string>
+    <string name="empty_password_error">Password cannot be empty</string>
+    <string name="wrong_email_pattern_error">Please enter a valid email</string>
+    <string name="password_length_error">Password must be between 8 and 16 characters</string>
+    <string name="password_invalid_error">Password must contain both letters and digits</string>
+    <string name="phone_number_invalid_error">Please enter a valid phone number</string>
+    <string name="empty_phone_number_error">Phone number cannot be blank</string>
+    <string name="empty_username_error">Name cannot be empty</string>
+    <string name="duplicate_email_error">An account with this email already exists</string>
+    <string name="duplicate_phone_number_error">This number is already in use</string>
+    <string name="unknown_error">An unknown error occurred</string>
+
+    <string name="default_web_client_id">815356474703-t6detomp23kcn4lr8ijdq8a8mk47a49m.apps.googleusercontent.com</string>
+    <string name="facebook_app_id">629358665937319</string>
+    <string name="fb_login_protocol_scheme">fb1234</string>
+    <string name="facebook_client_token">ce9ca32833436e41cded6021ab9731d5</string>
+    <string name="title_activity_main">MainActivity</string>
+
+</resources>

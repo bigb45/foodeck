@@ -1,7 +1,6 @@
 package com.example.authentication.presentation.screens.auth
 
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
@@ -35,19 +34,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
-import com.example.authentication.presentation.components.Hyperlink
-import com.example.authentication.presentation.components.PrimaryButton
-import com.example.authentication.presentation.screens.auth.data.AuthResult
-import com.example.authentication.presentation.screens.auth.google_login.GoogleAuthUiClient
+import com.example.core.ui.components.Hyperlink
+import com.example.core.ui.components.PrimaryButton
+import com.example.data.models.AuthResult
 import com.example.authentication.presentation.screens.auth.google_login.GoogleSignInViewModel
 import com.example.compose.facebook_color
 import com.example.compose.google_color
 import com.example.compose.seed
 import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.fooddelivery.R
-import com.example.fooddelivery.presentation.components.SecondaryButton
+import com.example.core.ui.components.SecondaryButton
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 
@@ -63,7 +60,7 @@ fun LoginMethods(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val googleAuthUiClient by lazy {
-        GoogleAuthUiClient(
+        com.example.data.util.GoogleAuthUiClient(
             context = context,
             oneTapClient = Identity.getSignInClient(context)
         )

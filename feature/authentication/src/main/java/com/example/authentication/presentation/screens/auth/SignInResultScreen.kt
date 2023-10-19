@@ -23,9 +23,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.authentication.presentation.components.PrimaryButton
-import com.example.authentication.presentation.screens.auth.data.AuthResult
-import com.example.fooddelivery.presentation.components.SecondaryButton
+import com.example.core.ui.components.PrimaryButton
+import com.example.data.models.AuthResult
+import com.example.core.ui.components.SecondaryButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

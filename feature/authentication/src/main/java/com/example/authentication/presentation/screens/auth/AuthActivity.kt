@@ -14,7 +14,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.authentication.presentation.screens.auth.data.AuthResult
+import com.example.data.models.AuthResult
 import com.example.authentication.presentation.screens.auth.email_login.EmailLogin
 import com.example.authentication.presentation.screens.auth.facebook_login.FacebookLogin
 import com.example.authentication.presentation.screens.auth.google_login.GoogleSignInViewModel

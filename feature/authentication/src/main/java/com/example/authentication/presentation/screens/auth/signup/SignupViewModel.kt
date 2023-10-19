@@ -1,21 +1,25 @@
 package com.example.authentication.presentation.screens.auth.signup
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.authentication.presentation.screens.auth.data.AuthEvent
-import com.example.authentication.presentation.screens.auth.data.AuthResult
-import com.example.authentication.presentation.screens.auth.data.AuthState
-import com.example.authentication.presentation.screens.auth.data.UserData
+import com.example.data.models.AuthResult
+import com.example.data.models.AuthState
+import com.example.data.models.ErrorCode
+import com.example.data.models.FieldError
+import com.example.data.models.NewUserData
+import com.example.data.util.ValidationResult
+import com.example.domain.use_cases.SignUserUpUseCase
 import com.example.domain.use_cases.ValidateEmailUseCase
 import com.example.domain.use_cases.ValidatePasswordUseCase
 import com.example.domain.use_cases.ValidatePhoneNumberUseCase
 import com.example.domain.use_cases.ValidateUsernameUseCase
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
-
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,6 +28,7 @@ class SignupViewModel @Inject constructor(
     private val phoneNumberUseCase: ValidatePhoneNumberUseCase,
     private val passwordUseCase: ValidatePasswordUseCase,
     private val usernameUseCase: ValidateUsernameUseCase,
+    private val signupUpUseCase: SignUserUpUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AuthState())
     private val _authResult: MutableStateFlow<AuthResult> = MutableStateFlow(AuthResult.SignedOut)
@@ -64,7 +69,7 @@ class SignupViewModel @Inject constructor(
             }
 
             AuthEvent.Submit -> {
-                if(validateFields()){
+                if (validateFields()) {
                     val newUser = with(_uiState.value) {
                         NewUserData(
                             username = username,
@@ -89,28 +94,34 @@ class SignupViewModel @Inject constructor(
     }
 
     private fun signUp(userInfo: NewUserData) {
-        val auth = Firebase.auth
-        _authResult.value = AuthResult.Loading
-//        check if username available
-//        false: _uistate.usernameError = "already in use"
-//        true: continue
-        auth.createUserWithEmailAndPassword(userInfo.email, userInfo.password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    _authResult.value = AuthResult.Success(
-                        data = UserData(
-                            username = userInfo.username,
-                            userId = task.result.user?.uid ?: "test_id",
-                            profilePictureUrl = null
+
+        viewModelScope.launch{
+            _authResult.value = signupUpUseCase(userInfo)
+//            TODO: add loading indicator to button
+            when (val result = _authResult.value) {
+                is AuthResult.Error -> {
+                    if (result.errorCode == ErrorCode.DUPLICATE_EMAIL) {
+                        _uiState.value = _uiState.value.copy(
+                            emailError = FieldError(
+                                isError = true,
+                                ValidationResult.DUPLICATE_EMAIL
+                            )
                         )
-                    )
-                } else {
-                    when(task.exception){
+                    }
+                    if (result.errorCode == ErrorCode.DUPLICATE_PHONE_NUMBER) {
+                        _uiState.value = _uiState.value.copy(
+                            emailError = FieldError(
+                                isError = true,
+                                ValidationResult.DUPLICATE_PHONE_NUMBER
+                            )
+                        )
 
                     }
-                    _authResult.value = AuthResult.Error(task.exception?.message ?: "Unknown error")
                 }
+
+                else -> {}
             }
+        }
 
     }
 

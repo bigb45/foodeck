@@ -1,7 +1,7 @@
 package com.example.authentication.presentation.screens.auth.google_login
 
 import androidx.lifecycle.ViewModel
-import com.example.authentication.presentation.screens.auth.data.AuthResult
+import com.example.data.models.AuthResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 
 import kotlinx.coroutines.flow.MutableStateFlow

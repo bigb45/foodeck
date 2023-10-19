@@ -1,9 +1,7 @@
 package com.example.authentication.presentation.screens.auth.email_login
 
 import androidx.lifecycle.ViewModel
-import com.example.domain.use_cases.ValidateEmailUseCase
-import com.example.domain.use_cases.ValidatePasswordUseCase
-import com.example.authentication.presentation.screens.auth.data.AuthState
+import com.example.data.models.AuthState
 import com.example.authentication.presentation.screens.auth.data.AuthEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

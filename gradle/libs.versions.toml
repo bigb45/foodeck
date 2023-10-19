@@ -13,6 +13,9 @@ appcompat = "1.6.1"
 material = "1.9.0"
 foundation-android = "1.5.3"
 ui-text-android = "1.5.3"
+play-services-auth = "20.7.0"
+firebase-auth-ktx = "22.1.2"
+tools-core = "1.0.0-alpha06"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -34,6 +37,9 @@ appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "a
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-foundation-android = { group = "androidx.compose.foundation", name = "foundation-android", version.ref = "foundation-android" }
 androidx-ui-text-android = { group = "androidx.compose.ui", name = "ui-text-android", version.ref = "ui-text-android" }
+play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "play-services-auth" }
+firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebase-auth-ktx" }
+androidx-tools-core = { group = "androidx.privacysandbox.tools", name = "tools-core", version.ref = "tools-core" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
