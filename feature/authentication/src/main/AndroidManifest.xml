@@ -9,19 +9,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FoodDelivery">
-        <activity
-            android:name="com.example.authentication.presentation.screens.MainActivity"
-            android:exported="false"
-            android:label="@string/title_activity_main"
-            android:theme="@style/Theme.FoodDelivery" />
-
-        <meta-data
-            android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id"
-            tools:replace="android:value" />
-        <meta-data
-            android:name="com.facebook.sdk.ClientToken"
-            android:value="@string/facebook_client_token" />
 
         <activity
             android:name="com.example.authentication.presentation.screens.auth.AuthActivity"

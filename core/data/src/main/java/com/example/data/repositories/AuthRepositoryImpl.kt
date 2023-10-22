@@ -3,9 +3,9 @@ package com.example.data.repositories
 
 import com.example.data.models.AuthResult
 import com.example.data.models.ErrorCode
-import com.example.data.models.NewUserData
+import com.example.data.models.UserSignUpModel
 import com.example.data.models.UserData
-import com.example.data.models.UserInfo
+import com.example.data.models.UserLoginCredentials
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : AuthRepository {
 
-    override suspend fun createUser(user: NewUserData): AuthResult {
+    override suspend fun createUser(user: UserSignUpModel): AuthResult {
 
         return try {
             val result = auth.createUserWithEmailAndPassword(user.email, user.password).await()
@@ -23,9 +23,8 @@ class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : A
             AuthResult.Success(
                 data = UserData(
                     username = user.username,
-//                            TODO: throw exception if user has no ID
-                    userId = result.user?.uid ?: "test_id",
-                    profilePictureUrl = null
+//                            TODO: throw excepti   on if user has no ID
+                    userId = result.user?.uid ?: "test_id", profilePictureUrl = null
                 )
             )
         } catch (e: Exception) {
@@ -41,24 +40,19 @@ class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : A
         }
     }
 
-    override suspend fun signUserIn(user: UserInfo): AuthResult {
-        var authResult: AuthResult = AuthResult.Loading
-        auth.signInWithEmailAndPassword(user.email, user.password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    authResult = AuthResult.Success(
-                        data = UserData(
-                            username = task.result.user?.displayName ?: "Unknown user",
-//                            TODO: throw exception if user has no ID
-                            userId = task.result.user?.uid ?: "test_id",
-                            profilePictureUrl = null
-                        )
-                    )
-                } else {
-                    authResult = AuthResult.Error(task.exception?.message ?: "Unknown error")
-                }
-            }
-        return authResult
+    override suspend fun signUserIn(user: UserLoginCredentials): AuthResult {
+        return try {
+            val result = auth.signInWithEmailAndPassword(user.email, user.password).await()
+            AuthResult.Success(
+                data = UserData(
+                    username = result.user?.displayName ?: "Unknown user",
+                    userId = result.user?.uid ?: "test_id",
+                    profilePictureUrl = null
+                )
+            )
+        } catch (e: Exception) {
+            AuthResult.Error("Email or password incorrect")
+        }
     }
 
     override suspend fun signUserOut(): AuthResult {

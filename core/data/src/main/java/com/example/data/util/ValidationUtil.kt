@@ -42,5 +42,8 @@ enum class ValidationResult(@StringRes val message: Int) {
     EMPTY_USERNAME(R.string.empty_username_error),
     DUPLICATE_EMAIL(R.string.duplicate_email_error),
     VALIDATION_FAILED(R.string.unknown_error),
-    DUPLICATE_PHONE_NUMBER(R.string.duplicate_phone_number_error)
+    DUPLICATE_PHONE_NUMBER(R.string.duplicate_phone_number_error),
+    PASSWORD_INCORRECT(R.string.incorrect_password_error),
+    UNREGISTERED_USER(R.string.unregistered_user_error),
+    INVALID_CREDENTIALS(R.string.invalid_credentials_error),
 }

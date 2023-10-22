@@ -1,6 +1,5 @@
 package com.example.authentication.presentation.screens.auth.signup
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.authentication.presentation.screens.auth.data.AuthEvent
@@ -8,7 +7,7 @@ import com.example.data.models.AuthResult
 import com.example.data.models.AuthState
 import com.example.data.models.ErrorCode
 import com.example.data.models.FieldError
-import com.example.data.models.NewUserData
+import com.example.data.models.UserSignUpModel
 import com.example.data.util.ValidationResult
 import com.example.domain.use_cases.SignUserUpUseCase
 import com.example.domain.use_cases.ValidateEmailUseCase
@@ -36,7 +35,6 @@ class SignupViewModel @Inject constructor(
 
     val signupUiState = _uiState.asStateFlow()
     val authState: StateFlow<AuthResult> = _authResult
-    val isFormValid: StateFlow<Boolean> = _isFormValid
     fun notifyChange(event: AuthEvent) {
         when (event) {
             is AuthEvent.EmailChanged -> {
@@ -71,7 +69,7 @@ class SignupViewModel @Inject constructor(
             AuthEvent.Submit -> {
                 if (validateFields()) {
                     val newUser = with(_uiState.value) {
-                        NewUserData(
+                        UserSignUpModel(
                             username = username,
                             email = email,
                             password = password,
@@ -93,38 +91,41 @@ class SignupViewModel @Inject constructor(
         return _isFormValid.value
     }
 
-    private fun signUp(userInfo: NewUserData) {
-
+    private fun signUp(user: UserSignUpModel) {
         viewModelScope.launch{
-            _authResult.value = signupUpUseCase(userInfo)
+            _authResult.value = signupUpUseCase(user)
 //            TODO: add loading indicator to button
             when (val result = _authResult.value) {
                 is AuthResult.Error -> {
-                    if (result.errorCode == ErrorCode.DUPLICATE_EMAIL) {
-                        _uiState.value = _uiState.value.copy(
-                            emailError = FieldError(
-                                isError = true,
-                                ValidationResult.DUPLICATE_EMAIL
-                            )
-                        )
-                    }
-                    if (result.errorCode == ErrorCode.DUPLICATE_PHONE_NUMBER) {
-                        _uiState.value = _uiState.value.copy(
-                            emailError = FieldError(
-                                isError = true,
-                                ValidationResult.DUPLICATE_PHONE_NUMBER
-                            )
-                        )
-
-                    }
+                    handleAuthError(result)
                 }
-
                 else -> {}
             }
         }
 
     }
 
+    private fun handleAuthError(result: AuthResult.Error){
+        when(result.errorCode){
+           ErrorCode.DUPLICATE_EMAIL -> {
+               _uiState.value = _uiState.value.copy(
+                   emailError = FieldError(
+                       isError = true,
+                       ValidationResult.DUPLICATE_EMAIL
+                   )
+               )
+           }
+           ErrorCode.DUPLICATE_PHONE_NUMBER -> {
+               _uiState.value = _uiState.value.copy(
+                   phoneNumberError = FieldError(
+                       isError = true,
+                       ValidationResult.DUPLICATE_PHONE_NUMBER
+                   )
+               )
+           }
+            else -> {}
+        }
+    }
     private fun validateEmail(): Boolean {
         val result = emailUseCase(_uiState.value.email)
         _uiState.value = _uiState.value.copy(

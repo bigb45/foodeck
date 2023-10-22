@@ -1,13 +1,13 @@
 package com.example.data.models
 
-data class NewUserData(
+data class UserSignUpModel(
     val email: String,
     val password: String,
     val username: String,
     val phoneNumber: String
 )
 
-data class UserInfo(
+data class UserLoginCredentials(
     val email: String,
     val password: String
 )

@@ -1,5 +1,7 @@
 package com.example.authentication.presentation.screens.auth.email_login
 
+import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,10 +23,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -38,15 +42,33 @@ import com.example.compose.gray6
 import com.example.compose.seed
 import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.core.ui.components.SecondaryButton
+import com.example.data.models.AuthResult
+import com.google.android.ads.mediationtestsuite.activities.HomeActivity
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmailLogin(navController: NavController,) {
     val viewModel: LoginViewModel = hiltViewModel()
-
+    val context = LocalContext.current
     val scrollState = rememberScrollState()
     val uiState by viewModel.loginUiState.collectAsState()
+    val authResult by viewModel.authResult.collectAsState()
+    LaunchedEffect(key1 = authResult){
+        when(authResult){
+            is AuthResult.Error -> {
+                Toast.makeText(context, (authResult as AuthResult.Error).errorMessage, Toast.LENGTH_SHORT).show()
+            }
+            is AuthResult.Success -> {
+                Toast.makeText(context, "Login Success", Toast.LENGTH_SHORT).show()
+                val welcomeIntent = Intent(context, HomeActivity::class.java)
+
+            }
+            AuthResult.Loading -> {}
+            AuthResult.SignedOut -> {}
+            AuthResult.Cancelled -> {}
+        }
+    }
     FoodDeliveryTheme {
 
         Scaffold(modifier = Modifier
@@ -71,8 +93,6 @@ fun EmailLogin(navController: NavController,) {
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(state = scrollState, enabled = true)
-
-
             ) {
                 Spacer(
                     modifier = Modifier
@@ -142,7 +162,9 @@ fun EmailLogin(navController: NavController,) {
                     PrimaryButton(
                         text = "Login",
                         enabled = true,
-                        onClick = { /*TODO validate user input and save to info. use view-model with use-cases*/ },
+                        onClick = {
+                                  viewModel.notifyChange(AuthEvent.Submit)
+                        },
                         modifier = Modifier
                             .fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(

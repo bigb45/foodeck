@@ -36,26 +36,6 @@ data class AuthState(
     ),
 )
 
-
-// TODO: convert data class to sealed interface, handle different login states (success, failure, unauthorized)
-//sealed interface AuthStateTest {
-//
-//    data class EmailData(
-//        val error: FieldError,
-//        val data: String?,
-//    ) : AuthStateTest
-//
-//    data class PhoneNumberData(
-//        val error: FieldError,
-//        val data: String?,
-//    ) : AuthStateTest
-//
-//    data class PasswordData(
-//        val error: FieldError,
-//        val data: String,
-//    ) : AuthStateTest
-//
-//}
 data class FieldData(
     val isError: Boolean = false,
     val errorMessage: ValidationResult? = null,
@@ -80,5 +60,7 @@ sealed interface AuthResult {
 enum class ErrorCode{
     DUPLICATE_EMAIL,
     DUPLICATE_PHONE_NUMBER,
-    OTHER
+    INCORRECT_PASSWORD,
+    OTHER,
+    UNREGISTERED_USER,
 }

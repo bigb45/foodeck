@@ -31,7 +31,6 @@ class AuthActivity : ComponentActivity() {
         setContent {
 
             FoodDeliveryTheme {
-
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {

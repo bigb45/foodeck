@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
+
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
 //    alias(libs.plugins.androidApplication)
@@ -7,9 +9,6 @@ plugins {
     id("org.jetbrains.kotlin.android")
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
-    id("com.google.gms.google-services")
-
-
 }
 
 android {
@@ -48,13 +47,6 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.3"
     }
-
-    sourceSets{
-        getByName("main") {
-            java.srcDirs("src/main/java")
-            res.srcDirs("src/main/res")
-        }
-    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -72,9 +64,10 @@ dependencies {
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
     implementation(libs.androidx.navigation.runtime.ktx)
+    implementation(libs.play.services.auth)
+    implementation(libs.firebase.auth.ktx)
     implementation(platform(libs.compose.bom))
-    implementation(libs.androidx.tools.core)
-    implementation(libs.mediation.test.suite)
+    implementation(libs.firebase.firestore.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -92,21 +85,14 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.44")
     kapt("com.google.dagger:hilt-android-compiler:2.44")
 
-    //noinspection UseTomlInstead
-    implementation( "androidx.compose.material:material-icons-extended")
 
-//    modules
     implementation(project(":core"))
     implementation(project(":core:data"))
     implementation(project(":core:domain"))
 
-//    Firebase
-    implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
-    implementation("com.firebaseui:firebase-ui-auth:7.2.0")
-    implementation("com.google.firebase:firebase-auth-ktx")
 
-//  Facebook OAuth
-    implementation("com.facebook.android:facebook-android-sdk:latest.release")
+    //noinspection UseTomlInstead
+    implementation( "androidx.compose.material:material-icons-extended")
 
 
 }
