@@ -74,7 +74,7 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(platform(libs.compose.bom))
     implementation(libs.androidx.tools.core)
-    implementation(libs.mediation.test.suite)
+    implementation(project(":feature:home"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

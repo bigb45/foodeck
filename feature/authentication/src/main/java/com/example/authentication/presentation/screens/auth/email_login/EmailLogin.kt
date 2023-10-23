@@ -43,7 +43,7 @@ import com.example.compose.seed
 import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.core.ui.components.SecondaryButton
 import com.example.data.models.AuthResult
-import com.google.android.ads.mediationtestsuite.activities.HomeActivity
+import com.example.home.HomeActivity
 
 
 @OptIn(ExperimentalMaterial3Api::class)
