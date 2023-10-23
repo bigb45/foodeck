@@ -2,11 +2,11 @@ package com.example.authentication.presentation.screens.auth.email_login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.authentication.presentation.screens.auth.data.AuthEvent
+import com.example.data.models.AuthEvent
 import com.example.data.models.AuthResult
 import com.example.data.models.AuthState
-import com.example.data.models.FieldError
-import com.example.data.models.UserLoginCredentials
+import com.example.data.data.FieldError
+import com.example.data.data.UserLoginCredentials
 import com.example.data.util.ValidationResult
 import com.example.domain.use_cases.SignUserInUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel

@@ -2,12 +2,12 @@ package com.example.authentication.presentation.screens.auth.signup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.authentication.presentation.screens.auth.data.AuthEvent
+import com.example.data.models.AuthEvent
 import com.example.data.models.AuthResult
 import com.example.data.models.AuthState
 import com.example.data.models.ErrorCode
-import com.example.data.models.FieldError
-import com.example.data.models.UserSignUpModel
+import com.example.data.data.FieldError
+import com.example.data.data.UserSignUpModel
 import com.example.data.util.ValidationResult
 import com.example.domain.use_cases.SignUserUpUseCase
 import com.example.domain.use_cases.ValidateEmailUseCase

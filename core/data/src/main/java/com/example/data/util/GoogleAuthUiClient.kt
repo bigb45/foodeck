@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import com.example.data.models.AuthResult
-import com.example.data.models.UserData
+import com.example.data.data.UserData
 import com.example.fooddelivery.R
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.BeginSignInRequest.GoogleIdTokenRequestOptions

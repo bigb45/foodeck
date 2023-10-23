@@ -26,7 +26,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.data.models.FieldError
+import com.example.data.data.FieldError
 import com.example.compose.gray2
 import com.example.core.ui.theme.inter
 
@@ -36,7 +36,7 @@ fun CustomTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
-    error: com.example.data.models.FieldError,
+    error: FieldError,
 //    make ui state sealed interface (error state or success state)
     keyboardType: KeyboardType = KeyboardType.Text,
 ) {

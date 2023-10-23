@@ -35,7 +35,7 @@ import androidx.navigation.NavController
 import com.example.core.ui.components.CustomPasswordTextField
 import com.example.core.ui.components.CustomTextField
 import com.example.core.ui.components.PrimaryButton
-import com.example.authentication.presentation.screens.auth.data.AuthEvent
+import com.example.data.models.AuthEvent
 import com.example.data.models.AuthResult
 import com.example.compose.gray6
 import com.example.compose.seed

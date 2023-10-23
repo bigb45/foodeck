@@ -1,6 +1,6 @@
 package com.example.domain.use_cases
 
-import com.example.data.models.UserData
+import com.example.data.data.UserData
 import com.example.data.repositories.AuthRepository
 import javax.inject.Inject
 

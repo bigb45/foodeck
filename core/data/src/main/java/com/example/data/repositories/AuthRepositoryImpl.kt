@@ -3,9 +3,9 @@ package com.example.data.repositories
 
 import com.example.data.models.AuthResult
 import com.example.data.models.ErrorCode
-import com.example.data.models.UserSignUpModel
-import com.example.data.models.UserData
-import com.example.data.models.UserLoginCredentials
+import com.example.data.data.UserSignUpModel
+import com.example.data.data.UserData
+import com.example.data.data.UserLoginCredentials
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser

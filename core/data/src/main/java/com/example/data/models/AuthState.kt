@@ -1,6 +1,7 @@
 package com.example.data.models
 
-import com.example.data.util.ValidationResult
+import com.example.data.data.FieldError
+import com.example.data.data.UserData
 
 
 // not working
@@ -10,12 +11,21 @@ import com.example.data.util.ValidationResult
 //    data class Success(val label: String, val data: String?): TextFieldState
 //}
 //
+
 //data class SignUpState(
 //    val usernameState: TextFieldState = TextFieldState.Success("Username", null),
 //    var emailState: TextFieldState = TextFieldState.Success("Email", null),
 //    val phoneNumberState: TextFieldState = TextFieldState.Success("Phone Number", null),
 //    val passwordState: TextFieldState = TextFieldState.Success("Password", null),
 //)
+//
+
+//data class FieldData(
+//    val isError: Boolean = false,
+//    val errorMessage: ValidationResult? = null,
+//    val data: String? = null,
+//)
+
 data class AuthState(
     val username: String = "",
     var email: String = "",
@@ -36,11 +46,7 @@ data class AuthState(
     ),
 )
 
-data class FieldData(
-    val isError: Boolean = false,
-    val errorMessage: ValidationResult? = null,
-    val data: String? = null,
-)
+
 
 sealed interface AuthResult {
     object Loading : AuthResult

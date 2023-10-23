@@ -1,7 +1,7 @@
 package com.example.domain.use_cases
 
 import com.example.data.models.AuthResult
-import com.example.data.models.UserLoginCredentials
+import com.example.data.data.UserLoginCredentials
 import com.example.data.repositories.AuthRepository
 import javax.inject.Inject
 

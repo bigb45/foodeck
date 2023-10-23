@@ -33,7 +33,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.authentication.presentation.screens.auth.data.AuthEvent
+import com.example.data.models.AuthEvent
 import com.example.core.ui.components.CustomPasswordTextField
 import com.example.core.ui.components.CustomTextField
 import com.example.core.ui.components.Hyperlink

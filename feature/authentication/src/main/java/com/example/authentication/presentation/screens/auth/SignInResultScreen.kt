@@ -55,7 +55,7 @@ fun SignInResult(
                 is AuthResult.Error -> ErrorState(errorMessage = state.errorMessage)
                 AuthResult.Loading -> CircularProgressIndicator()
                 is AuthResult.Success -> SuccessState(
-                    username = state.data.username,
+                    username = state.data.username?: "hello",
                     onClick = {}
                     )
 

@@ -2,7 +2,7 @@ package com.example.domain.use_cases
 
 import com.example.data.util.ValidationResult
 import com.example.data.util.ValidationUtil
-import com.example.data.models.FieldError
+import com.example.data.data.FieldError
 
 import javax.inject.Inject
 
