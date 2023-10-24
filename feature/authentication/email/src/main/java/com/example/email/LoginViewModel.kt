@@ -1,4 +1,4 @@
-package com.example.authentication.presentation.screens.auth.email_login
+package com.example.email
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,6 +9,8 @@ import com.example.data.data.FieldError
 import com.example.data.data.UserLoginCredentials
 import com.example.data.util.ValidationResult
 import com.example.domain.use_cases.SignUserInUseCase
+import com.example.domain.use_cases.ValidateEmailUseCase
+import com.example.domain.use_cases.ValidatePasswordUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,8 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val emailUseCase: com.example.domain.use_cases.ValidateEmailUseCase,
-    private val passwordUseCase: com.example.domain.use_cases.ValidatePasswordUseCase,
+    private val emailUseCase: ValidateEmailUseCase,
+    private val passwordUseCase: ValidatePasswordUseCase,
     private val signUserInUseCase: SignUserInUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AuthState())

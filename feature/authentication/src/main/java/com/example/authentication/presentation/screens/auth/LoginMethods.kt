@@ -47,6 +47,8 @@ import com.example.compose.seed
 import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.fooddelivery.R
 import com.example.core.ui.components.SecondaryButton
+import com.example.create_account.navigation.navigateToCreateAccount
+import com.example.email.navigation.navigateToEmail
 import com.example.facebook.FacebookLoginViewModel
 import com.example.facebook.navigation.navigateToFacebook
 import com.facebook.CallbackManager
@@ -62,17 +64,6 @@ fun LoginMethods(
 ) {
     val context = LocalContext.current
 
-    val fviewModel: FacebookLoginViewModel = hiltViewModel()
-    val callbackManager = CallbackManager.Factory.create()
-    val loginManager = LoginManager.getInstance()
-    LaunchedEffect(key1 = Unit) {
-        fviewModel.setStateToLoading()
-        loginManager.logIn(
-            context as ActivityResultRegistryOwner,
-            callbackManager,
-            listOf("email")
-        )
-    }
 
     val viewModel: GoogleSignInViewModel = hiltViewModel()
     val state by viewModel.state.collectAsState()
@@ -187,9 +178,9 @@ fun LoginMethods(
                     ),
                 )
                 PrimaryButton(
-                    text = "Login via Email",
+                    text = stringResource(R.string.login_via_email),
                     onClick = {
-                        navController.navigate("email_login")
+                        navController.navigateToEmail()
                     },
                     enabled = true,
                     colors = ButtonDefaults.buttonColors(
@@ -198,14 +189,13 @@ fun LoginMethods(
                 )
 
 
-                SecondaryButton(text = "Create an account", enabled = true, onClick = {
-                    navController.navigate("create_account")
+                SecondaryButton(text = stringResource(R.string.create_an_account), enabled = true, onClick = {
+                    navController.navigateToCreateAccount()
                 })
 
                 Hyperlink(
-                    text = "By signing up, you are agreeing to our Terms & Conditions",
-                    hyperLinkText = "Terms & Conditions",
-
+                    text = stringResource(R.string.terms_and_conditions),
+                    hyperLinkText = stringResource(R.string.terms_conditions_hyper_text),
                     )
             }
 

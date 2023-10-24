@@ -1,4 +1,4 @@
-package com.example.facebook.ui.theme
+package com.example.fooddelivery.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

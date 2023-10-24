@@ -77,7 +77,6 @@ dependencies {
     implementation(project(":feature:home"))
     implementation(project(":feature:authentication:facebook"))
     implementation(project(":feature:authentication:email"))
-    implementation(project(":feature:authentication:create_account"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

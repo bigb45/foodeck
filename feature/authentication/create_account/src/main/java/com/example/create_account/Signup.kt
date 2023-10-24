@@ -1,6 +1,5 @@
-package com.example.authentication.presentation.screens.auth.email_login
+package com.example.create_account
 
-import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -31,42 +30,34 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavOptions
-import androidx.navigation.navOptions
-import com.example.data.models.AuthEvent
 import com.example.core.ui.components.CustomPasswordTextField
 import com.example.core.ui.components.CustomTextField
-import com.example.core.ui.components.Hyperlink
 import com.example.core.ui.components.PrimaryButton
+import com.example.data.models.AuthEvent
+import com.example.data.models.AuthResult
 import com.example.compose.gray6
 import com.example.compose.seed
 import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.core.ui.components.SecondaryButton
-import com.example.data.models.AuthResult
-import com.example.home.HomeActivity
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EmailLogin(navController: NavController,) {
-    val viewModel: LoginViewModel = hiltViewModel()
-    val context = LocalContext.current
+internal fun Signup(onNavigateUp: () -> Unit) {
+    val viewModel: SignupViewModel = hiltViewModel()
     val scrollState = rememberScrollState()
-    val uiState by viewModel.loginUiState.collectAsState()
-    val authResult by viewModel.authResult.collectAsState()
+    val uiState by viewModel.signupUiState.collectAsState()
+    val authResult by viewModel.authState.collectAsState()
+    val context = LocalContext.current
     LaunchedEffect(key1 = authResult){
         when(authResult){
             is AuthResult.Error -> {
                 Toast.makeText(context, (authResult as AuthResult.Error).errorMessage, Toast.LENGTH_SHORT).show()
             }
             is AuthResult.Success -> {
-                Toast.makeText(context, "Login Success", Toast.LENGTH_SHORT).show()
-                val welcomeIntent = Intent(context, HomeActivity::class.java)
-                context.startActivity(welcomeIntent)
-
+                Toast.makeText(context, "Account created", Toast.LENGTH_SHORT).show()
             }
             AuthResult.Loading -> {}
             AuthResult.SignedOut -> {}
@@ -75,19 +66,11 @@ fun EmailLogin(navController: NavController,) {
     }
     FoodDeliveryTheme {
 
-        Scaffold(modifier = Modifier
-            .fillMaxSize(), topBar = {
-            TopAppBar(title = {
-                Text(
-                    "Create an Account",
-                    style = typography.titleMedium
-                )
-            },
+        Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
+            TopAppBar(title = { Text("Create an Account", style = typography.titleMedium) },
                 navigationIcon = {
                     IconButton(
-                        onClick = {
-                            navController.navigateUp()
-                        },
+                        onClick = onNavigateUp,
                     ) {
                         Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = null)
                     }
@@ -97,6 +80,8 @@ fun EmailLogin(navController: NavController,) {
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(state = scrollState, enabled = true)
+
+
             ) {
                 Spacer(
                     modifier = Modifier
@@ -118,44 +103,55 @@ fun EmailLogin(navController: NavController,) {
 
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(16.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth()
                     ) {
+
+
+                        CustomTextField(
+                            value = uiState.username,
+                            error = uiState.usernameError,
+                            onValueChange = { newUsername ->
+                                viewModel.notifyChange(AuthEvent.UsernameChanged(newUsername))
+                            },
+                            label = "Username",
+                        )
 
 
                         CustomTextField(
                             value = uiState.email,
                             keyboardType = KeyboardType.Email,
+                            error = uiState.emailError,
                             onValueChange = { newEmail ->
                                 viewModel.notifyChange(AuthEvent.EmailChanged(newEmail))
                             },
                             label = "Email",
-                            error = uiState.emailError,
+                        )
 
+                        CustomTextField(
+                            value = uiState.phoneNumber,
+
+                            keyboardType = KeyboardType.Phone,
+                            onValueChange = { newPhoneNumber ->
+                                viewModel.notifyChange(AuthEvent.PhoneNumberChanged(newPhoneNumber))
+                            },
+                            error = uiState.phoneNumberError,
+                            label = "Phone number"
                         )
 
                         CustomPasswordTextField(
                             value = uiState.password,
                             keyboardType = KeyboardType.Password,
-
-                            onValueChange =     { newPassword ->
+                            onValueChange = { newPassword ->
                                 viewModel.notifyChange(AuthEvent.PasswordChanged(newPassword))
                             },
 
                             label = "Password",
                             error = uiState.passwordError,
-
+//                            data = TextFieldData(uiState.password, uiState.passwordError)
                         )
 
-
                     }
-                    Hyperlink(
-                        text = "Forgot Password?",
-                        url = "example.com",
-                        hyperLinkText = "Forgot Password?"
-                    )
                 }
-
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -163,25 +159,23 @@ fun EmailLogin(navController: NavController,) {
                         .fillMaxWidth()
                         .padding(23.dp)
                 ) {
+//                    val isFormValid by viewModel.isFormValid.collectAsState()
                     PrimaryButton(
-                        text = "Login",
+                        text = "Create an Account",
                         enabled = true,
                         onClick = {
-                                  viewModel.notifyChange(AuthEvent.Submit)
+                            viewModel.notifyChange(AuthEvent.Submit)
                         },
-                        modifier = Modifier
-                            .fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = seed
                         )
                     )
                     SecondaryButton(
-                        onClick = {
-                            navController.navigateUp()
-                        },
-                        text = "Create an account instead",
+                        onClick =onNavigateUp,
+                        text = "Login instead",
                         enabled = true,
-//                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }

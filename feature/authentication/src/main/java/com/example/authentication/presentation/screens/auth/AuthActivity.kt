@@ -14,11 +14,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.authentication.presentation.screens.auth.email_login.EmailLogin
 import com.example.authentication.presentation.screens.auth.google_login.GoogleSignInViewModel
-import com.example.authentication.presentation.screens.auth.signup.Signup
 import com.example.core.ui.theme.FoodDeliveryTheme
+import com.example.create_account.navigation.createAccount
 import com.example.data.models.AuthResult
+import com.example.email.navigation.emailLogin
 import com.example.facebook.navigation.facebookLogin
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -64,13 +64,10 @@ class AuthActivity : ComponentActivity() {
                             LoginMethods(navController = navController)
                         }
 
-                        composable(Screen.SignupScreen.route) {
-                            Signup(navController = navController)
-                        }
+                        createAccount()
 
-                        composable(Screen.EmailLoginScreen.route) {
-                            EmailLogin(navController = navController)
-                        }
+                        emailLogin()
+
                         facebookLogin()
 
 
