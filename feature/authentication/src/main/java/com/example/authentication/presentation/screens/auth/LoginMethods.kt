@@ -3,6 +3,7 @@ package com.example.authentication.presentation.screens.auth
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultRegistryOwner
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -29,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -45,19 +47,37 @@ import com.example.compose.seed
 import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.fooddelivery.R
 import com.example.core.ui.components.SecondaryButton
+import com.example.facebook.FacebookLoginViewModel
+import com.example.facebook.navigation.navigateToFacebook
+import com.facebook.CallbackManager
+import com.facebook.login.LoginManager
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun LoginMethods(
+
     navController: NavController,
 ) {
+    val context = LocalContext.current
+
+    val fviewModel: FacebookLoginViewModel = hiltViewModel()
+    val callbackManager = CallbackManager.Factory.create()
+    val loginManager = LoginManager.getInstance()
+    LaunchedEffect(key1 = Unit) {
+        fviewModel.setStateToLoading()
+        loginManager.logIn(
+            context as ActivityResultRegistryOwner,
+            callbackManager,
+            listOf("email")
+        )
+    }
+
     val viewModel: GoogleSignInViewModel = hiltViewModel()
     val state by viewModel.state.collectAsState()
 
 //    Initiate Google sign in
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val googleAuthUiClient by lazy {
         com.example.data.util.GoogleAuthUiClient(
@@ -157,9 +177,9 @@ fun LoginMethods(
                 )
 
                 PrimaryButton(
-                    text = "Login with Facebook",
+                    text = stringResource(R.string.login_with_facebook),
                     onClick = {
-                        navController.navigate("facebook_login")
+                        navController.navigateToFacebook()
                     },
                     enabled = true,
                     colors = ButtonDefaults.buttonColors(

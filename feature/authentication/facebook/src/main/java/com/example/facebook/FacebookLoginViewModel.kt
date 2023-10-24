@@ -1,4 +1,4 @@
-package com.example.authentication.presentation.screens.auth.facebook_login
+package com.example.facebook
 
 import android.os.Bundle
 import androidx.lifecycle.ViewModel

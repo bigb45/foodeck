@@ -38,6 +38,7 @@ class HomeActivity : ComponentActivity() {
                         NavHost(navController = navController, startDestination = Screen.Welcome.route){
                             composable(Screen.Welcome.route){
                                 Welcome("get user id from navigation parameter")
+
                             }
                         }
                     }

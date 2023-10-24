@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources package="com.example.facebook">
+    <string name="app_name">Feature</string>
+    <string name="continue_to_foodeck">Continue to Foodeck</string>
+    <string name="title_activity_facebook_auth">FacebookAuthActivity</string>
+</resources>

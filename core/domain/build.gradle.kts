@@ -66,7 +66,6 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.tools.core)
     implementation(project(":core:data"))
-    implementation(project(":core:data"))
     implementation(libs.google.firebase.auth.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)

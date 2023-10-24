@@ -13,13 +13,15 @@
     <string name="duplicate_phone_number_error">This number is already in use</string>
     <string name="unknown_error">An unknown error occurred</string>
     <string name="incorrect_password_error">Incorrect password</string>
+    <string name="unregistered_user_error">Email not registered</string>
+    <string name="invalid_credentials_error">Email or password incorrect</string>
+
 
     <string name="default_web_client_id">815356474703-t6detomp23kcn4lr8ijdq8a8mk47a49m.apps.googleusercontent.com</string>
     <string name="facebook_app_id">629358665937319</string>
     <string name="fb_login_protocol_scheme">fb1234</string>
     <string name="facebook_client_token">ce9ca32833436e41cded6021ab9731d5</string>
-    <string name="title_activity_main">MainActivity</string>
-    <string name="unregistered_user_error">Email not registered</string>
-    <string name="invalid_credentials_error">Email or password incorrect</string>
+
+
 
 </resources>

@@ -31,8 +31,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavOptions
+import androidx.navigation.navOptions
 import com.example.data.models.AuthEvent
 import com.example.core.ui.components.CustomPasswordTextField
 import com.example.core.ui.components.CustomTextField
@@ -62,6 +65,7 @@ fun EmailLogin(navController: NavController,) {
             is AuthResult.Success -> {
                 Toast.makeText(context, "Login Success", Toast.LENGTH_SHORT).show()
                 val welcomeIntent = Intent(context, HomeActivity::class.java)
+                context.startActivity(welcomeIntent)
 
             }
             AuthResult.Loading -> {}
