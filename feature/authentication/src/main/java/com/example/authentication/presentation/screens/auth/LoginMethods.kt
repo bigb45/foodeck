@@ -3,7 +3,6 @@ package com.example.authentication.presentation.screens.auth
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResultRegistryOwner
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -49,17 +48,14 @@ import com.example.fooddelivery.R
 import com.example.core.ui.components.SecondaryButton
 import com.example.create_account.navigation.navigateToCreateAccount
 import com.example.email.navigation.navigateToEmail
-import com.example.facebook.FacebookLoginViewModel
 import com.example.facebook.navigation.navigateToFacebook
-import com.facebook.CallbackManager
-import com.facebook.login.LoginManager
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 
 
+
 @Composable
 fun LoginMethods(
-
     navController: NavController,
 ) {
     val context = LocalContext.current
