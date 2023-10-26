@@ -4,16 +4,24 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.example.email.EmailLogin
+import com.example.email.EmailLoginRoute
 
 const val emailLoginRoute = "email_login_route"
 
-fun NavController.navigateToEmail(navOptions: NavOptions? = null){
+fun NavController.navigateToEmail(navOptions: NavOptions? = null) {
     this.navigate(emailLoginRoute, navOptions)
 }
 
-fun NavGraphBuilder.emailLogin(){
-    composable(route = emailLoginRoute){
-        EmailLogin(onNavigateUpClick = {})
+fun NavGraphBuilder.emailLoginScreen(
+    onNavigationIconClick: () -> Unit,
+    onSecondaryButtonClick: () -> Unit,
+    onLoginSuccess: () -> Unit
+) {
+    composable(route = emailLoginRoute) {
+        EmailLoginRoute(
+            onNavigateUpClick = onNavigationIconClick,
+            onSecondaryButtonClick = onSecondaryButtonClick,
+            onLoginSuccess = onLoginSuccess
+        )
     }
 }

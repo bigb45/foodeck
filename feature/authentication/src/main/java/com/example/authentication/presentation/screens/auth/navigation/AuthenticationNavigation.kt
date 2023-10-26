@@ -4,19 +4,27 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.example.authentication.presentation.screens.auth.LoginMethods
+import com.example.authentication.presentation.screens.auth.Authentication
+import com.example.authentication.presentation.screens.auth.screens.LoginMethods
 
 const val loginMethodsRoute = "login_methods_route"
 fun NavController.navigateToLoginMethods(navOptions: NavOptions? = null){
-    this.navigate(loginMethodsRoute)
+    this.navigate(route = loginMethodsRoute, navOptions = navOptions)
 }
 
 fun NavGraphBuilder.loginMethods(navController: NavController){
     composable(
         route = loginMethodsRoute
     ){
-//        todo: change this
+//        TODO: change this
         LoginMethods(navController)
+    }
+}
+
+fun NavGraphBuilder.authenticationScreen(onAuthenticationSuccess: () -> Unit){
+    composable(
+        route = loginMethodsRoute
+    ){
+        Authentication(onAuthenticationSuccess)
     }
 }
