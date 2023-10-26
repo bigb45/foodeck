@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(project(":feature:authentication"))
     implementation(platform(libs.compose.bom))
+    implementation(project(":feature:home"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
