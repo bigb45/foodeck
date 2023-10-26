@@ -1,11 +1,16 @@
 package com.example.facebook
 
 import android.os.Bundle
+import androidx.activity.result.ActivityResultRegistryOwner
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.ViewModel
 import com.example.data.data.UserData
 import com.example.data.models.AuthResult
+import com.facebook.CallbackManager
+import com.facebook.FacebookCallback
 import com.facebook.FacebookException
 import com.facebook.GraphRequest
+import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,9 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FacebookLoginViewModel @Inject constructor() : ViewModel() {
     private val _authResult = MutableStateFlow<AuthResult>(AuthResult.Loading)
-
     val authResult: StateFlow<AuthResult> = _authResult
-
 
     fun handleLogInSuccess(result: LoginResult) {
         val graphRequest = GraphRequest.newMeRequest(

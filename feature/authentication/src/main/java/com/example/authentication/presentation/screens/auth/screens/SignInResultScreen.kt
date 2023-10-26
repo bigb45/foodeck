@@ -1,4 +1,4 @@
-package com.example.authentication.presentation.screens.auth
+package com.example.authentication.presentation.screens.auth.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,7 +26,7 @@ import androidx.navigation.NavController
 import com.example.core.ui.components.PrimaryButton
 import com.example.data.models.AuthResult
 import com.example.core.ui.components.SecondaryButton
-
+// TODO: remove this page, use the page in the home module instead
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignInResult(
