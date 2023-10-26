@@ -1,5 +1,6 @@
 package com.example.facebook
 
+import android.util.Log
 import androidx.activity.result.ActivityResultRegistryOwner
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,18 +36,18 @@ import com.example.fooddelivery.R
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
-import com.facebook.FacebookSdk
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 
 
-
 @Composable
-internal fun FacebookLogin() {
+internal fun FacebookLogin(
+    onContinueClick: () -> Unit,
+    onNavigationIconClick: () -> Unit,
+) {
     val context = LocalContext.current
     val viewModel: FacebookLoginViewModel = hiltViewModel()
 
-//    todo: move to view model
     val callbackManager = CallbackManager.Factory.create()
     val loginManager = LoginManager.getInstance()
 
@@ -56,9 +57,7 @@ internal fun FacebookLogin() {
     LaunchedEffect(key1 = Unit) {
         viewModel.setStateToLoading()
         loginManager.logIn(
-            context as ActivityResultRegistryOwner,
-            callbackManager,
-            listOf("email")
+            context as ActivityResultRegistryOwner, callbackManager, listOf("email")
         )
     }
 
@@ -75,20 +74,21 @@ internal fun FacebookLogin() {
             viewModel.handleLogInSuccess(result)
         }
     })
-    FacebookLoginScreen(onNavigationIconClick = {  }) {
-        
-    }
+    FacebookLoginScreen(
+        onNavigationIconClick = onNavigationIconClick,
+        state = state,
+        onContinueClick = onContinueClick
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun FacebookLoginScreen(
     onNavigationIconClick: () -> Unit,
-    username: String? = null,
     onContinueClick: () -> Unit,
+    state: AuthResult,
 
-){
-    val state: AuthResult = AuthResult.Loading
+    ) {
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("Sign in") }, navigationIcon = {
@@ -106,13 +106,13 @@ internal fun FacebookLoginScreen(
                 .fillMaxSize()
                 .padding(it)
         ) {
+            Log.d("state", state.toString())
             when (state) {
                 AuthResult.Loading -> CircularProgressIndicator()
                 AuthResult.Cancelled -> FacebookLoginError(errorMessage = "Cancelled by user")
                 is AuthResult.Error -> FacebookLoginError(errorMessage = state.errorMessage)
                 is AuthResult.Success -> FacebookLoginSuccess(
-                    username = username ?: "Unknown",
-                    onContinueClick = onContinueClick
+                    username = state.data.username?: "Unknown", onContinueClick = onContinueClick
                 )
 
                 else -> {}
@@ -122,7 +122,7 @@ internal fun FacebookLoginScreen(
 }
 
 @Composable
-fun FacebookLoginSuccess(username: String, onContinueClick: () -> Unit) {
+internal fun FacebookLoginSuccess(username: String, onContinueClick: () -> Unit) {
     Column(
         verticalArrangement = Arrangement.spacedBy(30.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -143,9 +143,8 @@ fun FacebookLoginSuccess(username: String, onContinueClick: () -> Unit) {
         Text("Signed in as $username")
         PrimaryButton(
             text = stringResource(
-               R.string.continue_to_foodeck),
-                enabled = true,
-                onClick = onContinueClick
+                R.string.continue_to_foodeck
+            ), enabled = true, onClick = onContinueClick
         )
 //        SecondaryButton(
 //            text = "Sign out", enabled = true, onClick = {  }
@@ -154,7 +153,7 @@ fun FacebookLoginSuccess(username: String, onContinueClick: () -> Unit) {
 }
 
 @Composable
-fun FacebookLoginError(errorMessage: String) {
+internal fun FacebookLoginError(errorMessage: String) {
     Icon(
         imageVector = Icons.Filled.Error,
         contentDescription = null,
