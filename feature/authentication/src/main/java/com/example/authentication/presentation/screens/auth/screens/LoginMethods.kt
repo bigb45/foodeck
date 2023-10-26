@@ -1,4 +1,4 @@
-package com.example.authentication.presentation.screens.auth
+package com.example.authentication.presentation.screens.auth.screens
 
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -72,6 +72,7 @@ fun LoginMethods(
             oneTapClient = Identity.getSignInClient(context)
         )
     }
+//    TODO: move this to the main app module
     LaunchedEffect(key1 = state) {
         when (state) {
             AuthResult.Cancelled -> {}
@@ -134,7 +135,6 @@ fun LoginMethods(
                         ),
 
                         )
-
                 }
             }
             Column(
