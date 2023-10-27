@@ -1,11 +1,12 @@
 package com.example.data.repositories
 
 
-import com.example.data.models.AuthResult
-import com.example.data.models.ErrorCode
-import com.example.data.data.UserSignUpModel
 import com.example.data.data.UserData
 import com.example.data.data.UserLoginCredentials
+import com.example.data.data.UserSignUpModel
+import com.example.data.models.AuthResult
+import com.example.data.models.ErrorCode
+import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
@@ -19,11 +20,10 @@ class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : A
 
         return try {
             val result = auth.createUserWithEmailAndPassword(user.email, user.password).await()
-
             AuthResult.Success(
                 data = UserData(
                     username = user.username,
-//                            TODO: throw excepti   on if user has no ID
+//                   TODO: throw exception if user has no ID
                     userId = result.user?.uid ?: "test_id", profilePictureUrl = null
                 )
             )
@@ -51,8 +51,16 @@ class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : A
                 )
             )
         } catch (e: Exception) {
-            AuthResult.Error("Email or password incorrect")
+
+            if (e is FirebaseNetworkException) {
+                AuthResult.Error("A network error has occurred")
+
+            } else {
+//                there is no way to check for error type thanks to firebase implementation
+                AuthResult.Error("Email or password incorrect")
+            }
         }
+
     }
 
     override suspend fun signUserOut(): AuthResult {

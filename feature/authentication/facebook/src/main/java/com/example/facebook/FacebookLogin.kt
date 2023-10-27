@@ -44,6 +44,7 @@ import com.facebook.login.LoginResult
 internal fun FacebookLogin(
     onContinueClick: () -> Unit,
     onNavigationIconClick: () -> Unit,
+    onAuthenticationSuccess: () -> Unit,
 ) {
     val context = LocalContext.current
     val viewModel: FacebookLoginViewModel = hiltViewModel()
@@ -77,6 +78,7 @@ internal fun FacebookLogin(
     FacebookLoginScreen(
         onNavigationIconClick = onNavigationIconClick,
         state = state,
+        onAuthenticationSuccess = onAuthenticationSuccess,
         onContinueClick = onContinueClick
     )
 }
@@ -86,6 +88,7 @@ internal fun FacebookLogin(
 internal fun FacebookLoginScreen(
     onNavigationIconClick: () -> Unit,
     onContinueClick: () -> Unit,
+    onAuthenticationSuccess: () -> Unit,
     state: AuthResult,
 
     ) {
@@ -111,47 +114,13 @@ internal fun FacebookLoginScreen(
                 AuthResult.Loading -> CircularProgressIndicator()
                 AuthResult.Cancelled -> FacebookLoginError(errorMessage = "Cancelled by user")
                 is AuthResult.Error -> FacebookLoginError(errorMessage = state.errorMessage)
-                is AuthResult.Success -> FacebookLoginSuccess(
-                    username = state.data.username?: "Unknown", onContinueClick = onContinueClick
-                )
+                is AuthResult.Success -> onAuthenticationSuccess()
 
                 else -> {}
             }
         }
     }
 }
-
-@Composable
-internal fun FacebookLoginSuccess(username: String, onContinueClick: () -> Unit) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(30.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(30.dp)
-    ) {
-
-        Icon(
-            imageVector = Icons.Filled.CheckCircle,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(120.dp)
-
-        )
-        // TODO: move text into resource string file
-        Text("Signed in successfully", style = MaterialTheme.typography.titleLarge)
-        Text("Signed in as $username")
-        PrimaryButton(
-            text = stringResource(
-                R.string.continue_to_foodeck
-            ), enabled = true, onClick = onContinueClick
-        )
-//        SecondaryButton(
-//            text = "Sign out", enabled = true, onClick = {  }
-//        )
-    }
-}
-
 @Composable
 internal fun FacebookLoginError(errorMessage: String) {
     Icon(

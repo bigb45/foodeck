@@ -1,5 +1,6 @@
 package com.example.email
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data.models.AuthEvent
@@ -47,6 +48,7 @@ class LoginViewModel @Inject constructor(
 
             AuthEvent.Submit -> {
                 if (validateFields()) {
+                    _authResult.value = AuthResult.Loading
                     val userInfo = with(_uiState.value) {
                         UserLoginCredentials(
                             email = email,
@@ -77,7 +79,7 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun handleAuthError(result: AuthResult.Error) {
-
+        Log.d("error", result.errorCode.toString())
         _uiState.value = _uiState.value.copy(
             emailError = FieldError(
                 isError = true,

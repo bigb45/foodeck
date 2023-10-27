@@ -1,6 +1,7 @@
 package com.example.authentication.presentation.screens.auth.screens
 
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
@@ -18,6 +19,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -49,6 +52,7 @@ import com.example.core.ui.components.SecondaryButton
 import com.example.create_account.navigation.navigateToCreateAccount
 import com.example.email.navigation.navigateToEmail
 import com.example.facebook.navigation.navigateToFacebook
+import com.example.home.navigation.navigateToHome
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 
@@ -77,13 +81,13 @@ fun LoginMethods(
         when (state) {
             AuthResult.Cancelled -> {}
             is AuthResult.Error -> {
-//                navController.navigate("sign_in_result")
+
                 Log.d("google", "error signing in with google")
 
             }
 
             is AuthResult.Success -> {
-//                navController.navigate("sign_in_result")
+                navController.navigateToHome()
                 Log.d("google", "successfully signed in with google")
 
             }

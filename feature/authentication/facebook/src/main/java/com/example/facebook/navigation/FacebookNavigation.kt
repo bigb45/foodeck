@@ -16,10 +16,12 @@ fun NavController.navigateToFacebook(navOptions: NavOptions? = null) {
 fun NavGraphBuilder.facebookLoginScreen(
     onContinueClick: () -> Unit,
     onNavigationIconClick: () -> Unit,
+    onAuthenticationSuccess: () -> Unit,
 ) {
     composable(route = facebookLoginRoute) {
         FacebookLogin(
             onContinueClick = onContinueClick,
+            onAuthenticationSuccess = onAuthenticationSuccess,
             onNavigationIconClick = onNavigationIconClick
         )
     }

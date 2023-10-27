@@ -20,12 +20,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -57,12 +60,15 @@ internal fun SignupRoute(
     val uiState by viewModel.signupUiState.collectAsState()
     val authResult by viewModel.authState.collectAsState()
     val context = LocalContext.current
+    val snackbarHostState = remember {SnackbarHostState()}
+
     LaunchedEffect(key1 = authResult) {
         when (authResult) {
             is AuthResult.Error -> {
-                Toast.makeText(
-                    context, (authResult as AuthResult.Error).errorMessage, Toast.LENGTH_SHORT
-                ).show()
+//                    Toast.makeText(
+//                    context, (authResult as AuthResult.Error).errorMessage, Toast.LENGTH_SHORT
+//                ).show()
+                snackbarHostState.showSnackbar(message = (authResult as AuthResult.Error).errorMessage, withDismissAction = true)
             }
 
             is AuthResult.Success -> {
@@ -80,7 +86,8 @@ internal fun SignupRoute(
             onSecondaryButtonClick = onLoginInsteadClick,
             scrollState = scrollState,
             uiState = uiState,
-            notifyChange = viewModel::notifyChange
+            notifyChange = viewModel::notifyChange,
+            snackbarHostState = snackbarHostState
         )
     }
 }
@@ -93,9 +100,13 @@ internal fun SignupScreen(
     uiState: AuthState,
     notifyChange: (AuthEvent) -> Unit,
     onSecondaryButtonClick: () -> Unit,
-) {
+    snackbarHostState: SnackbarHostState,
 
-    Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
+    ) {
+
+    Scaffold(
+
+        modifier = Modifier.fillMaxSize(), topBar = {
         TopAppBar(title = {
             Text(
                 text = stringResource(R.string.create_an_account),
@@ -108,13 +119,15 @@ internal fun SignupScreen(
                 Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = null)
             }
         })
-    }) {
+    },
+        snackbarHost = {SnackbarHost(hostState = snackbarHostState)}) {
         SignupForm(
             scrollState = scrollState,
             uiState = uiState,
             notifyChange = notifyChange,
             onSecondaryButtonClick = onSecondaryButtonClick,
             modifier = Modifier.padding(it)
+
         )
     }
 

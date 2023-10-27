@@ -72,6 +72,7 @@ fun Authentication(onAuthenticationSuccess: () -> Unit) {
 
             facebookLoginScreen(
                 onNavigationIconClick = navController::navigateUp,
+                onAuthenticationSuccess = onAuthenticationSuccess,
                 onContinueClick = navController::navigateToLoginMethods
             )
 

@@ -62,20 +62,11 @@ internal fun EmailLoginRoute(
     val authResult by viewModel.authResult.collectAsState()
     LaunchedEffect(key1 = authResult) {
         when (authResult) {
-            is AuthResult.Error -> {
-                Toast.makeText(
-                    context, (authResult as AuthResult.Error).errorMessage, Toast.LENGTH_SHORT
-                ).show()
-            }
-
             is AuthResult.Success -> {
                 Toast.makeText(context, "Login Success", Toast.LENGTH_SHORT).show()
                 onLoginSuccess()
             }
-
-            AuthResult.Loading -> {}
-            AuthResult.SignedOut -> {}
-            AuthResult.Cancelled -> {}
+            else -> {}
         }
     }
     FoodDeliveryTheme {

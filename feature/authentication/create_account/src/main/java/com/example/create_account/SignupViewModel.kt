@@ -68,6 +68,7 @@ class SignupViewModel @Inject constructor(
 
             AuthEvent.Submit -> {
                 if (validateFields()) {
+                _authResult.value = AuthResult.Loading
                     val newUser = with(_uiState.value) {
                         UserSignUpModel(
                             username = username,
