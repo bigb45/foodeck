@@ -9,24 +9,18 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.authentication.presentation.screens.auth.google_login.GoogleSignInViewModel
-import com.example.authentication.presentation.screens.auth.navigation.authenticationScreen
 import com.example.authentication.presentation.screens.auth.navigation.loginMethods
 import com.example.authentication.presentation.screens.auth.navigation.loginMethodsRoute
 import com.example.authentication.presentation.screens.auth.navigation.navigateToLoginMethods
-import com.example.authentication.presentation.screens.auth.screens.SignInResult
 import com.example.create_account.navigation.createAccountScreen
 import com.example.create_account.navigation.navigateToCreateAccount
 import com.example.data.models.AuthResult
 import com.example.email.navigation.emailLoginScreen
 import com.example.email.navigation.navigateToEmail
 import com.example.facebook.navigation.facebookLoginScreen
-import com.example.home.navigation.homeScreen
-import com.example.home.navigation.navigateToHome
 
 
 @Composable
@@ -59,9 +53,9 @@ fun Authentication(onAuthenticationSuccess: () -> Unit) {
             navController = navController, startDestination = loginMethodsRoute
         ) {
 
-//            Signup
             createAccountScreen(
                 onNavigationIconClick = navController::navigateUp,
+                onAuthenticationSuccess = onAuthenticationSuccess,
                 onSecondaryButtonClick = {
 //                    doing this prevents creating a 'navigation circle'
 //                    between 'log in' and 'sign up' pages
@@ -69,7 +63,6 @@ fun Authentication(onAuthenticationSuccess: () -> Unit) {
                     navController.navigateToEmail()
                 })
 
-//            Login with email
             emailLoginScreen(onNavigationIconClick = navController::navigateUp,
                 onLoginSuccess = onAuthenticationSuccess,
                 onSecondaryButtonClick = {
@@ -77,20 +70,12 @@ fun Authentication(onAuthenticationSuccess: () -> Unit) {
                     navController.navigateToCreateAccount()
                 })
 
-//            Facebook
             facebookLoginScreen(
                 onNavigationIconClick = navController::navigateUp,
                 onContinueClick = navController::navigateToLoginMethods
             )
 
-//            Host screen / sign in with google
             loginMethods(navController)
-
-
-//          TODO: Remove this
-            composable(Screen.SignInResultScreen.route) {
-                SignInResult(navController = navController)
-            }
 
         }
     }

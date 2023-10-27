@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
 
                     authenticationScreen(
                         onAuthenticationSuccess = {
-//                          pop the backstack to eliminate unwanted behavior
+//                          pop the all of the auth navgraph to eliminate unwanted behavior
 //                          (clicking back arrow after navigating to home screen shows the auth
 //                          screen momentarily)
                             navController.popBackStack()

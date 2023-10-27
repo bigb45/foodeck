@@ -47,7 +47,11 @@ import com.example.fooddelivery.R
 
 
 @Composable
-internal fun SignupRoute(onNavigateUp: () -> Unit, onLoginInsteadClick: () -> Unit) {
+internal fun SignupRoute(
+    onNavigateUp: () -> Unit,
+    onLoginInsteadClick: () -> Unit,
+    onAuthenticationSuccess: () -> Unit
+) {
     val viewModel: SignupViewModel = hiltViewModel()
     val scrollState = rememberScrollState()
     val uiState by viewModel.signupUiState.collectAsState()
@@ -63,7 +67,8 @@ internal fun SignupRoute(onNavigateUp: () -> Unit, onLoginInsteadClick: () -> Un
 
             is AuthResult.Success -> {
                 Toast.makeText(context, "Account created", Toast.LENGTH_SHORT).show()
-
+//                TODO: sign user in and start session
+                onAuthenticationSuccess()
             }
 
             else -> {}
