@@ -11,17 +11,21 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.core.ui.components.PrimaryButton
 import com.example.core.ui.components.SecondaryButton
+import com.example.fooddelivery.R
 
 @Composable
-fun Welcome(userId: String) {
+fun Welcome(onContinueClick: () -> Unit, onSignOut: () -> Unit) {
     val viewModel: WelcomeViewModel = hiltViewModel()
-    viewModel.getUserFromId(userId)
+    val user by viewModel.user.collectAsState()
     Column(
         verticalArrangement = Arrangement.spacedBy(30.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -38,13 +42,13 @@ fun Welcome(userId: String) {
 
         )
         // TODO: move text into resource string file
-        Text("Signed in successfully", style = MaterialTheme.typography.titleLarge)
-        Text("Signed in as username")
+        Text(stringResource(R.string.signed_in_successfully), style = MaterialTheme.typography.titleLarge)
+        Text("Signed in as ${user.username}")
         PrimaryButton(
-            text = "Continue to Foodeck", enabled = true, onClick = {}
+            text = "Continue to Foodeck", enabled = true, onClick = onContinueClick
         )
         SecondaryButton(
-            text = "Sign out", enabled = true, onClick = { }
+            text = "Sign out", enabled = true, onClick = onSignOut
         )
     }
 }
