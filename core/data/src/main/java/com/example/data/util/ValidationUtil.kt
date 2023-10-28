@@ -1,7 +1,6 @@
 package com.example.data.util
 
 import androidx.annotation.StringRes
-// TODO: fix this issue
 import com.example.fooddelivery.R
 import javax.inject.Inject
 
