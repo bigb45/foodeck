@@ -12,19 +12,19 @@ fun NavController.navigateToLoginMethods(navOptions: NavOptions? = null){
     this.navigate(route = loginMethodsRoute, navOptions = navOptions)
 }
 
-fun NavGraphBuilder.loginMethods(navController: NavController){
+fun NavGraphBuilder.loginMethods(navController: NavController, onAuthenticationSuccess: (String) -> Unit){
     composable(
         route = loginMethodsRoute
     ){
-//        TODO: change this
-        LoginMethods(navController)
+
+        LoginMethods(navController, onGoogleAuthenticationSuccess = onAuthenticationSuccess)
     }
 }
 
-fun NavGraphBuilder.authenticationScreen(onAuthenticationSuccess: () -> Unit){
+fun NavGraphBuilder.authenticationScreen(onAuthenticationSuccess: (String) -> Unit){
     composable(
         route = loginMethodsRoute
     ){
-        Authentication(onAuthenticationSuccess)
+        Authentication { userId: String -> onAuthenticationSuccess(userId) }
     }
 }

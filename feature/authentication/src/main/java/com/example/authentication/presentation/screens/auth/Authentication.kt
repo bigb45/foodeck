@@ -24,7 +24,7 @@ import com.example.facebook.navigation.facebookLoginScreen
 
 
 @Composable
-fun Authentication(onAuthenticationSuccess: () -> Unit) {
+fun Authentication(onAuthenticationSuccess: (String) -> Unit) {
     Surface(
         modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
     ) {
@@ -63,7 +63,8 @@ fun Authentication(onAuthenticationSuccess: () -> Unit) {
                     navController.navigateToEmail()
                 })
 
-            emailLoginScreen(onNavigationIconClick = navController::navigateUp,
+            emailLoginScreen(
+                onNavigationIconClick = navController::navigateUp,
                 onLoginSuccess = onAuthenticationSuccess,
                 onSecondaryButtonClick = {
                     navController.navigateUp()
@@ -76,7 +77,7 @@ fun Authentication(onAuthenticationSuccess: () -> Unit) {
                 onContinueClick = navController::navigateToLoginMethods
             )
 
-            loginMethods(navController)
+            loginMethods(navController, onAuthenticationSuccess)
 
         }
     }

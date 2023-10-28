@@ -31,6 +31,7 @@ class GoogleAuthUiClient(
                 AuthResult.Success(data = user.run {
                     UserData(
                         userId = uid,
+                        email = email,
                         username = displayName ?: "default user",
                         profilePictureUrl = photoUrl?.toString(),
                     )

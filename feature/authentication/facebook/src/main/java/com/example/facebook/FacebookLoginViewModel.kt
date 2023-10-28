@@ -29,12 +29,13 @@ class FacebookLoginViewModel @Inject constructor() : ViewModel() {
             if (user != null) {
                 val userId = user.getString("id")
                 val username = user.getString("name")
-
+                val email = user.getString("email")
                 val profilePictureUrl = "https://graph.facebook.com/$userId/picture?type=large"
 
                 _authResult.value = AuthResult.Success(
                     data = UserData(
                         userId = userId,
+                        email = email,
                         username = username,
                         profilePictureUrl = profilePictureUrl
                     )
