@@ -52,7 +52,7 @@ import com.example.core.ui.components.SecondaryButton
 import com.example.create_account.navigation.navigateToCreateAccount
 import com.example.email.navigation.navigateToEmail
 import com.example.facebook.navigation.navigateToFacebook
-import com.example.home.navigation.navigateToHome
+import com.example.fooddelivery.R.string.create_an_account
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 
@@ -61,6 +61,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoginMethods(
     navController: NavController,
+    onGoogleAuthenticationSuccess: (String) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -81,14 +82,13 @@ fun LoginMethods(
         when (state) {
             AuthResult.Cancelled -> {}
             is AuthResult.Error -> {
-
+// TODO: show snackbar
                 Log.d("google", "error signing in with google")
 
             }
 
             is AuthResult.Success -> {
-                navController.navigateToHome()
-                Log.d("google", "successfully signed in with google")
+                onGoogleAuthenticationSuccess((state as AuthResult.Success).data.userId.toString())
 
             }
 
@@ -97,6 +97,7 @@ fun LoginMethods(
             else -> {}
         }
     }
+
     val launcher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.StartIntentSenderForResult(),
             onResult = { result ->
@@ -189,7 +190,7 @@ fun LoginMethods(
                 )
 
 
-                SecondaryButton(text = stringResource(R.string.create_an_account), enabled = true, onClick = {
+                SecondaryButton(text = stringResource(create_an_account), enabled = true, onClick = {
                     navController.navigateToCreateAccount()
                 })
 

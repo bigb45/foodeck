@@ -8,8 +8,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.authentication.presentation.screens.auth.navigation.authenticationScreen
 import com.example.authentication.presentation.screens.auth.navigation.loginMethodsRoute
 import com.example.fooddelivery.ui.theme.FoodDeliveryTheme
-import com.example.home.navigation.homeScreen
-import com.example.home.navigation.navigateToHome
+import com.example.home.navigation.welcomeScreen
+import com.example.home.navigation.navigateToWelcome
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -23,16 +23,15 @@ class MainActivity : ComponentActivity() {
 
 //                   splashScreen()
 
-                    authenticationScreen(
-                        onAuthenticationSuccess = {
+                    authenticationScreen { userId: String ->
 //                          pop the all of the auth navgraph to eliminate unwanted behavior
 //                          (clicking back arrow after navigating to home screen shows the auth
 //                          screen momentarily)
-                            navController.popBackStack()
-                            navController.navigateToHome() }
-                    )
+                        navController.popBackStack()
+                        navController.navigateToWelcome(userId = userId)
+                    }
 
-                    homeScreen()
+                    welcomeScreen()
                 }
             }
         }

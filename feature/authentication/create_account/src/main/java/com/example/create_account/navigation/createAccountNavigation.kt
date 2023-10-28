@@ -15,7 +15,7 @@ fun NavController.navigateToCreateAccount(navOptions: NavOptions? = null) {
 fun NavGraphBuilder.createAccountScreen(
     onNavigationIconClick: () -> Unit,
     onSecondaryButtonClick: () -> Unit,
-    onAuthenticationSuccess: () -> Unit,
+    onAuthenticationSuccess: (String) -> Unit,
 ) {
     composable(route = createAccountRoute) {
         SignupRoute(onNavigateUp = onNavigationIconClick, onLoginInsteadClick = onSecondaryButtonClick, onAuthenticationSuccess = onAuthenticationSuccess)

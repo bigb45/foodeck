@@ -15,7 +15,7 @@ fun NavController.navigateToEmail(navOptions: NavOptions? = null) {
 fun NavGraphBuilder.emailLoginScreen(
     onNavigationIconClick: () -> Unit,
     onSecondaryButtonClick: () -> Unit,
-    onLoginSuccess: () -> Unit
+    onLoginSuccess: (String) -> Unit
 ) {
     composable(route = emailLoginRoute) {
         EmailLoginRoute(

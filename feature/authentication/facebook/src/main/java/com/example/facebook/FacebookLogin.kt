@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,12 +26,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.core.ui.components.PrimaryButton
 import com.example.data.models.AuthResult
-import com.example.fooddelivery.R
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
@@ -44,7 +40,7 @@ import com.facebook.login.LoginResult
 internal fun FacebookLogin(
     onContinueClick: () -> Unit,
     onNavigationIconClick: () -> Unit,
-    onAuthenticationSuccess: () -> Unit,
+    onAuthenticationSuccess: (String) -> Unit,
 ) {
     val context = LocalContext.current
     val viewModel: FacebookLoginViewModel = hiltViewModel()
@@ -88,7 +84,7 @@ internal fun FacebookLogin(
 internal fun FacebookLoginScreen(
     onNavigationIconClick: () -> Unit,
     onContinueClick: () -> Unit,
-    onAuthenticationSuccess: () -> Unit,
+    onAuthenticationSuccess: (String) -> Unit,
     state: AuthResult,
 
     ) {
@@ -109,12 +105,11 @@ internal fun FacebookLoginScreen(
                 .fillMaxSize()
                 .padding(it)
         ) {
-            Log.d("state", state.toString())
             when (state) {
                 AuthResult.Loading -> CircularProgressIndicator()
                 AuthResult.Cancelled -> FacebookLoginError(errorMessage = "Cancelled by user")
                 is AuthResult.Error -> FacebookLoginError(errorMessage = state.errorMessage)
-                is AuthResult.Success -> onAuthenticationSuccess()
+                is AuthResult.Success -> onAuthenticationSuccess(state.data.userId.toString())
 
                 else -> {}
             }
