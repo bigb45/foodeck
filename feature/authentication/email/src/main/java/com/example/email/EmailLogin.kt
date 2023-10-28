@@ -1,6 +1,5 @@
 package com.example.email
 
-import android.widget.Toast
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,15 +19,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -52,29 +53,31 @@ import com.example.fooddelivery.R
 internal fun EmailLoginRoute(
     onNavigateUpClick: () -> Unit,
     onSecondaryButtonClick: () -> Unit,
-    onLoginSuccess: () -> Unit,
+    onLoginSuccess: (String) -> Unit,
 
-) {
+    ) {
     val viewModel: LoginViewModel = hiltViewModel()
-    val context = LocalContext.current
     val scrollState = rememberScrollState()
     val uiState by viewModel.loginUiState.collectAsState()
     val authResult by viewModel.authResult.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
     LaunchedEffect(key1 = authResult) {
         when (authResult) {
             is AuthResult.Success -> {
-                Toast.makeText(context, "Login Success", Toast.LENGTH_SHORT).show()
-                onLoginSuccess()
+                onLoginSuccess((authResult as AuthResult.Success).data.userId.toString())
+                snackbarHostState.showSnackbar("Login Success")
             }
             else -> {}
         }
     }
     FoodDeliveryTheme {
 
-        Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
+        Scaffold(modifier = Modifier.fillMaxSize(),
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },topBar = {
             TopAppBar(title = {
                 Text(
-                    "Create an Account", style = typography.titleMedium
+                    stringResource(R.string.login), style = typography.titleMedium
                 )
             }, navigationIcon = {
                 IconButton(

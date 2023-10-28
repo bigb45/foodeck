@@ -1,6 +1,5 @@
 package com.example.create_account
 
-import android.widget.Toast
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -31,7 +30,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -53,28 +51,24 @@ import com.example.fooddelivery.R
 internal fun SignupRoute(
     onNavigateUp: () -> Unit,
     onLoginInsteadClick: () -> Unit,
-    onAuthenticationSuccess: () -> Unit
+    onAuthenticationSuccess: (String) -> Unit
 ) {
     val viewModel: SignupViewModel = hiltViewModel()
     val scrollState = rememberScrollState()
     val uiState by viewModel.signupUiState.collectAsState()
     val authResult by viewModel.authState.collectAsState()
-    val context = LocalContext.current
     val snackbarHostState = remember {SnackbarHostState()}
 
     LaunchedEffect(key1 = authResult) {
         when (authResult) {
             is AuthResult.Error -> {
-//                    Toast.makeText(
-//                    context, (authResult as AuthResult.Error).errorMessage, Toast.LENGTH_SHORT
-//                ).show()
                 snackbarHostState.showSnackbar(message = (authResult as AuthResult.Error).errorMessage, withDismissAction = true)
             }
 
             is AuthResult.Success -> {
-                Toast.makeText(context, "Account created", Toast.LENGTH_SHORT).show()
 //                TODO: sign user in and start session
-                onAuthenticationSuccess()
+                onAuthenticationSuccess((authResult as AuthResult.Success).data.userId.toString())
+                snackbarHostState.showSnackbar("Account created")
             }
 
             else -> {}
