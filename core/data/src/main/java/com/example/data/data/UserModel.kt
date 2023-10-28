@@ -1,5 +1,7 @@
 package com.example.data.data
 
+import com.google.firebase.database.DataSnapshot
+
 data class UserSignUpModel(
     val email: String,
     val password: String,
@@ -15,5 +17,7 @@ data class UserLoginCredentials(
 data class UserData(
     val userId: String?,
     val username: String? = null,
+    val email: String? = null,
+    val phoneNumber: String? = null,
     val profilePictureUrl: String? = null,
 )
