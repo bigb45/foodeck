@@ -21,6 +21,7 @@ google-firebase-auth-ktx = "22.2.0"
 navigation-common-ktx = "2.7.4"
 androidx-navigation-runtime-ktx = "2.7.4"
 material3 = "1.1.2"
+firebase-database-ktx = "20.3.0"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -50,6 +51,7 @@ google-firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-aut
 androidx-navigation-common-ktx = { group = "androidx.navigation", name = "navigation-common-ktx", version.ref = "navigation-common-ktx" }
 navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "androidx-navigation-runtime-ktx" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+firebase-database-ktx = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebase-database-ktx" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
