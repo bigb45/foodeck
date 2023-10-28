@@ -6,11 +6,7 @@ import javax.inject.Inject
 
 class GetUserFromIdUseCase @Inject constructor(private val repository: AuthRepository){
     suspend operator fun invoke(userId: String): UserData {
-        val user = repository.getUser(userId)
-        return UserData(
-            userId = user?.uid,
-            profilePictureUrl = user?.photoUrl.toString(),
-            username = user?.displayName
-        )
+            return repository.getUserById(userId)
+
     }
 }

@@ -64,12 +64,3 @@ fun PrimaryButton(
 
 }
 
-@Preview
-@Composable
-fun PrimaryButtonPrev() {
-    PrimaryButton(
-        text = "test", enabled = true, onClick = { /*TODO*/ }, colors = ButtonDefaults.buttonColors(
-            containerColor = seed
-        )
-    )
-}

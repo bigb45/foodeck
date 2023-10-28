@@ -79,7 +79,6 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun handleAuthError(result: AuthResult.Error) {
-        Log.d("error", result.errorCode.toString())
         _uiState.value = _uiState.value.copy(
             emailError = FieldError(
                 isError = true,
