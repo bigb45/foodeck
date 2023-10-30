@@ -1,10 +1,9 @@
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
 //    alias(libs.plugins.androidApplication)
-//    alias(libs.plugins.kotlinAndroid)
-//    id("com.google.dagger.hilt.android")
+    alias(libs.plugins.kotlinAndroid)
     id("com.android.library")
-    id("org.jetbrains.kotlin.android")
+//    id("org.jetbrains.kotlin.android")
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
     id("com.google.gms.google-services")
@@ -74,7 +73,6 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(platform(libs.compose.bom))
     implementation(libs.androidx.tools.core)
-    implementation(project(":feature:home"))
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
@@ -86,20 +84,22 @@ dependencies {
     debugImplementation(libs.ui.test.manifest)
 
 
-    implementation("androidx.compose.ui:ui-text-google-fonts:1.5.3")
-    implementation("androidx.navigation:navigation-compose:2.7.3")
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    implementation(libs.androidx.ui.text.google.fonts)
+    implementation(libs.androidx.navigation.compose)
 
-    implementation("com.google.dagger:hilt-android:2.44")
-    kapt("com.google.dagger:hilt-android-compiler:2.44")
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation)
 
     //noinspection UseTomlInstead
     implementation( "androidx.compose.material:material-icons-extended")
+
 
 //    modules
     implementation(project(":core"))
     implementation(project(":core:data"))
     implementation(project(":core:domain"))
+    implementation(project(":feature:home"))
 
 //    Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.3.1"))

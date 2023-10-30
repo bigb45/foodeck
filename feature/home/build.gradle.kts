@@ -81,15 +81,14 @@ dependencies {
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
 
+    implementation(libs.androidx.ui.text.google.fonts)
+    implementation(libs.androidx.navigation.compose)
 
-    implementation("androidx.compose.ui:ui-text-google-fonts:1.5.3")
-    implementation("androidx.navigation:navigation-compose:2.7.3")
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation)
 
-    implementation("com.google.dagger:hilt-android:2.44")
-    kapt("com.google.dagger:hilt-android-compiler:2.44")
 
-    //noinspection UseTomlInstead
     implementation( "androidx.compose.material:material-icons-extended")
 
 
