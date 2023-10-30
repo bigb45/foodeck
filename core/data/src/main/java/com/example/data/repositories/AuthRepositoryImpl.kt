@@ -58,7 +58,6 @@ class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : A
 
     override suspend fun addUserInformationToDatabase(userData: UserData) {
         db.child("users").child(userData.userId ?: "error").setValue(userData)
-
     }
 
     override suspend fun signUserIn(user: UserLoginCredentials): AuthResult {
