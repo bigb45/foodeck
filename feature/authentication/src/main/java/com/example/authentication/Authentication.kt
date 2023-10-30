@@ -8,6 +8,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
@@ -27,26 +28,7 @@ fun Authentication(onAuthenticationSuccess: (String) -> Unit) {
     Surface(
         modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
     ) {
-        val googleSignInViewModel = viewModel<GoogleSignInViewModel>()
-        val state by googleSignInViewModel.state.collectAsState()
         val navController = rememberNavController()
-        LaunchedEffect(key1 = state) {
-            when (state) {
-                AuthResult.Cancelled -> {}
-                is AuthResult.Error -> {
-                    navController.navigate("sign_in_result")
-                }
-
-                is AuthResult.Success -> {
-                    navController.navigate("sign_in_result")
-                }
-
-                AuthResult.Loading -> {}
-
-                else -> {}
-            }
-        }
-//                    TODO:  navigate to main app screen if user already signed in
 
         NavHost(
             navController = navController, startDestination = loginMethodsRoute

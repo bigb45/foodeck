@@ -28,24 +28,24 @@ class FacebookLoginViewModel @Inject constructor(private val addAdditionalUserIn
                 val userId = user.getString("id")
                 val username = user.getString("name")
                 val email = user.getString("email")
-                val phoneNumber = user.getString("phoneNumber")
                 val profilePictureUrl = "https://graph.facebook.com/$userId/picture?type=large"
 
                 val data = UserData(
                     userId = userId,
                     email = email,
-                    phoneNumber = phoneNumber,
                     username = username,
                     profilePictureUrl = profilePictureUrl
                 )
+
                 addUserInfo(data)
+
                 _authResult.value = AuthResult.Success(
                     data = data
                 )
             }
         }
         val parameters = Bundle()
-        parameters.putString("fields", "email,phoneNumber,id,name")
+        parameters.putString("fields", "email,id,name")
         graphRequest.parameters = parameters
         graphRequest.executeAsync()
 

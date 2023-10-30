@@ -3,8 +3,11 @@ package com.example.authentication
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.lifecycle.viewModelScope
 import com.example.data.data.UserData
 import com.example.data.models.AuthResult
+import com.example.domain.use_cases.AddUserInformationUseCase
 import com.example.fooddelivery.authentication.R
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.BeginSignInRequest.GoogleIdTokenRequestOptions
@@ -12,15 +15,16 @@ import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.concurrent.CancellationException
 
 class GoogleAuthUiClient(
     private val context: Context,
     private val oneTapClient: SignInClient,
+
 ) {
     private val auth = Firebase.auth
-
     suspend fun signInWithIntent(intent: Intent): AuthResult {
         val credential = oneTapClient.getSignInCredentialFromIntent(intent)
         val googleIdToken = credential.googleIdToken
@@ -28,14 +32,15 @@ class GoogleAuthUiClient(
         return try {
             val user = auth.signInWithCredential(googleCredentials).await().user
             if(user != null){
-                AuthResult.Success(data = user.run {
+                val data = user.run {
                     UserData(
                         userId = uid,
                         email = email,
                         username = displayName ?: "default user",
                         profilePictureUrl = photoUrl?.toString(),
                     )
-                })
+                }
+                AuthResult.Success(data = data)
             }else{
                 return AuthResult.Error("Unable to sign in")
             }

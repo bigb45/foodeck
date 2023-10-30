@@ -36,7 +36,6 @@ class WelcomeViewModel @Inject constructor(
         _authState.value = AuthResult.Loading
         viewModelScope.launch {
             _user.value = getUser(userId)
-            Log.d("user info", _user.value.toString())
         }
     }
 }

@@ -105,7 +105,6 @@ class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : A
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        Log.d("snapshot", "cancelled")
                         continuation.resume(false) // Handle the error accordingly
                     }
                 })
@@ -118,6 +117,7 @@ class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : A
             UserData(
                 userId = child("userId").value.toString(),
                 username = child("username").value.toString(),
+                phoneNumber = child("phoneNumber").value.toString(),
                 email = child("email").value.toString(),
                 profilePictureUrl = child("profilePictureUrl").value.toString(),
             )

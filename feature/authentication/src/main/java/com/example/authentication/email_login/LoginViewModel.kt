@@ -88,7 +88,6 @@ class LoginViewModel @Inject constructor(
 
     }
 
-
     private fun validateFields(): Boolean {
         return (validateEmail() && validatePassword())
     }
@@ -108,6 +107,4 @@ class LoginViewModel @Inject constructor(
         )
         return !result.isError
     }
-
-
 }

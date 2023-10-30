@@ -59,7 +59,6 @@ fun LoginMethods(
 ) {
     val context = LocalContext.current
 
-
     val viewModel: GoogleSignInViewModel = hiltViewModel()
     val state by viewModel.state.collectAsState()
 
@@ -76,9 +75,7 @@ fun LoginMethods(
         when (state) {
             AuthResult.Cancelled -> {}
             is AuthResult.Error -> {
-// TODO: show snackbar
-                Log.d("google", "error signing in with google")
-
+//             TODO: show snack-bar
             }
 
             is AuthResult.Success -> {
@@ -86,7 +83,9 @@ fun LoginMethods(
 
             }
 
-            AuthResult.Loading -> {}
+            AuthResult.Loading -> {
+                // TODO: show loading state
+            }
 
             else -> {}
         }
