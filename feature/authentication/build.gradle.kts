@@ -13,7 +13,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.fooddelivery"
+    namespace = "com.example.fooddelivery.authentication"
     compileSdk = 34
 
     defaultConfig {
@@ -75,9 +75,7 @@ dependencies {
     implementation(platform(libs.compose.bom))
     implementation(libs.androidx.tools.core)
     implementation(project(":feature:home"))
-    implementation(project(":feature:authentication:facebook"))
-    implementation(project(":feature:authentication:email"))
-    implementation(project(":feature:authentication:create_account"))
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

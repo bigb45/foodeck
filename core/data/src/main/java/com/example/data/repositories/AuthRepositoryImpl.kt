@@ -15,8 +15,10 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+import kotlin.coroutines.resume
 
 
 class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : AuthRepository {
@@ -24,7 +26,7 @@ class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : A
 
     override suspend fun createUser(user: UserSignUpModel): AuthResult {
         return try {
-            if(!checkDuplicatePhoneNumber(user.phoneNumber)){
+            if(checkDuplicatePhoneNumber(user.phoneNumber)){
                 AuthResult.Error(errorMessage = "Phone number is already in use", errorCode = ErrorCode.DUPLICATE_PHONE_NUMBER)
             }else{
             val result = auth.createUserWithEmailAndPassword(user.email, user.password).await()
@@ -93,26 +95,22 @@ class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : A
     }
 
     override suspend fun checkDuplicatePhoneNumber(phoneNumber: String): Boolean {
-            var isDuplicate = false
-        val usersReference = db.child("users")
+        return suspendCancellableCoroutine { continuation ->
+            val usersReference = db.child("users")
 
-        usersReference.orderByChild("phoneNumber").equalTo(phoneNumber)
-                .addListenerForSingleValueEvent(object: ValueEventListener{
+            usersReference.orderByChild("phoneNumber").equalTo(phoneNumber)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        Log.d("snapshot", snapshot.toString())
-                        if(snapshot.exists()){
-                            isDuplicate = true
-                        }
+                        val isDuplicate = snapshot.exists()
+                        continuation.resume(isDuplicate)
                     }
 
                     override fun onCancelled(error: DatabaseError) {
                         Log.d("snapshot", "cancelled")
-
+                        continuation.resume(false) // Handle the error accordingly
                     }
-
                 })
-
-        return isDuplicate
+        }
     }
 
     override suspend fun getUserById(id: String): UserData {

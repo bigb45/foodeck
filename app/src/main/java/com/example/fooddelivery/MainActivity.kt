@@ -5,8 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.example.authentication.presentation.screens.auth.navigation.authenticationScreen
-import com.example.authentication.presentation.screens.auth.navigation.loginMethodsRoute
+import com.example.authentication.navigation.authenticationScreen
+import com.example.authentication.navigation.loginMethodsRoute
 import com.example.fooddelivery.ui.theme.FoodDeliveryTheme
 import com.example.home.navigation.welcomeScreen
 import com.example.home.navigation.navigateToWelcome

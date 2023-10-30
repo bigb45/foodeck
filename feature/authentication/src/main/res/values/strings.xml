@@ -19,8 +19,19 @@
 
     <string name="login_with_facebook">Login with Facebook</string>
     <string name="login_via_email">Login via Email</string>
-    <string name="create_an_account">Create an Account</string>
     <string name="terms_and_conditions"><![CDATA[By signing up, you are agreeing to our Terms & Conditions]]></string>
     <string name="terms_conditions_hyper_text"><![CDATA[Terms & Conditions]]></string>
+    <string name="title_activity_facebook_auth">FacebookAuthActivity</string>
+    <string name="create_an_account">Create an Account</string>
+    <string name="input_your_credentials">Input your credentials</string>
+    <string name="username">Username</string>
+    <string name="email">Email</string>
+    <string name="phone_number">Phone number</string>
+    <string name="password">Password</string>
+    <string name="login_instead">Login instead</string>
+    <string name="login">Login</string>
+    <string name="create_an_account_instead">Create an account instead</string>
+    <string name="sign_in">Sign in</string>
+
 
 </resources>

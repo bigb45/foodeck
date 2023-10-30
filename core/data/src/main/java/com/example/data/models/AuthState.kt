@@ -47,7 +47,6 @@ data class AuthState(
 )
 
 
-
 sealed interface AuthResult {
     object Loading : AuthResult
     object Cancelled : AuthResult
@@ -62,6 +61,7 @@ sealed interface AuthResult {
     ) : AuthResult
 
 }
+
 
 enum class ErrorCode{
     DUPLICATE_EMAIL,

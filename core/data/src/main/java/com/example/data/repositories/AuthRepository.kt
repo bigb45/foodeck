@@ -5,7 +5,6 @@ import com.example.data.data.UserData
 import com.example.data.models.AuthResult
 import com.example.data.data.UserSignUpModel
 import com.example.data.data.UserLoginCredentials
-import com.google.firebase.auth.FirebaseUser
 
 
 interface AuthRepository {
