@@ -4,12 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.authentication.create_account.navigation.createAccountScreen
@@ -20,7 +15,6 @@ import com.example.authentication.facebook_login.navigation.facebookLoginScreen
 import com.example.authentication.navigation.loginMethods
 import com.example.authentication.navigation.loginMethodsRoute
 import com.example.authentication.navigation.navigateToLoginMethods
-import com.example.data.models.AuthResult
 
 
 @Composable

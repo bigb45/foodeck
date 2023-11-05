@@ -34,7 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.data.models.AuthResult
+import com.example.authentication.AuthResult
 import com.example.compose.gray6
 import com.example.compose.seed
 import com.example.core.ui.components.CustomPasswordTextField
@@ -44,7 +44,7 @@ import com.example.core.ui.components.PrimaryButton
 import com.example.core.ui.components.SecondaryButton
 import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.data.models.AuthEvent
-import com.example.data.models.AuthState
+import com.example.data.models.CreateAccountScreenState
 import com.example.fooddelivery.authentication.R
 
 
@@ -105,7 +105,7 @@ internal fun LoginForm(
     scrollState: ScrollState,
     onSecondaryButtonClick: () -> Unit,
     notifyChange: (AuthEvent) -> Unit,
-    uiState: AuthState,
+    uiState: CreateAccountScreenState,
 ) {
     Column(
         modifier = Modifier
@@ -137,7 +137,7 @@ internal fun LoginForm(
 }
 
 @Composable
-internal fun TextFields(notifyChange: (AuthEvent) -> Unit, uiState: AuthState) {
+internal fun TextFields(notifyChange: (AuthEvent) -> Unit, uiState: CreateAccountScreenState) {
     Column(
 
         horizontalAlignment = Alignment.CenterHorizontally,

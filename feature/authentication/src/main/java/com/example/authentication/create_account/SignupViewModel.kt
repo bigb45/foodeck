@@ -1,19 +1,23 @@
 package com.example.authentication.create_account
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.data.models.AuthResult
+import com.example.authentication.AuthResult
+import com.example.common.Result
+import com.example.common.asResult
 import com.example.data.data.FieldError
 import com.example.data.data.UserSignUpModel
 import com.example.data.models.AuthEvent
-import com.example.data.models.AuthState
-import com.example.data.models.ErrorCode
+import com.example.data.models.CreateAccountScreenState
+import com.example.data.repositories.AuthRepositoryImpl
 import com.example.data.util.ValidationResult
 import com.example.domain.use_cases.SignUserUpUseCase
 import com.example.domain.use_cases.ValidateEmailUseCase
 import com.example.domain.use_cases.ValidatePasswordUseCase
 import com.example.domain.use_cases.ValidatePhoneNumberUseCase
 import com.example.domain.use_cases.ValidateUsernameUseCase
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,7 +33,7 @@ class SignupViewModel @Inject constructor(
     private val usernameUseCase: ValidateUsernameUseCase,
     private val signupUpUseCase: SignUserUpUseCase,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(AuthState())
+    private val _uiState = MutableStateFlow(CreateAccountScreenState())
     private val _authResult: MutableStateFlow<AuthResult> = MutableStateFlow(AuthResult.SignedOut)
     private val _isFormValid = MutableStateFlow(false)
 
@@ -94,22 +98,40 @@ class SignupViewModel @Inject constructor(
 
     private fun signUp(user: UserSignUpModel) {
         viewModelScope.launch {
-            _authResult.value = signupUpUseCase(user)
 
-            when (val result = _authResult.value) {
-                is AuthResult.Error -> {
-                    handleAuthError(result)
+            signupUpUseCase(user).asResult().collect { result ->
+
+                Log.d("error", "$result")
+                when (result) {
+                    is Result.Success -> {
+                        _authResult.value = AuthResult.Success(result.data)
+                    }
+
+                    Result.Loading -> {
+                        _authResult.value = AuthResult.Loading
+                    }
+
+                    is Result.Error -> {
+                        handleAuthError(result)
+                        _authResult.value = AuthResult.Error(result.exception?.message ?: "Unknown")
+
+                    }
                 }
 
-                else -> {}
+
             }
         }
+//            .stateIn(
+//            scope = viewModelScope,
+//            started = SharingStarted.WhileSubscribed(5_000),
+//            initialValue = AuthResult.Loading,
+//        )
 
     }
 
-    private fun handleAuthError(result: AuthResult.Error) {
-        when (result.errorCode) {
-            ErrorCode.DUPLICATE_EMAIL -> {
+    private fun handleAuthError(result: Result.Error) {
+        when (result.exception) {
+            is FirebaseAuthUserCollisionException -> {
                 _uiState.value = _uiState.value.copy(
                     emailError = FieldError(
                         isError = true,
@@ -118,7 +140,7 @@ class SignupViewModel @Inject constructor(
                 )
             }
 
-            ErrorCode.DUPLICATE_PHONE_NUMBER -> {
+            is AuthRepositoryImpl.DuplicatePhoneNumberError -> {
                 _uiState.value = _uiState.value.copy(
                     phoneNumberError = FieldError(
                         isError = true,

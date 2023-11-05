@@ -3,7 +3,7 @@ package com.example.authentication.facebook_login
 import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.data.models.AuthResult
+import com.example.authentication.AuthResult
 import com.example.data.data.UserData
 import com.example.domain.use_cases.AddUserInformationUseCase
 import com.facebook.FacebookException
@@ -16,7 +16,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FacebookLoginViewModel @Inject constructor(private val addAdditionalUserInformation: AddUserInformationUseCase) : ViewModel() {
+class FacebookLoginViewModel @Inject constructor(private val addAdditionalUserInformation: AddUserInformationUseCase) :
+    ViewModel() {
     private val _authResult = MutableStateFlow<AuthResult>(AuthResult.Loading)
     val authResult: StateFlow<AuthResult> = _authResult
 

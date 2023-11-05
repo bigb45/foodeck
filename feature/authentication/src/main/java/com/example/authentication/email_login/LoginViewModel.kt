@@ -2,11 +2,13 @@ package com.example.authentication.email_login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.data.models.AuthResult
+import com.example.authentication.AuthResult
+import com.example.common.Result
+import com.example.common.asResult
 import com.example.data.data.FieldError
 import com.example.data.data.UserLoginCredentials
 import com.example.data.models.AuthEvent
-import com.example.data.models.AuthState
+import com.example.data.models.CreateAccountScreenState
 import com.example.data.util.ValidationResult
 import com.example.domain.use_cases.SignUserInUseCase
 import com.example.domain.use_cases.ValidateEmailUseCase
@@ -23,7 +25,7 @@ class LoginViewModel @Inject constructor(
     private val passwordUseCase: ValidatePasswordUseCase,
     private val signUserInUseCase: SignUserInUseCase,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(AuthState())
+    private val _uiState = MutableStateFlow(CreateAccountScreenState())
     private var _authResult: MutableStateFlow<AuthResult> = MutableStateFlow(AuthResult.SignedOut)
     val authResult: StateFlow<AuthResult> = _authResult
     val loginUiState = _uiState
@@ -50,8 +52,7 @@ class LoginViewModel @Inject constructor(
                     _authResult.value = AuthResult.Loading
                     val userInfo = with(_uiState.value) {
                         UserLoginCredentials(
-                            email = email,
-                            password = password
+                            email = email, password = password
                         )
                     }
                     signIn(userInfo)
@@ -64,24 +65,36 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun signIn(user: UserLoginCredentials) {
+//        TODO: use stateIn
         viewModelScope.launch {
-            _authResult.value = signUserInUseCase(user)
-            when (val result = _authResult.value) {
-                is AuthResult.Error -> {
-                    handleAuthError(result)
+            signUserInUseCase(user).asResult().collect { result ->
+
+                when (result) {
+
+                    is Result.Error -> {
+                        handleAuthError(result)
+                        _authResult.value =
+                            AuthResult.Error(result.exception?.message ?: "Unknown error.")
+                    }
+
+                    Result.Loading -> {
+                        _authResult.value = AuthResult.Loading
+                    }
+
+                    is Result.Success -> {
+                        _authResult.value = AuthResult.Success(result.data)
+                    }
+
                 }
 
-                else -> {}
             }
-
         }
     }
 
-    private fun handleAuthError(result: AuthResult.Error) {
+    private fun handleAuthError(result: Result.Error) {
         _uiState.value = _uiState.value.copy(
             emailError = FieldError(
-                isError = true,
-                ValidationResult.INVALID_CREDENTIALS
+                isError = true, ValidationResult.INVALID_CREDENTIALS
 
             )
         )

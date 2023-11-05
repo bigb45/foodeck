@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.androidx.tools.core)
     implementation(project(":core:data"))
     implementation(libs.google.firebase.auth.ktx)
+    implementation(project(":core:common"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

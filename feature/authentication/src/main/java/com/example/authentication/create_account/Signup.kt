@@ -34,7 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.data.models.AuthResult
+import com.example.authentication.AuthResult
 import com.example.compose.gray6
 import com.example.compose.seed
 import com.example.core.ui.components.CustomPasswordTextField
@@ -43,7 +43,7 @@ import com.example.core.ui.components.PrimaryButton
 import com.example.core.ui.components.SecondaryButton
 import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.data.models.AuthEvent
-import com.example.data.models.AuthState
+import com.example.data.models.CreateAccountScreenState
 import com.example.fooddelivery.authentication.R
 
 
@@ -57,7 +57,7 @@ internal fun SignupRoute(
     val scrollState = rememberScrollState()
     val uiState by viewModel.signupUiState.collectAsState()
     val authResult by viewModel.authState.collectAsState()
-    val snackbarHostState = remember {SnackbarHostState()}
+    val snackbarHostState: SnackbarHostState = remember {SnackbarHostState()}
 
     LaunchedEffect(key1 = authResult) {
         when (authResult) {
@@ -68,8 +68,11 @@ internal fun SignupRoute(
             is AuthResult.Success -> {
                 onAuthenticationSuccess((authResult as AuthResult.Success).data.userId.toString())
             }
+            is AuthResult.Loading -> {
 
-            else -> {}
+            }
+
+          else -> {}
         }
     }
     FoodDeliveryTheme {
@@ -89,7 +92,7 @@ internal fun SignupRoute(
 internal fun SignupScreen(
     onNavigateUp: () -> Unit,
     scrollState: ScrollState,
-    uiState: AuthState,
+    uiState: CreateAccountScreenState,
     notifyChange: (AuthEvent) -> Unit,
     onSecondaryButtonClick: () -> Unit,
     snackbarHostState: SnackbarHostState,
@@ -128,7 +131,7 @@ internal fun SignupScreen(
 @Composable
 internal fun SignupForm(
     scrollState: ScrollState,
-    uiState: AuthState,
+    uiState: CreateAccountScreenState,
     notifyChange: (AuthEvent) -> Unit,
     onSecondaryButtonClick: () -> Unit,
     modifier: Modifier,
@@ -162,7 +165,7 @@ internal fun SignupForm(
 
 @Composable
 fun TextFields(
-    uiState: AuthState,
+    uiState: CreateAccountScreenState,
     notifyChange: (AuthEvent) -> Unit,
 ) {
     Column(

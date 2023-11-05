@@ -1,6 +1,5 @@
 package com.example.authentication
 
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
@@ -46,7 +45,6 @@ import com.example.core.ui.components.Hyperlink
 import com.example.core.ui.components.PrimaryButton
 import com.example.core.ui.components.SecondaryButton
 import com.example.core.ui.theme.FoodDeliveryTheme
-import com.example.data.models.AuthResult
 import com.example.fooddelivery.authentication.R
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch

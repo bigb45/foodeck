@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.core.ui.components.PrimaryButton
 import com.example.core.ui.components.SecondaryButton
-import com.example.fooddelivery.R
+import com.example.fooddeliver.home.R
 
 @Composable
 fun Welcome(onContinueClick: () -> Unit, onSignOut: () -> Unit) {
