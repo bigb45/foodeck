@@ -1,10 +1,9 @@
 package com.example.home.welcome
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.data.data.UserData
+import com.example.data.models.UserData
 import com.example.domain.use_cases.GetUserFromIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

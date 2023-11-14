@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.authentication.AuthResult
-import com.example.data.data.UserData
+import com.example.data.models.UserData
 import com.example.domain.use_cases.AddUserInformationUseCase
 import com.facebook.FacebookException
 import com.facebook.GraphRequest

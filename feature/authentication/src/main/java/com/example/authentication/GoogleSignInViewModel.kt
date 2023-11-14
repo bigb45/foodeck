@@ -2,7 +2,7 @@ package com.example.authentication
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.data.data.UserData
+import com.example.data.models.UserData
 import com.example.domain.use_cases.AddUserInformationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

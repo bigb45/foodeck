@@ -6,9 +6,9 @@ import com.example.authentication.AuthResult
 import com.example.common.Result
 import com.example.common.asResult
 import com.example.data.data.FieldError
-import com.example.data.data.UserLoginCredentials
-import com.example.data.models.AuthEvent
-import com.example.data.models.CreateAccountScreenState
+import com.example.data.models.UserLoginCredentials
+import com.example.authentication.AuthEvent
+import com.example.authentication.create_account.CreateAccountScreenState
 import com.example.data.util.ValidationResult
 import com.example.domain.use_cases.SignUserInUseCase
 import com.example.domain.use_cases.ValidateEmailUseCase

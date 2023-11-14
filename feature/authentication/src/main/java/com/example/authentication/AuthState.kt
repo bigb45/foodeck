@@ -1,6 +1,6 @@
 package com.example.authentication
 
-import com.example.data.data.UserData
+import com.example.data.models.UserData
 
 sealed interface AuthResult {
     object Loading : AuthResult

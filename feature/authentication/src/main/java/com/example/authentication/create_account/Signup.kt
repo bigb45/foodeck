@@ -42,8 +42,7 @@ import com.example.core.ui.components.CustomTextField
 import com.example.core.ui.components.PrimaryButton
 import com.example.core.ui.components.SecondaryButton
 import com.example.core.ui.theme.FoodDeliveryTheme
-import com.example.data.models.AuthEvent
-import com.example.data.models.CreateAccountScreenState
+import com.example.authentication.AuthEvent
 import com.example.fooddelivery.authentication.R
 
 

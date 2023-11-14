@@ -7,9 +7,8 @@ import com.example.authentication.AuthResult
 import com.example.common.Result
 import com.example.common.asResult
 import com.example.data.data.FieldError
-import com.example.data.data.UserSignUpModel
-import com.example.data.models.AuthEvent
-import com.example.data.models.CreateAccountScreenState
+import com.example.data.models.UserSignUpModel
+import com.example.authentication.AuthEvent
 import com.example.data.repositories.AuthRepositoryImpl
 import com.example.data.util.ValidationResult
 import com.example.domain.use_cases.SignUserUpUseCase

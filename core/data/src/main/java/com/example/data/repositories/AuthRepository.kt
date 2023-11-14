@@ -1,9 +1,9 @@
 package com.example.data.repositories
 
 
-import com.example.data.data.UserData
-import com.example.data.data.UserLoginCredentials
-import com.example.data.data.UserSignUpModel
+import com.example.data.models.UserData
+import com.example.data.models.UserLoginCredentials
+import com.example.data.models.UserSignUpModel
 import kotlinx.coroutines.flow.Flow
 
 

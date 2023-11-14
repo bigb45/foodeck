@@ -1,8 +1,7 @@
 package com.example.domain.use_cases
 
-import com.example.common.Result
-import com.example.data.data.UserData
-import com.example.data.data.UserSignUpModel
+import com.example.data.models.UserData
+import com.example.data.models.UserSignUpModel
 import com.example.data.repositories.AuthRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
