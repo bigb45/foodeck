@@ -1,5 +1,6 @@
 package com.example.authentication.create_account
 
+import android.util.Log.d
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -65,6 +66,7 @@ internal fun SignupRoute(
             }
 
             is AuthResult.Success -> {
+                d("navigating", (authResult as AuthResult.Success).data.userId.toString())
                 onAuthenticationSuccess((authResult as AuthResult.Success).data.userId.toString())
             }
             is AuthResult.Loading -> {

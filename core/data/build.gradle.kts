@@ -67,6 +67,8 @@ dependencies {
     implementation(libs.play.services.auth)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.database.ktx)
+    implementation(libs.retrofit2)
+    implementation(libs.gson.converter)
     implementation(project(":core:common"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)

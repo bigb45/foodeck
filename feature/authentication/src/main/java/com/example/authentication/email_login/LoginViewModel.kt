@@ -1,14 +1,16 @@
 package com.example.authentication.email_login
 
+import android.util.Log.d
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.authentication.AuthResult
 import com.example.common.Result
-import com.example.common.asResult
 import com.example.data.data.FieldError
 import com.example.data.models.UserLoginCredentials
 import com.example.authentication.AuthEvent
 import com.example.authentication.create_account.CreateAccountScreenState
+import com.example.data.models.LoginAuthResponseModel
+import com.example.data.models.UserData
 import com.example.data.util.ValidationResult
 import com.example.domain.use_cases.SignUserInUseCase
 import com.example.domain.use_cases.ValidateEmailUseCase
@@ -25,11 +27,11 @@ class LoginViewModel @Inject constructor(
     private val passwordUseCase: ValidatePasswordUseCase,
     private val signUserInUseCase: SignUserInUseCase,
 ) : ViewModel() {
+
     private val _uiState = MutableStateFlow(CreateAccountScreenState())
     private var _authResult: MutableStateFlow<AuthResult> = MutableStateFlow(AuthResult.SignedOut)
     val authResult: StateFlow<AuthResult> = _authResult
     val loginUiState = _uiState
-
 
     fun notifyChange(event: AuthEvent) {
         when (event) {
@@ -67,24 +69,22 @@ class LoginViewModel @Inject constructor(
     private fun signIn(user: UserLoginCredentials) {
 //        TODO: use stateIn
         viewModelScope.launch {
-            signUserInUseCase(user).asResult().collect { result ->
+            signUserInUseCase(user).collect { result ->
 
                 when (result) {
-
-                    is Result.Error -> {
-                        handleAuthError(result)
-                        _authResult.value =
-                            AuthResult.Error(result.exception?.message ?: "Unknown error.")
-                    }
-
-                    Result.Loading -> {
+                    LoginAuthResponseModel.InternalServerError -> d("error", "server is down")
+                    LoginAuthResponseModel.InvalidCredentials -> d("error", "wrong password")
+                    LoginAuthResponseModel.Loading -> {
                         _authResult.value = AuthResult.Loading
                     }
-
-                    is Result.Success -> {
-                        _authResult.value = AuthResult.Success(result.data)
+                    is LoginAuthResponseModel.LoginFailure -> d("error", "user not found")
+                    is LoginAuthResponseModel.LoginSuccess -> {
+                        _authResult.value = AuthResult.Success(UserData(userId = result.tokens.userId))
                     }
-
+                    LoginAuthResponseModel.UnknownError -> d("error", "unknown error")
+                    LoginAuthResponseModel.UserNotFound -> {
+                        d("error", "user not found")
+                    }
                 }
 
             }

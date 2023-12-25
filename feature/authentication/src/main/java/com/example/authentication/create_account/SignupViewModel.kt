@@ -1,6 +1,7 @@
 package com.example.authentication.create_account
 
 import android.util.Log
+import android.util.Log.d
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.authentication.AuthResult
@@ -9,9 +10,11 @@ import com.example.common.asResult
 import com.example.data.data.FieldError
 import com.example.data.models.UserSignUpModel
 import com.example.authentication.AuthEvent
+import com.example.data.models.SignupAuthResponseModel
+import com.example.data.models.UserData
 import com.example.data.repositories.AuthRepositoryImpl
 import com.example.data.util.ValidationResult
-import com.example.domain.use_cases.SignUserUpUseCase
+import com.example.domain.use_cases.CreateUserUseCase
 import com.example.domain.use_cases.ValidateEmailUseCase
 import com.example.domain.use_cases.ValidatePasswordUseCase
 import com.example.domain.use_cases.ValidatePhoneNumberUseCase
@@ -30,7 +33,7 @@ class SignupViewModel @Inject constructor(
     private val phoneNumberUseCase: ValidatePhoneNumberUseCase,
     private val passwordUseCase: ValidatePasswordUseCase,
     private val usernameUseCase: ValidateUsernameUseCase,
-    private val signupUpUseCase: SignUserUpUseCase,
+    private val signupUpUseCase: CreateUserUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CreateAccountScreenState())
     private val _authResult: MutableStateFlow<AuthResult> = MutableStateFlow(AuthResult.SignedOut)
@@ -98,34 +101,25 @@ class SignupViewModel @Inject constructor(
     private fun signUp(user: UserSignUpModel) {
         viewModelScope.launch {
 
-            signupUpUseCase(user).asResult().collect { result ->
-
-                Log.d("error", "$result")
-                when (result) {
-                    is Result.Success -> {
-                        _authResult.value = AuthResult.Success(result.data)
-                    }
-
-                    Result.Loading -> {
+            signupUpUseCase(user).collect { result ->
+                when(result){
+                    SignupAuthResponseModel.InternalServerError -> d("error", "server is down")
+                    SignupAuthResponseModel.Loading -> {
                         _authResult.value = AuthResult.Loading
+                        d("error", "Loading")
                     }
-
-                    is Result.Error -> {
-                        handleAuthError(result)
-                        _authResult.value = AuthResult.Error(result.exception?.message ?: "Unknown")
-
+                    is SignupAuthResponseModel.SignupFailure -> d("error", "error")
+                    is SignupAuthResponseModel.SignupSuccess -> {
+                        _authResult.value = AuthResult.Success(UserData(result.tokens.userId))
+                        d("error", "success")
                     }
+                    SignupAuthResponseModel.UnknownError -> d("error", "Unknown error")
+                    SignupAuthResponseModel.UserAlreadyExists -> d("error", "A user already exists")
+                    SignupAuthResponseModel.PhoneNumberAlreadyExists -> d("error", "phone number already exists")
                 }
-
 
             }
         }
-//            .stateIn(
-//            scope = viewModelScope,
-//            started = SharingStarted.WhileSubscribed(5_000),
-//            initialValue = AuthResult.Loading,
-//        )
-
     }
 
     private fun handleAuthError(result: Result.Error) {

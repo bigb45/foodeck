@@ -1,6 +1,8 @@
 package com.example.data.repositories
 
 
+import com.example.data.models.LoginAuthResponseModel
+import com.example.data.models.SignupAuthResponseModel
 import com.example.data.models.UserData
 import com.example.data.models.UserLoginCredentials
 import com.example.data.models.UserSignUpModel
@@ -21,7 +23,8 @@ import kotlin.coroutines.resume
 class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : AuthRepository {
     private val db = Firebase.database.reference
 
-    override fun createUser(user: UserSignUpModel): Flow<UserData> {
+    override fun createUser(user: UserSignUpModel): Flow<SignupAuthResponseModel> {
+
         return flow {
             if (checkDuplicatePhoneNumber(user.phoneNumber)) {
                 throw DuplicatePhoneNumberError()
@@ -36,7 +39,7 @@ class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : A
                 profilePictureUrl = null
             )
             addUserInformationToDatabase(userData)
-            emit(userData)
+            emit(SignupAuthResponseModel.Loading)
         }
 
     }
@@ -50,7 +53,7 @@ class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : A
         db.child("users").child(userData.userId ?: "error").setValue(userData)
     }
 
-    override fun signUserIn(user: UserLoginCredentials): Flow<UserData> {
+    override suspend fun signUserIn(user: UserLoginCredentials): Flow<LoginAuthResponseModel> {
         return flow {
             val result = auth.signInWithEmailAndPassword(user.email, user.password).await()
             val userData = UserData(
@@ -60,7 +63,8 @@ class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : A
                 profilePictureUrl = null
             )
 
-            emit(userData)
+//            emit(userData)
+            emit(LoginAuthResponseModel.Loading)
         }
 
 
@@ -69,7 +73,6 @@ class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : A
     override suspend fun signUserOut(): Flow<Boolean> {
         return flow{false}
     }
-
     override suspend fun getUsernameFromEmail(email: String): String {
         return "Unimplemented method"
     }
