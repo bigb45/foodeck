@@ -12,7 +12,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.fooddelivery"
+    namespace = "com.example.data"
     compileSdk = 34
 
     defaultConfig {

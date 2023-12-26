@@ -10,7 +10,8 @@ import com.example.data.models.UserLoginCredentials
 import com.example.authentication.AuthEvent
 import com.example.authentication.create_account.CreateAccountScreenState
 import com.example.data.models.LoginAuthResponseModel
-import com.example.data.models.UserData
+import com.example.data.util.AccessTokenRemoteDataSource
+import com.example.data.util.PreferencesManager
 import com.example.data.util.ValidationResult
 import com.example.domain.use_cases.SignUserInUseCase
 import com.example.domain.use_cases.ValidateEmailUseCase
@@ -20,12 +21,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.data.R
+import com.example.data.models.UserData
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val emailUseCase: ValidateEmailUseCase,
     private val passwordUseCase: ValidatePasswordUseCase,
     private val signUserInUseCase: SignUserInUseCase,
+    private val tokenRepository: AccessTokenRemoteDataSource,
+    private val preferencesManager: PreferencesManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CreateAccountScreenState())
@@ -79,6 +84,8 @@ class LoginViewModel @Inject constructor(
                     }
                     is LoginAuthResponseModel.LoginFailure -> d("error", "user not found")
                     is LoginAuthResponseModel.LoginSuccess -> {
+//                        preferencesManager.writeToken(R.string.refresh_token, result.tokens.refreshToken)
+//                        tokenRepository.getAccessToken()
                         _authResult.value = AuthResult.Success(UserData(userId = result.tokens.userId))
                     }
                     LoginAuthResponseModel.UnknownError -> d("error", "unknown error")

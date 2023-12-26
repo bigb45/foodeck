@@ -7,9 +7,10 @@ import com.example.data.repositories.AuthRepository
 import com.example.data.repositories.AuthRepositoryImplCustomApi
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+import javax.inject.Named
 
 
-class CreateUserUseCase @Inject constructor(private val repository: AuthRepositoryImplCustomApi) {
+class CreateUserUseCase @Inject constructor(@Named("customApi") private val repository: AuthRepository) {
     operator fun invoke(user: UserSignUpModel): Flow<SignupAuthResponseModel> {
         return repository.createUser(user)
 

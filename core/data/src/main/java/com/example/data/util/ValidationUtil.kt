@@ -1,7 +1,7 @@
 package com.example.data.util
 
 import androidx.annotation.StringRes
-import com.example.fooddelivery.R
+import com.example.data.R
 import javax.inject.Inject
 
 val EMAIL_PATTERN = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+".toRegex()

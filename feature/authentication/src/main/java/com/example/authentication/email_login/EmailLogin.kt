@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.getString
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.authentication.AuthResult
 import com.example.compose.gray6
@@ -65,6 +66,7 @@ internal fun EmailLoginRoute(
     LaunchedEffect(key1 = authResult) {
         when (authResult) {
             is AuthResult.Success -> {
+//                write token to shared preferences
                 onLoginSuccess((authResult as AuthResult.Success).data.userId.toString())
                 snackbarHostState.showSnackbar("Login Success")
             }

@@ -25,6 +25,7 @@ class AuthRepositoryImplCustomApi @Inject constructor(private val authService: A
                 emit(
                     when {
                         res.isSuccessful -> {
+
                             SignupAuthResponseModel.SignupSuccess(res.body()!!)
                         }
 
