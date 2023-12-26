@@ -45,7 +45,7 @@ fun Welcome(onContinueClick: () -> Unit, onSignOut: () -> Unit) {
         Text(stringResource(R.string.signed_in_successfully), style = MaterialTheme.typography.titleLarge)
         Text("Signed in as ${user.username}")
         PrimaryButton(
-            text = "Continue to Foodeck", enabled = true, onClick = onContinueClick
+            text = "Continue to Foodeck", enabled = true, onClick = {viewModel.getUserFromId("1")}
         )
         SecondaryButton(
             text = "Sign out", enabled = true, onClick = onSignOut

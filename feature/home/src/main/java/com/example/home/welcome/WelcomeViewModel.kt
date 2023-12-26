@@ -1,5 +1,6 @@
 package com.example.home.welcome
 
+import android.util.Log.d
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -28,9 +29,10 @@ class WelcomeViewModel @Inject constructor(
         getUserFromId(userId)
     }
 
-    private fun getUserFromId(userId: String) {
+    fun getUserFromId(userId: String) {
         viewModelScope.launch {
             _user.value = getUser(userId)
+            d("error", _user.value.toString())
         }
     }
 }

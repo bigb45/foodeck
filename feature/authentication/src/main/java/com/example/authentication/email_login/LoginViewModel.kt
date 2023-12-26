@@ -84,7 +84,7 @@ class LoginViewModel @Inject constructor(
                     }
                     is LoginAuthResponseModel.LoginFailure -> d("error", "user not found")
                     is LoginAuthResponseModel.LoginSuccess -> {
-//                        preferencesManager.writeToken(R.string.refresh_token, result.tokens.refreshToken)
+                        preferencesManager.writeToken(R.string.access_token, result.tokens.accessToken)
 //                        tokenRepository.getAccessToken()
                         _authResult.value = AuthResult.Success(UserData(userId = result.tokens.userId))
                     }

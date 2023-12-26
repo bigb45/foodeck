@@ -9,7 +9,6 @@ class PreferencesManager(private val context: Context) {
         context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
     fun writeToken(name: Int, token: String){
         with(sharedPreferences.edit()){
-            d("pref manager", token)
             putString(context.getString(name), token)
             apply()
         }

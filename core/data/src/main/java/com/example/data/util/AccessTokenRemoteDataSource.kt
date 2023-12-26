@@ -27,7 +27,7 @@ class AccessTokenRemoteDataSource @Inject constructor(
                         d("error", "invalid refresh token")
                     }
 
-                    else -> {}
+                    else -> {"no token"}
                 }
 
             }

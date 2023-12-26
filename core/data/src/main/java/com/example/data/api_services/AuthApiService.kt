@@ -39,11 +39,3 @@ data class TokenDto(
 data class RefreshTokenDto(
     @SerializedName("accessToken") val token: String
 )
-// TODO: move the user dto and endpoint to UserApiService
-//data class UserDto(
-//    val userId: String,
-//    val name: String,
-//    val email: String
-//)
-//@GET("users")
-//suspend fun getUserById(@Query("id") id: String): Response<UserDto>
