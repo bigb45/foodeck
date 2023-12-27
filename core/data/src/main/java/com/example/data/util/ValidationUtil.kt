@@ -1,7 +1,7 @@
 package com.example.data.util
 
 import androidx.annotation.StringRes
-import com.example.fooddelivery.R
+import com.example.data.R
 import javax.inject.Inject
 
 val EMAIL_PATTERN = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+".toRegex()
@@ -30,6 +30,7 @@ class ValidationUtil @Inject constructor() {
 
 }
 
+// TODO: move this to separate file
 enum class ValidationResult(@StringRes val message: Int) {
     PASSWORD_LENGTH(R.string.password_length_error),
     EMPTY_PASSWORD(R.string.empty_password_error),

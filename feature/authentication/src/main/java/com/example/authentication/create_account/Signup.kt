@@ -1,5 +1,6 @@
 package com.example.authentication.create_account
 
+import android.util.Log.d
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -54,7 +55,7 @@ internal fun SignupRoute(
 ) {
     val viewModel: SignupViewModel = hiltViewModel()
     val scrollState = rememberScrollState()
-    val uiState by viewModel.signupUiState.collectAsState()
+    val uiState by viewModel.signUpScreenUiState.collectAsState()
     val authResult by viewModel.authState.collectAsState()
     val snackbarHostState: SnackbarHostState = remember {SnackbarHostState()}
 
@@ -68,7 +69,7 @@ internal fun SignupRoute(
                 onAuthenticationSuccess((authResult as AuthResult.Success).data.userId.toString())
             }
             is AuthResult.Loading -> {
-
+//            TODO: make button disabled and show loading state
             }
 
           else -> {}

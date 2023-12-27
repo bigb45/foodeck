@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.authentication.AuthResult
-import com.example.data.models.UserData
+import com.example.data.models.UserDetailsModel
 import com.example.domain.use_cases.AddUserInformationUseCase
 import com.facebook.FacebookException
 import com.facebook.GraphRequest
@@ -31,7 +31,7 @@ class FacebookLoginViewModel @Inject constructor(private val addAdditionalUserIn
                 val email = user.getString("email")
                 val profilePictureUrl = "https://graph.facebook.com/$userId/picture?type=large"
 
-                val data = UserData(
+                val data = UserDetailsModel(
                     userId = userId,
                     email = email,
                     username = username,
@@ -52,7 +52,7 @@ class FacebookLoginViewModel @Inject constructor(private val addAdditionalUserIn
 
     }
 
-    private fun addUserInfo(data: UserData) {
+    private fun addUserInfo(data: UserDetailsModel) {
         viewModelScope.launch {
 //          TODO: handle error here ↘️↘️
             addAdditionalUserInformation(data)

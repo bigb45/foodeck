@@ -1,12 +1,8 @@
 package com.example.authentication.create_account
 
-import com.example.data.data.FieldError
+import com.example.data.models.FieldError
 
 
-sealed interface TextFieldState{
-    data class Error(val label: String, val errorMessage: String): TextFieldState
-    data class Success(val label: String, val data: String?): TextFieldState
-}
 
 data class CreateAccountScreenState(
     val username: String = "",

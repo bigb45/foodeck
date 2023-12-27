@@ -1,17 +1,20 @@
 package com.example.authentication.create_account
 
-import android.util.Log
+import android.util.Log.d
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.authentication.AuthEvent
 import com.example.authentication.AuthResult
 import com.example.common.Result
 import com.example.common.asResult
-import com.example.data.data.FieldError
+import com.example.data.models.FieldError
+import com.example.data.models.SignInAuthResponseModel
+import com.example.data.models.SignupAuthResponseModel
+import com.example.data.models.UserDetailsModel
 import com.example.data.models.UserSignUpModel
-import com.example.authentication.AuthEvent
 import com.example.data.repositories.AuthRepositoryImpl
 import com.example.data.util.ValidationResult
-import com.example.domain.use_cases.SignUserUpUseCase
+import com.example.domain.use_cases.CreateUserUseCase
 import com.example.domain.use_cases.ValidateEmailUseCase
 import com.example.domain.use_cases.ValidatePasswordUseCase
 import com.example.domain.use_cases.ValidatePhoneNumberUseCase
@@ -30,13 +33,13 @@ class SignupViewModel @Inject constructor(
     private val phoneNumberUseCase: ValidatePhoneNumberUseCase,
     private val passwordUseCase: ValidatePasswordUseCase,
     private val usernameUseCase: ValidateUsernameUseCase,
-    private val signupUpUseCase: SignUserUpUseCase,
+    private val signupUpUseCase: CreateUserUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CreateAccountScreenState())
     private val _authResult: MutableStateFlow<AuthResult> = MutableStateFlow(AuthResult.SignedOut)
     private val _isFormValid = MutableStateFlow(false)
 
-    val signupUiState = _uiState.asStateFlow()
+    val signUpScreenUiState = _uiState.asStateFlow()
     val authState: StateFlow<AuthResult> = _authResult
     fun notifyChange(event: AuthEvent) {
         when (event) {
@@ -44,7 +47,6 @@ class SignupViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(
                     email = event.newEmail
                 )
-
                 validateEmail()
             }
 
@@ -81,9 +83,7 @@ class SignupViewModel @Inject constructor(
                         )
                     }
                     signUp(newUser)
-
                 }
-
             }
         }
     }
@@ -99,33 +99,48 @@ class SignupViewModel @Inject constructor(
         viewModelScope.launch {
 
             signupUpUseCase(user).asResult().collect { result ->
-
-                Log.d("error", "$result")
                 when (result) {
-                    is Result.Success -> {
-                        _authResult.value = AuthResult.Success(result.data)
+//                    SignupAuthResponseModel.InternalServerError -> {
+//                        handleAuthError(result.)
+//                    }
+//                    SignupAuthResponseModel.Loading -> {
+//                        _authResult.value = AuthResult.Loading
+//                        d("error", "Loading")
+//                    }
+//                    is SignupAuthResponseModel.SignupFailure -> d("error", "error")
+//                    is SignupAuthResponseModel.SignupSuccess -> {
+//                        _authResult.value = AuthResult.Success(UserData(result.tokens.userId))
+//                        d("error", "success")
+//                    }
+//                    SignupAuthResponseModel.UnknownError -> d("error", "Unknown error")
+//                    SignupAuthResponseModel.UserAlreadyExists -> d("error", "A user already exists")
+//                    SignupAuthResponseModel.PhoneNumberAlreadyExists -> d("error", "phone number already exists")
+
+                    is Result.Error -> {
+                        _authResult.value =
+                            AuthResult.Error(result.exception?.message ?: "Unknown error")
+                        d("error", "${result.exception?.message}")
+                        handleAuthError(result)
                     }
 
                     Result.Loading -> {
                         _authResult.value = AuthResult.Loading
+                        d("error", "loading")
                     }
 
-                    is Result.Error -> {
-                        handleAuthError(result)
-                        _authResult.value = AuthResult.Error(result.exception?.message ?: "Unknown")
-
+                    is Result.Success -> {
+                        _authResult.value =
+                            AuthResult.Success(UserDetailsModel(userId = (result.data as SignupAuthResponseModel.SignupSuccess).tokens.userId))
+                        d(
+                            "error",
+                            "user data ${(result.data as SignupAuthResponseModel.SignupSuccess).tokens.userId}"
+                        )
                     }
+
                 }
-
 
             }
         }
-//            .stateIn(
-//            scope = viewModelScope,
-//            started = SharingStarted.WhileSubscribed(5_000),
-//            initialValue = AuthResult.Loading,
-//        )
-
     }
 
     private fun handleAuthError(result: Result.Error) {
@@ -133,8 +148,7 @@ class SignupViewModel @Inject constructor(
             is FirebaseAuthUserCollisionException -> {
                 _uiState.value = _uiState.value.copy(
                     emailError = FieldError(
-                        isError = true,
-                        ValidationResult.DUPLICATE_EMAIL
+                        isError = true, ValidationResult.DUPLICATE_EMAIL
                     )
                 )
             }
@@ -142,8 +156,7 @@ class SignupViewModel @Inject constructor(
             is AuthRepositoryImpl.DuplicatePhoneNumberError -> {
                 _uiState.value = _uiState.value.copy(
                     phoneNumberError = FieldError(
-                        isError = true,
-                        ValidationResult.DUPLICATE_PHONE_NUMBER
+                        isError = true, ValidationResult.DUPLICATE_PHONE_NUMBER
                     )
                 )
             }
@@ -151,6 +164,7 @@ class SignupViewModel @Inject constructor(
             else -> {}
         }
     }
+
 
     private fun validateEmail(): Boolean {
         val result = emailUseCase(_uiState.value.email)

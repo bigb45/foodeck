@@ -12,7 +12,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.fooddelivery"
+    namespace = "com.example.data"
     compileSdk = 34
 
     defaultConfig {
@@ -67,6 +67,8 @@ dependencies {
     implementation(libs.play.services.auth)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.database.ktx)
+    implementation(libs.retrofit2)
+    implementation(libs.gson.converter)
     implementation(project(":core:common"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)

@@ -3,7 +3,7 @@ package com.example.authentication
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
-import com.example.data.models.UserData
+import com.example.data.models.UserDetailsModel
 import com.example.fooddelivery.authentication.R
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.BeginSignInRequest.GoogleIdTokenRequestOptions
@@ -28,7 +28,7 @@ class GoogleAuthUiClient(
             val user = auth.signInWithCredential(googleCredentials).await().user
             if (user != null) {
                 val data = user.run {
-                    UserData(
+                    UserDetailsModel(
                         userId = uid,
                         email = email,
                         username = displayName ?: "default user",
@@ -79,8 +79,8 @@ class GoogleAuthUiClient(
         }
     }
 
-    fun getSignedInUser(): UserData? = auth.currentUser?.run {
-        UserData(
+    fun getSignedInUser(): UserDetailsModel? = auth.currentUser?.run {
+        UserDetailsModel(
             userId = uid,
             username = displayName ?: "default user",
             profilePictureUrl = photoUrl?.toString()
