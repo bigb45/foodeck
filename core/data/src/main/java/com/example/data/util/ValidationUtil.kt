@@ -30,6 +30,7 @@ class ValidationUtil @Inject constructor() {
 
 }
 
+// TODO: move this to separate file
 enum class ValidationResult(@StringRes val message: Int) {
     PASSWORD_LENGTH(R.string.password_length_error),
     EMPTY_PASSWORD(R.string.empty_password_error),

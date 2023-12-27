@@ -1,7 +1,7 @@
 package com.example.domain.use_cases
 
 import com.example.data.util.ValidationResult
-import com.example.data.data.FieldError
+import com.example.data.models.FieldError
 import javax.inject.Inject
 
 class ValidateUsernameUseCase @Inject constructor() {

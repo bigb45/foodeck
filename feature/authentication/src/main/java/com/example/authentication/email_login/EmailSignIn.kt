@@ -33,7 +33,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.getString
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.authentication.AuthResult
 import com.example.compose.gray6
@@ -45,7 +44,6 @@ import com.example.core.ui.components.PrimaryButton
 import com.example.core.ui.components.SecondaryButton
 import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.authentication.AuthEvent
-import com.example.authentication.create_account.CreateAccountScreenState
 import com.example.fooddelivery.authentication.R
 
 
@@ -57,9 +55,9 @@ internal fun EmailLoginRoute(
     onLoginSuccess: (String) -> Unit,
 
     ) {
-    val viewModel: LoginViewModel = hiltViewModel()
+    val viewModel: SignInViewModel = hiltViewModel()
     val scrollState = rememberScrollState()
-    val uiState by viewModel.loginUiState.collectAsState()
+    val uiState by viewModel.signInUiState.collectAsState()
     val authResult by viewModel.authResult.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -68,7 +66,10 @@ internal fun EmailLoginRoute(
             is AuthResult.Success -> {
 //                write token to shared preferences
                 onLoginSuccess((authResult as AuthResult.Success).data.userId.toString())
-                snackbarHostState.showSnackbar("Login Success")
+            }
+
+            is AuthResult.Error -> {
+                snackbarHostState.showSnackbar((authResult as AuthResult.Error).errorMessage)
             }
 
             else -> {}
@@ -107,7 +108,7 @@ internal fun LoginForm(
     scrollState: ScrollState,
     onSecondaryButtonClick: () -> Unit,
     notifyChange: (AuthEvent) -> Unit,
-    uiState: CreateAccountScreenState,
+    uiState: SignInScreenState,
 ) {
     Column(
         modifier = Modifier
@@ -139,7 +140,7 @@ internal fun LoginForm(
 }
 
 @Composable
-internal fun TextFields(notifyChange: (AuthEvent) -> Unit, uiState: CreateAccountScreenState) {
+internal fun TextFields(notifyChange: (AuthEvent) -> Unit, uiState: SignInScreenState) {
     Column(
 
         horizontalAlignment = Alignment.CenterHorizontally,

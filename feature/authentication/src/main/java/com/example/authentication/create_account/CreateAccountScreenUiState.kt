@@ -1,6 +1,6 @@
 package com.example.authentication.create_account
 
-import com.example.data.data.FieldError
+import com.example.data.models.FieldError
 
 
 

@@ -1,12 +1,11 @@
 package com.example.data.repositories
 
 
-import com.example.data.models.LoginAuthResponseModel
+import com.example.data.models.SignInAuthResponseModel
 import com.example.data.models.SignupAuthResponseModel
-import com.example.data.models.UserData
-import com.example.data.models.UserLoginCredentials
+import com.example.data.models.UserDetailsModel
+import com.example.data.models.UserSignInModel
 import com.example.data.models.UserSignUpModel
-import com.example.data.util.AccessTokenRemoteDataSource
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -32,14 +31,14 @@ class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : A
             }
             val result =
                 auth.createUserWithEmailAndPassword(user.email, user.password).await()
-            val userData = UserData(
+            val userData = UserDetailsModel(
                 username = user.username,
                 userId = result.user?.uid ?: "test_id",
                 email = user.email,
                 phoneNumber = user.phoneNumber,
                 profilePictureUrl = null
             )
-            addUserInformationToDatabase(userData)
+            addUserInformation(userData)
             emit(SignupAuthResponseModel.Loading)
         }
 
@@ -50,14 +49,14 @@ class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : A
         override val message: String = "The phone number is already in use."
     }
 
-    override suspend fun addUserInformationToDatabase(userData: UserData) {
+    override suspend fun addUserInformation(userData: UserDetailsModel) {
         db.child("users").child(userData.userId ?: "error").setValue(userData)
     }
 
-    override suspend fun signUserIn(user: UserLoginCredentials): Flow<LoginAuthResponseModel> {
+    override suspend fun signUserIn(user: UserSignInModel): Flow<SignInAuthResponseModel> {
         return flow {
             val result = auth.signInWithEmailAndPassword(user.email, user.password).await()
-            val userData = UserData(
+            val userData = UserDetailsModel(
                 username = result.user?.displayName ?: "Unknown user",
                 userId = result.user?.uid ?: "test_id",
                 email = user.email,
@@ -65,7 +64,7 @@ class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : A
             )
 
 //            emit(userData)
-            emit(LoginAuthResponseModel.Loading)
+            emit(SignInAuthResponseModel.Loading)
         }
 
 
@@ -90,16 +89,16 @@ class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : A
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        continuation.resume(false) // Handle the error accordingly
+                        continuation.resume(false)
                     }
                 })
         }
     }
 
-    override suspend fun getUserById(id: String): UserData {
+    override suspend fun getUserById(id: String): UserDetailsModel {
         val dbUser = db.child("users").child(id).get().await()
         val userData = with(dbUser) {
-            UserData(
+            UserDetailsModel(
                 userId = child("userId").value.toString(),
                 username = child("username").value.toString(),
                 phoneNumber = child("phoneNumber").value.toString(),

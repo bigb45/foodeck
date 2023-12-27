@@ -1,4 +1,4 @@
-package com.example.data.data
+package com.example.data.models
 
 import com.example.data.util.ValidationResult
 

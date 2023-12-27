@@ -2,7 +2,6 @@ package com.example.data.util
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log.d
 
 class PreferencesManager(private val context: Context) {
     private val sharedPreferences: SharedPreferences =

@@ -1,6 +1,5 @@
 package com.example.data.models
 
-import com.example.data.api_services.TokenDto
 
 sealed class SignupAuthResponseModel {
     data class SignupSuccess(val tokens: TokenDto): SignupAuthResponseModel()

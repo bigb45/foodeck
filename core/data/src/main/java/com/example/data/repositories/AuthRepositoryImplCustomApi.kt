@@ -1,11 +1,15 @@
 package com.example.data.repositories
 
 import android.util.Log
+import android.util.Log.d
 import com.example.data.api_services.AuthApiService
-import com.example.data.models.LoginAuthResponseModel
+import com.example.data.models.InternalServerException
+import com.example.data.models.InvalidCredentialsException
+import com.example.data.models.SignInAuthResponseModel
 import com.example.data.models.SignupAuthResponseModel
-import com.example.data.models.UserData
-import com.example.data.models.UserLoginCredentials
+import com.example.data.models.UserDetailsModel
+import com.example.data.models.UserSignInModel
+import com.example.data.models.UserNotFoundException
 import com.example.data.models.UserSignUpModel
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.flow.Flow
@@ -19,7 +23,6 @@ class AuthRepositoryImplCustomApi @Inject constructor(private val authService: A
             NewUserCredentials(user.username, user.email, user.password, )
         return try {
             flow {
-                emit(SignupAuthResponseModel.Loading)
                 val res = authService.createUser(credentials)
 
                 emit(
@@ -41,43 +44,50 @@ class AuthRepositoryImplCustomApi @Inject constructor(private val authService: A
 
             }
         } catch (e: Exception) {
-            Log.d("error", e.message.toString())
+            d("error", e.message.toString())
             flow { SignupAuthResponseModel.InternalServerError }
         }
     }
 
-    override suspend fun signUserIn(user: UserLoginCredentials): Flow<LoginAuthResponseModel> {
+    override suspend fun signUserIn(user: UserSignInModel): Flow<SignInAuthResponseModel> {
         val userCredentials = UserCredentials(email = user.email, password = user.password)
         return try {
             flow {
-                emit(LoginAuthResponseModel.Loading)
                 val res = authService.logUserIn(userCredentials)
-                Log.d("tag", res.code().toString())
+                d("tag", res.code().toString())
 
                 emit(
                     when {
                         res.isSuccessful -> {
-                            LoginAuthResponseModel.LoginSuccess(res.body()!!)
+                            SignInAuthResponseModel.SignInSuccess(res.body()!!)
                         }
 
                         res.code() == 403 -> {
-                            LoginAuthResponseModel.InvalidCredentials
+                            SignInAuthResponseModel.InvalidCredentials
+                            throw(InvalidCredentialsException("Invalid credentials"))
                         }
 
                         res.code() == 404 -> {
-                            LoginAuthResponseModel.UserNotFound
+                            SignInAuthResponseModel.UserNotFound
+                            throw(UserNotFoundException("User does not exist"))
+                        }
+
+                        res.code() == 500 -> {
+                            SignInAuthResponseModel.InternalServerError
+                            throw(InternalServerException("Internal server error"))
                         }
 
                         else -> {
-                            LoginAuthResponseModel.LoginFailure(res.code())
+                            SignInAuthResponseModel.SignInFailure(res.code())
+                            throw(UnknownError("Unknown error"))
                         }
                     }
                 )
             }
 
         } catch (e: Exception) {
-            Log.d("error", e.message.toString())
-            flow { LoginAuthResponseModel.Loading }
+            d("error", e.message.toString())
+            flow { throw(UnknownError("exception caught")) }
         }
     }
 
@@ -89,12 +99,13 @@ class AuthRepositoryImplCustomApi @Inject constructor(private val authService: A
         TODO("Not yet implemented")
     }
 
-    override suspend fun getUserById(id: String): UserData {
+    override suspend fun getUserById(id: String): UserDetailsModel {
         TODO("Not yet implemented")
     }
 
-    override suspend fun addUserInformationToDatabase(userData: UserData) {
-        TODO("Not yet implemented")
+    override suspend fun addUserInformation(userData: UserDetailsModel) {
+//        TODO: get validation token from google, send it to api and handle request in backend
+        d("error", userData.toString())
     }
 
     override suspend fun checkDuplicatePhoneNumber(phoneNumber: String): Boolean {
@@ -102,6 +113,7 @@ class AuthRepositoryImplCustomApi @Inject constructor(private val authService: A
     }
 }
 
+// TODO: move these out of here into data/models folder
 data class UserCredentials(
     @SerializedName("email") val email: String,
     @SerializedName("password") val password: String,

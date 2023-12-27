@@ -2,7 +2,7 @@ package com.example.authentication
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.data.models.UserData
+import com.example.data.models.UserDetailsModel
 import com.example.domain.use_cases.AddUserInformationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +27,7 @@ class GoogleSignInViewModel @Inject constructor(private val addAdditionalUserInf
         _state.value = result
     }
 
-    private fun addUserInfo(data: UserData) {
+    private fun addUserInfo(data: UserDetailsModel) {
         viewModelScope.launch {
 //          TODO: handle error here ↘️↘️
             addAdditionalUserInformation(data)
