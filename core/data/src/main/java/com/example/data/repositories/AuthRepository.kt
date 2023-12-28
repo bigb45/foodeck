@@ -16,5 +16,6 @@ interface AuthRepository {
     suspend fun getUsernameFromEmail(email: String): String
     suspend fun getUserById(id: String): UserDetailsModel
     suspend fun addUserInformation(userData: UserDetailsModel)
+    suspend fun authenticateUserWithToken(token: String, provider: String)
     suspend fun checkDuplicatePhoneNumber(phoneNumber: String): Boolean
 }

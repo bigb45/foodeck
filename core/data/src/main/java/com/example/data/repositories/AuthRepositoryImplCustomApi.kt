@@ -1,12 +1,12 @@
 package com.example.data.repositories
 
-import android.util.Log
 import android.util.Log.d
 import com.example.data.api_services.AuthApiService
 import com.example.data.models.InternalServerException
 import com.example.data.models.InvalidCredentialsException
 import com.example.data.models.SignInAuthResponseModel
 import com.example.data.models.SignupAuthResponseModel
+import com.example.data.models.TokenDto
 import com.example.data.models.UserDetailsModel
 import com.example.data.models.UserSignInModel
 import com.example.data.models.UserNotFoundException
@@ -91,6 +91,19 @@ class AuthRepositoryImplCustomApi @Inject constructor(private val authService: A
         }
     }
 
+    override suspend fun authenticateUserWithToken(token: String, provider: String) {
+        val response = authService.authenticateWithGoogleToken(provider, TokenDto(token))
+        when{
+            response.isSuccessful -> {
+                d("error", response.body().toString())
+            }
+
+            else -> {
+                d("error", response.message())
+            }
+        }
+    }
+
     override suspend fun signUserOut(): Flow<Boolean> {
         TODO("Not yet implemented")
     }
@@ -107,6 +120,7 @@ class AuthRepositoryImplCustomApi @Inject constructor(private val authService: A
 //        TODO: get validation token from google, send it to api and handle request in backend
         d("error", userData.toString())
     }
+
 
     override suspend fun checkDuplicatePhoneNumber(phoneNumber: String): Boolean {
         TODO("Not yet implemented")

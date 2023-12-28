@@ -136,9 +136,7 @@ class SignupViewModel @Inject constructor(
                             "user data ${(result.data as SignupAuthResponseModel.SignupSuccess).tokens.userId}"
                         )
                     }
-
                 }
-
             }
         }
     }

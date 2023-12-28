@@ -3,7 +3,7 @@ package com.example.data.util
 import android.util.Log.d
 import com.example.data.api_services.AuthApiService
 import com.example.data.R
-import com.example.data.models.AccessTokenDto
+import com.example.data.models.TokenDto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -16,7 +16,7 @@ class AccessTokenRemoteDataSource @Inject constructor(
     suspend fun getAccessToken(){
         withContext(Dispatchers.Default) {
             refreshToken?.let {
-                val accessToken = apiService.getAccessToken(AccessTokenDto(it))
+                val accessToken = apiService.getAccessToken(TokenDto(it))
                 when{
                     accessToken.isSuccessful -> {
                         d("error", "access token ${accessToken.body().toString()}")

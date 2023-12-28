@@ -3,7 +3,10 @@ package com.example.authentication
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
+import android.util.Log.d
+import com.example.data.api_services.AuthApiService
 import com.example.data.models.UserDetailsModel
+import com.example.domain.use_cases.AuthenticateUserWithTokenUseCase
 import com.example.fooddelivery.authentication.R
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.BeginSignInRequest.GoogleIdTokenRequestOptions
@@ -13,38 +16,45 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 import java.util.concurrent.CancellationException
+import javax.inject.Inject
 
-class GoogleAuthUiClient(
+class GoogleAuthUiClient (
     private val context: Context,
     private val oneTapClient: SignInClient,
-
     ) {
+
     private val auth = Firebase.auth
-    suspend fun signInWithIntent(intent: Intent): AuthResult {
+    suspend fun signInWithIntent(intent: Intent): String {
         val credential = oneTapClient.getSignInCredentialFromIntent(intent)
         val googleIdToken = credential.googleIdToken
         val googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)
-        return try {
-            val user = auth.signInWithCredential(googleCredentials).await().user
-            if (user != null) {
-                val data = user.run {
-                    UserDetailsModel(
-                        userId = uid,
-                        email = email,
-                        username = displayName ?: "default user",
-                        profilePictureUrl = photoUrl?.toString(),
-                    )
-                }
-                AuthResult.Success(data = data)
-            } else {
-                return AuthResult.Error("Unable to sign in")
-            }
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-            if (e is CancellationException) throw e
-            AuthResult.Error(errorMessage = e.message ?: "Unknown Error")
+        d("error", googleIdToken.toString())
+        googleIdToken?.let{
+            return googleIdToken
         }
+
+        return ""
+//        return try {
+//            val user = auth.signInWithCredential(googleCredentials).await().user
+//            if (user != null) {
+//                val data = user.run {
+//                    UserDetailsModel(
+//                        userId = uid,
+//                        email = email,
+//                        username = displayName ?: "default user",
+//                        profilePictureUrl = photoUrl?.toString(),
+//                    )
+//                }
+//                AuthResult.Success(data = data)
+//            } else {
+//                return AuthResult.Error("Unable to sign in")
+//            }
+//
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//            if (e is CancellationException) throw e
+//            AuthResult.Error(errorMessage = e.message ?: "Unknown Error")
+//        }
     }
 
 

@@ -11,20 +11,17 @@ class UsersRepositoryImpl @Inject constructor(private val usersService: UserApiS
     override suspend fun getUser(userId: String): UserDetailsModel {
 
         val token = "Bearer ${sharedPrefs.getToken(R.string.access_token)}"
-        d("token", token)
         return try {
             val user = usersService.getUser(token, userId)
-            d("error", user.code().toString())
-            d("error", userId)
+            d("error", "${user.code()}, ${user.message()}")
             when{
                 user.isSuccessful -> {
-                    d("error", user.body()?.name.toString())
+                    d("error", "${user.body()}")
                     with(user.body()!!){
                         UserDetailsModel(this.userId, this.name, this.email)
                     }
                 }
                 else -> {
-                    d("error", user.body().toString())
                     UserDetailsModel(null)
                 }
             }

@@ -53,6 +53,10 @@ class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : A
         db.child("users").child(userData.userId ?: "error").setValue(userData)
     }
 
+    override suspend fun authenticateUserWithToken(token: String, provider: String) {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun signUserIn(user: UserSignInModel): Flow<SignInAuthResponseModel> {
         return flow {
             val result = auth.signInWithEmailAndPassword(user.email, user.password).await()

@@ -2,7 +2,7 @@ package com.example.data.models
 
 
 sealed class SignupAuthResponseModel {
-    data class SignupSuccess(val tokens: TokenDto): SignupAuthResponseModel()
+    data class SignupSuccess(val tokens: AuthenticationResponseDto): SignupAuthResponseModel()
     data class SignupFailure(val httpCode: Int): SignupAuthResponseModel()
     object UserAlreadyExists: SignupAuthResponseModel()
     object PhoneNumberAlreadyExists: SignupAuthResponseModel()
