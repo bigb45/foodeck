@@ -6,10 +6,12 @@ import com.example.data.models.InternalServerException
 import com.example.data.models.InvalidCredentialsException
 import com.example.data.models.SignInAuthResponseModel
 import com.example.data.models.SignupAuthResponseModel
+import com.example.data.models.TokenAuthResponseModel
 import com.example.data.models.TokenDto
+import com.example.data.models.UnknownException
 import com.example.data.models.UserDetailsModel
-import com.example.data.models.UserSignInModel
 import com.example.data.models.UserNotFoundException
+import com.example.data.models.UserSignInModel
 import com.example.data.models.UserSignUpModel
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.flow.Flow
@@ -20,7 +22,7 @@ class AuthRepositoryImplCustomApi @Inject constructor(private val authService: A
     AuthRepository {
     override fun createUser(user: UserSignUpModel): Flow<SignupAuthResponseModel> {
         val credentials =
-            NewUserCredentials(user.username, user.email, user.password, )
+            NewUserCredentials(user.username, user.email, user.password)
         return try {
             flow {
                 val res = authService.createUser(credentials)
@@ -64,22 +66,22 @@ class AuthRepositoryImplCustomApi @Inject constructor(private val authService: A
 
                         res.code() == 403 -> {
                             SignInAuthResponseModel.InvalidCredentials
-                            throw(InvalidCredentialsException("Invalid credentials"))
+                            throw (InvalidCredentialsException("Invalid credentials"))
                         }
 
                         res.code() == 404 -> {
                             SignInAuthResponseModel.UserNotFound
-                            throw(UserNotFoundException("User does not exist"))
+                            throw (UserNotFoundException("User does not exist"))
                         }
 
                         res.code() == 500 -> {
                             SignInAuthResponseModel.InternalServerError
-                            throw(InternalServerException("Internal server error"))
+                            throw (InternalServerException("Internal server error"))
                         }
 
                         else -> {
                             SignInAuthResponseModel.SignInFailure(res.code())
-                            throw(UnknownError("Unknown error"))
+                            throw (UnknownException("Unknown error"))
                         }
                     }
                 )
@@ -87,19 +89,43 @@ class AuthRepositoryImplCustomApi @Inject constructor(private val authService: A
 
         } catch (e: Exception) {
             d("error", e.message.toString())
-            flow { throw(UnknownError("exception caught")) }
+            flow { throw (UnknownError("exception caught")) }
         }
     }
 
-    override suspend fun authenticateUserWithToken(token: String, provider: String) {
-        val response = authService.authenticateWithGoogleToken(provider, TokenDto(token))
-        when{
-            response.isSuccessful -> {
-                d("error", response.body().toString())
-            }
+    override suspend fun authenticateUserWithToken(
+        token: String,
+        provider: String,
+    ): Flow<TokenAuthResponseModel> {
+        return try {
+            val res = authService.authenticateWithGoogleToken(provider, TokenDto(token))
+            flow {
+                emit(
+                    when {
+                        res.isSuccessful -> {
+                            TokenAuthResponseModel.SignInSuccess(res.body()!!)
+                        }
+                        res.code() == 500 -> {
+                            TokenAuthResponseModel.InternalServerError
+                            throw (InternalServerException("Error while inserting data"))
+                        }
 
-            else -> {
-                d("error", response.message())
+//                        response.code() ==  -> {
+//                            d("error", res.message())
+//                            TokenAuthResponseModel.SignInFailure(res.code())
+//                        }
+                        else -> {
+                            TokenAuthResponseModel.SignInFailure(res.code())
+                            throw (UnknownException("Unknown error"))
+                        }
+                    }
+                )
+            }
+        } catch (e: Exception) {
+            d("error", e.message.toString())
+            return flow {
+                TokenAuthResponseModel.UnknownError
+                throw(UnknownException("Unknown error: ${e.message.toString()}"))
             }
         }
     }

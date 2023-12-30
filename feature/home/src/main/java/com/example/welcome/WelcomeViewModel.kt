@@ -1,4 +1,4 @@
-package com.example.home.welcome
+package com.example.welcome
 
 import android.util.Log.d
 import androidx.lifecycle.SavedStateHandle

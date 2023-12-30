@@ -1,7 +1,7 @@
 package com.example.domain.use_cases
 
 import com.example.data.models.FieldError
-import com.example.data.util.ValidationResult
+import com.example.data.util.TextFieldMessages
 import com.example.data.util.ValidationUtil
 import javax.inject.Inject
 
@@ -11,12 +11,12 @@ class ValidateEmailUseCase @Inject constructor(private val validationUtil: Valid
 
         if (email.isEmpty()) {
             return FieldError(
-                true, ValidationResult.EMPTY_EMAIL
+                true, TextFieldMessages.EMPTY_EMAIL
             )
         }
         if (!validationUtil.validateEmail(email)) {
             return FieldError(
-                true, ValidationResult.WRONG_PATTERN
+                true, TextFieldMessages.WRONG_PATTERN
             )
         }
         return FieldError(false, null)

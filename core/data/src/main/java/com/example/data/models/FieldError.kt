@@ -1,9 +1,9 @@
 package com.example.data.models
 
-import com.example.data.util.ValidationResult
+import com.example.data.util.TextFieldMessages
 
 data class FieldError(
     val isError: Boolean = false,
-    val errorMessage: ValidationResult? = null,
+    val errorMessage: TextFieldMessages? = null,
     )
 

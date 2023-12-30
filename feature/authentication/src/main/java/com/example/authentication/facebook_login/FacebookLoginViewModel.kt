@@ -17,7 +17,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FacebookLoginViewModel @Inject constructor(
-    private val addAdditionalUserInformation: AddUserInformationUseCase,
     private val authenticateWithToken: AuthenticateUserWithTokenUseCase,
 ) :
     ViewModel() {
@@ -25,47 +24,12 @@ class FacebookLoginViewModel @Inject constructor(
     val authResult: StateFlow<AuthResult> = _authResult
 
     fun handleLogInSuccess(result: LoginResult) {
-        d("error", result.accessToken.token)
         viewModelScope.launch {
             authenticateWithToken(token=result.accessToken.token, provider="facebook")
         }
-//        val graphRequest = GraphRequest.newMeRequest(
-//            result.accessToken
-//        ) { user, _ ->
-//            d("error", user.toString())
-//            if (user != null) {
-//                val userId = user.getString("id")
-//                val username = user.getString("name")
-//                val email = user.getString("email")
-//                val profilePictureUrl = "https://graph.facebook.com/$userId/picture?type=large"
-//
-//                val data = UserDetailsModel(
-//                    userId = userId,
-//                    email = email,
-//                    username = username,
-//                    profilePictureUrl = profilePictureUrl
-//                )
-//
-//                addUserInfo(data)
-//
-//                _authResult.value = AuthResult.Success(
-//                    data = data
-//                )
-//            }
-//        }
-//        val parameters = Bundle()
-//        parameters.putString("fields", "email,id,name")
-//        graphRequest.parameters = parameters
-//        graphRequest.executeAsync()
 
     }
 
-    private fun addUserInfo(data: UserDetailsModel) {
-        viewModelScope.launch {
-//          TODO: handle error here ↘️↘️
-            addAdditionalUserInformation(data)
-        }
-    }
 
     fun cancelLogin() {
         _authResult.value = AuthResult.Cancelled

@@ -1,6 +1,7 @@
 package com.example.data.models
 
 
+// TODO: Add error message to the error states
 sealed class SignupAuthResponseModel {
     data class SignupSuccess(val tokens: AuthenticationResponseDto): SignupAuthResponseModel()
     data class SignupFailure(val httpCode: Int): SignupAuthResponseModel()

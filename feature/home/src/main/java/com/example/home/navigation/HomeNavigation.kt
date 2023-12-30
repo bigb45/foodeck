@@ -3,33 +3,21 @@ package com.example.home.navigation
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
-import com.example.home.welcome.Welcome
-import java.net.URLEncoder
-
-private val URL_CHARACTER_ENCODING = Charsets.UTF_8.name()
-internal const val userIdArgument = "userId"
+import com.example.home.Home
 
 const val homeRoute = "home_route"
 
-fun NavController.navigateToWelcome(navOptions: NavOptions? = null, userId: String){
-    val encodedUserId = URLEncoder.encode(userId, URL_CHARACTER_ENCODING)
-
-    this.navigate(route = "$homeRoute/$encodedUserId", navOptions = navOptions)
+fun NavController.navigateToHome(navOptions: NavOptions? = null){
+    this.navigate(homeRoute, navOptions)
 }
 
-fun NavGraphBuilder.welcomeScreen(){
+fun NavGraphBuilder.homeScreen(){
     composable(
-        route = "$homeRoute/{$userIdArgument}",
-        arguments = listOf(
-            navArgument(userIdArgument) { type = NavType.StringType },
-        ),
+        route = homeRoute
     ){
-        Welcome(
-            onContinueClick = {},
-            onSignOut = {}
+        Home(
+
         )
     }
 }

@@ -1,4 +1,4 @@
-package com.example.home.welcome
+package com.example.welcome
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -41,11 +41,11 @@ fun Welcome(onContinueClick: () -> Unit, onSignOut: () -> Unit) {
             modifier = Modifier.size(120.dp)
 
         )
-        // TODO: move text into resource string file
+
         Text(stringResource(R.string.signed_in_successfully), style = MaterialTheme.typography.titleLarge)
         Text("Signed in as ${user.username}")
         PrimaryButton(
-            text = "Continue to Foodeck", enabled = true, onClick = {viewModel.getUserFromId("1")}
+            text = "Continue to Foodeck", enabled = true, onClick = onContinueClick
         )
         SecondaryButton(
             text = "Sign out", enabled = true, onClick = onSignOut

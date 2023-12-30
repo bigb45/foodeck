@@ -7,9 +7,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.authentication.navigation.authenticationScreen
 import com.example.authentication.navigation.loginMethodsRoute
+import com.example.authentication.navigation.navigateToLoginMethods
 import com.example.fooddelivery.ui.theme.FoodDeliveryTheme
-import com.example.home.navigation.welcomeScreen
-import com.example.home.navigation.navigateToWelcome
+import com.example.home.navigation.homeScreen
+import com.example.home.navigation.navigateToHome
+import com.example.welcome.navigation.navigateToWelcome
+import com.example.welcome.navigation.welcomeScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -19,7 +22,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
             FoodDeliveryTheme {
-                NavHost(startDestination = loginMethodsRoute, navController = navController){
+                NavHost(startDestination = loginMethodsRoute, navController = navController) {
 
 //                   splashScreen()
 
@@ -31,7 +34,19 @@ class MainActivity : ComponentActivity() {
                         navController.navigateToWelcome(userId = userId)
                     }
 
-                    welcomeScreen()
+                    welcomeScreen(
+                        onContinueClick = {
+//                                          TODO: navigate to the home page
+                            navController.navigateToHome()
+                        },
+                        onSignOut = {
+                            navController.popBackStack()
+                            navController.navigateToLoginMethods(
+                            )
+                        }
+                    )
+
+                    homeScreen()
                 }
             }
         }

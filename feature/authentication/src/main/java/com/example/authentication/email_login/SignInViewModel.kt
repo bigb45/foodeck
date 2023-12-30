@@ -9,7 +9,7 @@ import com.example.data.models.FieldError
 import com.example.data.models.UserSignInModel
 import com.example.authentication.AuthEvent
 import com.example.common.asResult
-import com.example.data.util.ValidationResult
+import com.example.data.util.TextFieldMessages
 import com.example.domain.use_cases.SignUserInUseCase
 import com.example.domain.use_cases.ValidateEmailUseCase
 import com.example.domain.use_cases.ValidatePasswordUseCase
@@ -113,7 +113,7 @@ class SignInViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(
                     emailError = FieldError(
                         isError = true,
-                        ValidationResult.UNREGISTERED_USER
+                        TextFieldMessages.UNREGISTERED_USER
                     )
                 )
             }
@@ -122,7 +122,7 @@ class SignInViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(
                     passwordError = FieldError(
                         isError = true,
-                        ValidationResult.INVALID_CREDENTIALS
+                        TextFieldMessages.INVALID_CREDENTIALS
                     )
                 )
             }
@@ -133,9 +133,7 @@ class SignInViewModel @Inject constructor(
 //                )
 //            }
 
-            else -> {
 
-            }
         }
 
     }
