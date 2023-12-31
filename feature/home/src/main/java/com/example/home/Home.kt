@@ -7,12 +7,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.LocationOn
@@ -52,10 +54,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.compose.gray2
 import com.example.core.ui.theme.inter
 import com.example.fooddeliver.home.R
 
@@ -66,31 +70,30 @@ fun HomeScreen() {
     val scrollBehavior =
         TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     var query by remember { mutableStateOf("") }
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            AddressTopAppBar(
-                address = "Ankar, Kecioren, Baglarbasi Mahllesi", scrollBehavior = scrollBehavior
-            )
-        },
-        floatingActionButton = {
-            BadgedFab(number)
-        },
-        bottomBar = {
-            BottomNavBar()
-        }
+    Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
+        AddressTopAppBar(
+            address = "Ankara, Kecioren, Baglarbasi Mahllesi", scrollBehavior = scrollBehavior
+        )
+    }, floatingActionButton = {
+        BadgedFab(number)
+    }, bottomBar = {
+        BottomNavBar()
+    }
 
     ) { padding ->
         Column(
-            Modifier.padding(padding)
-        ) {
-            CustomSearchBox(query = query, onValueChange = { query = it })
-            Column(
-                Modifier.fillMaxSize()
-            ) {
-                BentoSection()
+            Modifier
+                .padding(padding)
+                .verticalScroll(rememberScrollState()),
 
-            }
+            ) {
+            CustomSearchBox(query = query, onValueChange = { query = it })
+            BentoSection()
+            RestaurantCard()
+            RestaurantCard()
+            RestaurantCard()
+            RestaurantCard()
+
         }
     }
 
@@ -204,52 +207,51 @@ private fun AddressTopAppBar(address: String, scrollBehavior: TopAppBarScrollBeh
     TopAppBar(colors = TopAppBarDefaults.topAppBarColors(
         containerColor = colorScheme.primaryContainer,
         titleContentColor = colorScheme.primary,
-    ),
-        title = {
+    ), title = {
 
 
-            TextButton(
-                onClick = { Log.d("error", "edit address") },
-                Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
+        TextButton(
+            onClick = { Log.d("error", "edit address") },
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
 
-                    ) {
-                    Icon(
-                        imageVector = Icons.Outlined.LocationOn,
-                        contentDescription = "delivery address",
-                        modifier = Modifier.weight(0.5f)
-                    )
-                    Text(
-                        text = address,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        style = TextStyle(
-                            fontSize = 20.sp,
-                        ),
-                        modifier = Modifier.weight(4f)
-                    )
-                    Icon(
-                        imageVector = Icons.Outlined.KeyboardArrowDown,
-                        contentDescription = "open dropdown menu",
-                        Modifier
-                            .size(32.dp)
-                            .weight(0.5f)
-                    )
-                }
-
-
+                ) {
+                Icon(
+                    imageVector = Icons.Outlined.LocationOn,
+                    contentDescription = "delivery address",
+                    modifier = Modifier.weight(0.5f)
+                )
+                Text(
+                    text = address,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                    ),
+                    modifier = Modifier.weight(4f)
+                )
+                Icon(
+                    imageVector = Icons.Outlined.KeyboardArrowDown,
+                    contentDescription = "open dropdown menu",
+                    Modifier
+                        .size(32.dp)
+                        .weight(0.5f)
+                )
             }
 
-        }, actions = {
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(imageVector = Icons.Outlined.Menu, contentDescription = "Menu")
-            }
-        }, scrollBehavior = scrollBehavior
+
+        }
+
+    }, actions = {
+        IconButton(onClick = { /*TODO*/ }) {
+            Icon(imageVector = Icons.Outlined.Menu, contentDescription = "Menu")
+        }
+    }, scrollBehavior = scrollBehavior
     )
 }
 
@@ -305,23 +307,19 @@ private fun CustomSearchBox(
 @Composable
 private fun BottomNavBar() {
     NavigationBar {
-        NavigationBarItem(
-            selected = true,
+        NavigationBarItem(selected = true,
             onClick = { },
             icon = { Icon(Icons.Outlined.Search, null) },
             label = { Text("Discover") })
-        NavigationBarItem(
-            selected = false,
+        NavigationBarItem(selected = false,
             onClick = { },
             icon = { Icon(Icons.Outlined.FavoriteBorder, null) },
             label = { Text("Saved") })
-        NavigationBarItem(
-            selected = false,
+        NavigationBarItem(selected = false,
             onClick = { },
             icon = { Icon(Icons.Outlined.Notifications, null) },
             label = { Text("Notifications") })
-        NavigationBarItem(
-            selected = false,
+        NavigationBarItem(selected = false,
             onClick = { },
             icon = { Icon(Icons.Outlined.PersonOutline, null) },
             label = { Text("Profile") })
@@ -335,8 +333,7 @@ private fun BadgedFab(number: Int) {
 
 
         FloatingActionButton(
-            onClick = { /*TODO*/ },
-            Modifier.padding(5.dp)
+            onClick = { /*TODO*/ }, Modifier.padding(5.dp)
         ) {
             Icon(
                 imageVector = Icons.Outlined.ShoppingCart,
@@ -359,9 +356,85 @@ private fun BadgedFab(number: Int) {
 }
 
 
+// TODO: Move the restaurant card to its own file
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RestaurantCard() {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(24.dp)
 
+    ) {
+
+        Box {
+
+            Image(
+                painter = painterResource(id = R.drawable.wallpaperflare_com_wallpaper),
+                contentDescription = "Food image",
+                modifier = Modifier.clip(shape = RoundedCornerShape(16.dp)),
+            )
+            IconButton(
+                onClick = { /*TODO*/ },
+                Modifier
+//                    .size(60.dp)
+                    .align(Alignment.TopEnd)
+                    .padding(16.dp)
+                    .clip(RoundedCornerShape(100))
+                    .background(colorScheme.secondaryContainer.copy(alpha = 0.4f))
+            ) {
+                Icon(
+                    Icons.Outlined.FavoriteBorder, contentDescription = null,
+                    tint = colorScheme.onSecondary,
+                )
+            }
+            CustomBadge(
+                text = "40 Minutes",
+                Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(12.dp)
+            )
+
+        }
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
+        ) {
+            Column {
+                Text(
+                    "Candy", style = TextStyle(
+                        fontSize = 20.sp, fontWeight = FontWeight.Bold, fontFamily = inter
+                    )
+                )
+                Text(
+                    "Sweet tooth!", style = TextStyle(
+                        color = gray2, fontSize = 16.sp, fontFamily = inter
+                    )
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(Icons.Filled.Star, tint = Color.Yellow, contentDescription = null)
+                Text(
+                    "4.5", style = TextStyle(
+                        fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, fontFamily = inter
+                    )
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun CustomBadge(text: String, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .background(Color.White, shape = RoundedCornerShape(100))
+            .padding(6.dp)
+    ) {
+        Text(text, style = TextStyle(fontWeight = FontWeight.Bold, fontFamily = inter))
+    }
 }
 
 @Preview
