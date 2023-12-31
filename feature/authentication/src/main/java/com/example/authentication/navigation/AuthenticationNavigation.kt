@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import com.example.authentication.Authentication
 import com.example.authentication.LoginMethods
 
+// TODO: move these to the constants file
 const val loginMethodsRoute = "login_methods_route"
 fun NavController.navigateToLoginMethods(navOptions: NavOptions? = null){
     this.navigate(route = loginMethodsRoute, navOptions = navOptions)

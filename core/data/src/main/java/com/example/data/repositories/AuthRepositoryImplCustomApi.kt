@@ -2,6 +2,7 @@ package com.example.data.repositories
 
 import android.util.Log.d
 import com.example.data.api_services.AuthApiService
+import com.example.data.models.AuthenticationResponseDto
 import com.example.data.models.InternalServerException
 import com.example.data.models.InvalidCredentialsException
 import com.example.data.models.SignInAuthResponseModel
@@ -13,12 +14,14 @@ import com.example.data.models.UserDetailsModel
 import com.example.data.models.UserNotFoundException
 import com.example.data.models.UserSignInModel
 import com.example.data.models.UserSignUpModel
+import com.example.data.util.AccessTokenLocalDataSource
+import com.example.data.util.PreferencesManager
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class AuthRepositoryImplCustomApi @Inject constructor(private val authService: AuthApiService) :
+class AuthRepositoryImplCustomApi @Inject constructor(private val authService: AuthApiService, private val tokenDataSource: AccessTokenLocalDataSource) :
     AuthRepository {
     override fun createUser(user: UserSignUpModel): Flow<SignupAuthResponseModel> {
         val credentials =
@@ -30,7 +33,7 @@ class AuthRepositoryImplCustomApi @Inject constructor(private val authService: A
                 emit(
                     when {
                         res.isSuccessful -> {
-
+                            writeTokens(res.body())
                             SignupAuthResponseModel.SignupSuccess(res.body()!!)
                         }
 
@@ -51,6 +54,8 @@ class AuthRepositoryImplCustomApi @Inject constructor(private val authService: A
         }
     }
 
+
+
     override suspend fun signUserIn(user: UserSignInModel): Flow<SignInAuthResponseModel> {
         val userCredentials = UserCredentials(email = user.email, password = user.password)
         return try {
@@ -61,6 +66,7 @@ class AuthRepositoryImplCustomApi @Inject constructor(private val authService: A
                 emit(
                     when {
                         res.isSuccessful -> {
+                            writeTokens(res.body())
                             SignInAuthResponseModel.SignInSuccess(res.body()!!)
                         }
 
@@ -103,6 +109,7 @@ class AuthRepositoryImplCustomApi @Inject constructor(private val authService: A
                 emit(
                     when {
                         res.isSuccessful -> {
+                            writeTokens(res.body())
                             TokenAuthResponseModel.SignInSuccess(res.body()!!)
                         }
                         res.code() == 500 -> {
@@ -110,10 +117,6 @@ class AuthRepositoryImplCustomApi @Inject constructor(private val authService: A
                             throw (InternalServerException("Error while inserting data"))
                         }
 
-//                        response.code() ==  -> {
-//                            d("error", res.message())
-//                            TokenAuthResponseModel.SignInFailure(res.code())
-//                        }
                         else -> {
                             TokenAuthResponseModel.SignInFailure(res.code())
                             throw (UnknownException("Unknown error"))
@@ -150,6 +153,15 @@ class AuthRepositoryImplCustomApi @Inject constructor(private val authService: A
 
     override suspend fun checkDuplicatePhoneNumber(phoneNumber: String): Boolean {
         TODO("Not yet implemented")
+    }
+
+    private fun writeTokens(body: AuthenticationResponseDto?) {
+        if(body == null){
+            throw UnknownException("Empty response body returned")
+        }
+        tokenDataSource.writeAccessToken(body.accessToken)
+        tokenDataSource.writeRefreshToken(body.refreshToken)
+
     }
 }
 

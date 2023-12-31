@@ -13,6 +13,7 @@ class AccessTokenRemoteDataSource @Inject constructor(
     private val storage: PreferencesManager,
 ) {
     private val refreshToken = storage.getToken(R.string.refresh_token)
+//    TODO: use this to generate a new token when the old access token expires
     suspend fun getAccessToken(){
         withContext(Dispatchers.Default) {
             refreshToken?.let {

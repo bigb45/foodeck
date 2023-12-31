@@ -19,20 +19,22 @@ class WelcomeViewModel @Inject constructor(
     private val getUser: GetUserFromIdUseCase,
 ) : ViewModel() {
 
+    private val _uiState = MutableStateFlow<WelcomeScreenUiState>(WelcomeScreenUiState.Loading)
     private val userId: String =
         URLDecoder.decode(savedStateHandle["userId"], Charsets.UTF_8.name())
 
-    private val _user: MutableStateFlow<UserDetailsModel> = MutableStateFlow(UserDetailsModel(userId = ""))
-    val user: StateFlow<UserDetailsModel> = _user
+    val uiState: StateFlow<WelcomeScreenUiState> = _uiState
 
     init {
         getUserFromId(userId)
     }
 
-    fun getUserFromId(userId: String) {
+    private fun getUserFromId(userId: String) {
         viewModelScope.launch {
-            _user.value = getUser(userId)
-            d("error", _user.value.toString())
+            val user = getUser(userId)
+            _uiState.value = WelcomeScreenUiState.Success(user)
+
+            d("error", user.toString())
         }
     }
 }
