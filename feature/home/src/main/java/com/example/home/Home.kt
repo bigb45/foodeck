@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -68,7 +69,7 @@ import com.example.fooddeliver.home.R
 fun HomeScreen() {
     val number = 5
     val scrollBehavior =
-        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+        TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     var query by remember { mutableStateOf("") }
     Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
         AddressTopAppBar(
@@ -87,12 +88,17 @@ fun HomeScreen() {
                 .verticalScroll(rememberScrollState()),
 
             ) {
-            CustomSearchBox(query = query, onValueChange = { query = it })
-            BentoSection()
-            RestaurantCard()
-            RestaurantCard()
-            RestaurantCard()
-            RestaurantCard()
+            CustomSearchBox(query = query, onValueChange = {query = it})
+            BentoSection(modifier = Modifier.padding(16.dp))
+
+            RestaurantCard(modifier = Modifier.padding(16.dp))
+            RestaurantCard(modifier = Modifier.padding(16.dp))
+            RestaurantCard(modifier = Modifier.padding(16.dp))
+            RestaurantCard(modifier = Modifier.padding(16.dp))
+            RestaurantCard(modifier = Modifier.padding(16.dp))
+            RestaurantCard(modifier = Modifier.padding(16.dp))
+
+
 
         }
     }
@@ -102,19 +108,18 @@ fun HomeScreen() {
 
 
 @Composable
-private fun BentoSection() {
+private fun BentoSection(modifier: Modifier = Modifier) {
     val gradientBrush = Brush.verticalGradient(
-        0.5f to Color.Transparent, 1F to Color.Black
+        0.7f to Color.Transparent, 1F to Color.Black
     )
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(24.dp)
 
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.padding(8.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier
         ) {
             Box {
                 Image(
@@ -139,7 +144,9 @@ private fun BentoSection() {
 
                 }
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Row(horizontalArrangement = Arrangement.Absolute.Center,
+                modifier = Modifier
+                    .fillMaxWidth()) {
                 Box(Modifier.weight(1f)) {
 
                     Image(
@@ -168,11 +175,12 @@ private fun BentoSection() {
 
                     }
                 }
-                Box(Modifier.weight(1f)) {
+                Box(Modifier) {
                     Image(
                         painter = painterResource(id = R.drawable.cover),
                         contentDescription = "Food image",
                         Modifier
+
                             .clip(shape = RoundedCornerShape(16.dp))
                             .drawWithCache {
                                 onDrawWithContent {
@@ -187,10 +195,10 @@ private fun BentoSection() {
                             .padding(10.dp)
                     ) {
                         Text(
-                            "Sweet & Sour", style = TextStyle(color = Color.White, fontSize = 20.sp)
+                            "Sweet", style = TextStyle(color = Color.White, fontSize = 20.sp)
                         )
                         Text(
-                            "Order authentic chinese food",
+                            "Order a",
                             style = TextStyle(color = Color.White, fontSize = 16.sp)
                         )
 
@@ -243,15 +251,13 @@ private fun AddressTopAppBar(address: String, scrollBehavior: TopAppBarScrollBeh
                         .weight(0.5f)
                 )
             }
-
-
         }
-
     }, actions = {
         IconButton(onClick = { /*TODO*/ }) {
             Icon(imageVector = Icons.Outlined.Menu, contentDescription = "Menu")
         }
-    }, scrollBehavior = scrollBehavior
+    },
+        scrollBehavior = scrollBehavior
     )
 }
 
@@ -357,14 +363,12 @@ private fun BadgedFab(number: Int) {
 
 
 // TODO: Move the restaurant card to its own file
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RestaurantCard() {
+fun RestaurantCard(modifier: Modifier = Modifier) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(24.dp)
 
     ) {
 
