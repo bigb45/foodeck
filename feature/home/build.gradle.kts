@@ -89,7 +89,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation)
 
 
-    implementation( "androidx.compose.material:material-icons-extended")
+    implementation(libs.androidx.compose.material)
 
 
 
