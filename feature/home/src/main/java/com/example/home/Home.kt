@@ -1,6 +1,9 @@
 package com.example.home
 
 import android.util.Log.d
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -27,10 +30,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.StarRate
 import androidx.compose.material.icons.outlined.ArrowForward
-import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.LocationOn
@@ -71,7 +71,6 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
@@ -87,7 +86,9 @@ import com.bumptech.glide.integration.compose.CrossFade
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
+import com.example.compose.gray1
 import com.example.compose.gray2
+import com.example.compose.gray6
 import com.example.core.ui.theme.Typography
 import com.example.core.ui.theme.inter
 import com.example.core.ui.theme.interBold
@@ -143,10 +144,8 @@ fun HomeScreen() {
             }
             item {
                 CarrouselCards(
-                    listOf(
-                        "A",
-                        "B",
-                        "C"
+                    modifier = Modifier.padding(vertical = 16.dp), listOf(
+                        "A", "B", "C"
                     )
                 )
             }
@@ -319,8 +318,7 @@ fun RestaurantsSection(restaurantList: List<RestaurantDto>) {
 @Composable
 fun DealsSection(modifier: Modifier = Modifier) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = modifier
+        verticalArrangement = Arrangement.spacedBy(16.dp), modifier = modifier
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -512,17 +510,17 @@ private fun BadgedFab(number: Int, onClick: () -> Unit) {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 // TODO: pass a callback to know which item was clicked
-fun CarrouselCards(items: List<String>) {
+fun CarrouselCards(modifier: Modifier = Modifier, items: List<String>) {
 
-    val pagerState = rememberPagerState(
-    ) {
+    val pagerState = rememberPagerState {
         items.size
     }
+
     HorizontalPager(
         contentPadding = PaddingValues(horizontal = 16.dp),
         pageSpacing = 4.dp,
         state = pagerState,
-        modifier = Modifier,
+        modifier = modifier,
     ) { index ->
         Box(
             modifier = Modifier
@@ -543,28 +541,78 @@ fun CarrouselCards(items: List<String>) {
                     .align(Alignment.Center))
 
         }
+
     }
+    PagerIndicatorRow(pagerState.pageCount, pagerState.currentPage)
+//    Row(
+//        Modifier
+//            .wrapContentHeight()
+//            .fillMaxWidth()
+//            .padding(vertical = 8.dp),
+//        horizontalArrangement = Arrangement.Center
+//    ) {
+//        repeat(pagerState.pageCount) { iteration ->
+//            val color =
+//                if (pagerState.currentPage == iteration) colorScheme.inversePrimary else Color.Transparent
+//            Box(
+//                modifier = Modifier
+//                    .padding(2.dp)
+//                    .clip(CircleShape)
+//                    .background(color)
+//                    .size(8.dp)
+//                    .border(color = colorScheme.secondary, width = 0.5.dp, shape = CircleShape)
+//            )
+//        }
+//    }
+
+}
+
+@Composable
+fun PagerIndicatorRow(pageCount: Int, selectedPage: Int, modifier: Modifier = Modifier) {
     Row(
-        Modifier
+        modifier
             .wrapContentHeight()
             .fillMaxWidth()
             .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.Center
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        repeat(pagerState.pageCount) { iteration ->
-            val color =
-                if (pagerState.currentPage == iteration) colorScheme.inversePrimary else Color.Transparent
-            Box(
-                modifier = Modifier
-                    .padding(2.dp)
-                    .clip(CircleShape)
-                    .background(color)
-                    .size(8.dp)
-                    .border(color = colorScheme.secondary, width = 0.5.dp, shape = CircleShape)
-            )
+        repeat(pageCount) {
+            PagerIndicator(isSelected = it == selectedPage)
         }
     }
 
+}
+
+@Composable
+private fun PagerIndicator(isSelected: Boolean) {
+    val selectedWidth = 8.dp
+    val unselectedWidth = 6.dp
+    val animatedColor by animateColorAsState(
+        targetValue = (if (isSelected) colorScheme.inversePrimary else gray2),
+        label = "background"
+    )
+    val animatedWidth by animateDpAsState(
+
+        if (isSelected) {
+            selectedWidth
+        } else {
+            unselectedWidth
+        },
+        animationSpec = tween(300),
+        label = "size"
+    )
+    Box(
+        modifier = Modifier
+            .padding(2.dp)
+            .clip(CircleShape)
+            .background(animatedColor)
+            .size(animatedWidth)
+
+
+    )
+//        }
+//    }
 }
 
 
@@ -588,48 +636,47 @@ fun RestaurantCard(
 
     ) {
 
-        Box (modifier = Modifier
-            .fillMaxWidth()
-            .height(240.dp)
-            .clip(shape = RoundedCornerShape(16.dp))
-            .background(Color.Red)
-        ){
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(240.dp)
+                .clip(shape = RoundedCornerShape(16.dp))
+                .background(Color.Red)
+        ) {
 
-            if(imageUrl.isNullOrEmpty()) {
+            if (imageUrl.isNullOrEmpty()) {
                 Image(
                     painter = painterResource(id = R.drawable.wallpaperflare_com_wallpaper),
                     contentDescription = "Food image",
                     modifier = Modifier.clip(shape = RoundedCornerShape(16.dp)),
                 )
-            }else{
+            } else {
                 GlideImage(
-                    modifier = Modifier
-                        ,
+                    modifier = Modifier,
                     model = imageUrl,
                     contentDescription = "restaurant image",
                     loading = placeholder(R.drawable.wallpaperflare_com_wallpaper),
                     contentScale = ContentScale.Crop,
                     transition = CrossFade
-                    )
+                )
             }
 
 
-                Icon(Icons.Outlined.FavoriteBorder,
-                    contentDescription = null,
-                        tint = colorScheme.surface,
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .shadow(elevation = 16.dp, shape = CircleShape, ambientColor = Color.Black)
-                        .align(Alignment.TopEnd)
-                        .clip(CircleShape)
-                        .background(colorScheme.primaryContainer.copy(alpha = 0.6f))
-                        .clickable {
+            Icon(Icons.Outlined.FavoriteBorder,
+                contentDescription = null,
+                tint = colorScheme.surface,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .shadow(elevation = 16.dp, shape = CircleShape, ambientColor = Color.Black)
+                    .align(Alignment.TopEnd)
+                    .clip(CircleShape)
+                    .background(colorScheme.primaryContainer.copy(alpha = 0.6f))
+                    .clickable {
 //                        TODO: add restaurant to favorites
-                            d("error", "added restaurant to favorites")
-                        }
-                        .padding(5.dp)
-                        .size(24.dp)
-                )
+                        d("error", "added restaurant to favorites")
+                    }
+                    .padding(5.dp)
+                    .size(24.dp))
 
 
             CustomBadge(
@@ -660,7 +707,7 @@ fun RestaurantCard(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Icon(Icons.Rounded.Star, tint = colorScheme.primary, contentDescription = null,)
+                Icon(Icons.Rounded.Star, tint = colorScheme.primary, contentDescription = null)
                 Text(
                     restaurantRating, style = Typography.titleLarge
                 )
