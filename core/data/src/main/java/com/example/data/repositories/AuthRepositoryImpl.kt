@@ -24,7 +24,7 @@ import kotlin.coroutines.resume
 class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : AuthRepository {
     private val db = Firebase.database.reference
 
-    override fun createUser(user: UserSignUpModel): Flow<SignupAuthResponseModel> {
+    override suspend fun createUser(user: UserSignUpModel): Flow<SignupAuthResponseModel> {
 
         return flow {
             if (checkDuplicatePhoneNumber(user.phoneNumber)) {
@@ -61,14 +61,7 @@ class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : A
     override suspend fun signUserIn(user: UserSignInModel): Flow<SignInAuthResponseModel> {
         return flow {
             val result = auth.signInWithEmailAndPassword(user.email, user.password).await()
-            val userData = UserDetailsModel(
-                username = result.user?.displayName ?: "Unknown user",
-                userId = result.user?.uid ?: "test_id",
-                email = user.email,
-                profilePictureUrl = null
-            )
 
-//            emit(userData)
             emit(SignInAuthResponseModel.Loading)
         }
 

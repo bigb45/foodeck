@@ -22,6 +22,7 @@ import com.example.data.models.InvalidCredentialsException
 import com.example.data.models.SignInAuthResponseModel
 import com.example.data.models.UserDetailsModel
 import com.example.data.models.UserNotFoundException
+import com.firebase.ui.auth.ui.idp.SingleSignInActivity
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
@@ -30,7 +31,7 @@ class SignInViewModel @Inject constructor(
     private val signUserInUseCase: SignUserInUseCase,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(SignInScreenState())
+    private val _uiState: MutableStateFlow<SignInScreenState> = MutableStateFlow(SignInScreenState())
     private var _authResult: MutableStateFlow<AuthResult> = MutableStateFlow(AuthResult.SignedOut)
     val authResult: StateFlow<AuthResult> = _authResult
     val signInUiState = _uiState

@@ -91,6 +91,7 @@ dependencies {
 
     implementation(libs.androidx.compose.material)
 
+    implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
 
 
 //    Firebase

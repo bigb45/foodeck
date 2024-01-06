@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 
 
 interface AuthRepository {
-    fun createUser(user: UserSignUpModel): Flow<SignupAuthResponseModel>
+    suspend fun createUser(user: UserSignUpModel): Flow<SignupAuthResponseModel>
     suspend fun signUserIn(user: UserSignInModel): Flow<SignInAuthResponseModel>
     suspend fun signUserOut(): Flow<Boolean>
     suspend fun getUsernameFromEmail(email: String): String

@@ -12,21 +12,25 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarRate
 import androidx.compose.material.icons.outlined.ArrowForward
+import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.LocationOn
@@ -35,6 +39,7 @@ import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.PersonOutline
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.ShoppingCart
+import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Badge
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -53,6 +58,8 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,27 +68,51 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.bumptech.glide.integration.compose.CrossFade
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.integration.compose.placeholder
 import com.example.compose.gray2
 import com.example.core.ui.theme.Typography
 import com.example.core.ui.theme.inter
 import com.example.core.ui.theme.interBold
+import com.example.data.models.RestaurantDto
 import com.example.fooddeliver.home.R
+import com.example.home.navigation.HomeScreenUiState
 import kotlin.math.absoluteValue
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen() {
+    val viewModel: HomeViewModel = hiltViewModel()
+    val uiState by viewModel.uiState.collectAsState()
+    var restaurants = emptyList<RestaurantDto>()
+    LaunchedEffect(key1 = uiState) {
+        when (uiState) {
+            is HomeScreenUiState.Success -> {
+                restaurants = (uiState as HomeScreenUiState.Success).restaurants
+            }
+
+            HomeScreenUiState.Loading -> {
+
+            }
+        }
+    }
     val number = 5
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     var query by remember { mutableStateOf("") }
@@ -90,34 +121,64 @@ fun HomeScreen() {
             address = "Ankara, Kecioren, Baglarbasi Mahllesi", scrollBehavior = scrollBehavior
         )
     }, floatingActionButton = {
-        BadgedFab(number)
+        BadgedFab(number) { viewModel.load() }
     }, bottomBar = {
         BottomNavBar()
     }
 
     ) { padding ->
-        Column(
+
+        LazyColumn(
             Modifier
-                .padding(padding)
-                .verticalScroll(rememberScrollState()),
+                .fillMaxSize()
+                .padding(padding),
 
             ) {
+            item {
+                CustomSearchBox(query = query, onValueChange = { query = it })
+            }
 
-            CustomSearchBox(query = query, onValueChange = { query = it })
+            item {
+                BentoSection(modifier = Modifier.padding(16.dp))
+            }
+            item {
+                CarrouselCards(
+                    listOf(
+                        "A",
+                        "B",
+                        "C"
+                    )
+                )
+            }
 
-            BentoSection(modifier = Modifier.padding(16.dp))
+            item { DealsSection(modifier = Modifier.padding(vertical = 16.dp)) }
 
-            CarrouselCards()
-
-            DealsSection(modifier = Modifier.padding(horizontal = 16.dp))
-
-            RestaurantsSection()
-
-
+            item {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        "Explore More", style = TextStyle(
+                            fontWeight = FontWeight.W900, fontSize = 20.sp, fontFamily = interBold
+                        )
+                    )
+                }
+            }
+            items(restaurants) {
+                RestaurantCard(
+                    modifier = Modifier.padding(16.dp),
+                    restaurantName = it.restaurantName,
+                    restaurantAddress = it.restaurantAddress,
+                    deliveryTime = it.timeToDeliver,
+                    imageUrl = it.coverImageUrl,
+                    restaurantRating = it.restaurantRating
+                )
+            }
         }
     }
-
-
 }
 
 
@@ -223,49 +284,35 @@ private fun BentoSection(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun RestaurantsSection() {
-    Column(
+fun RestaurantsSection(restaurantList: List<RestaurantDto>) {
+    LazyColumn(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier.padding(vertical = 16.dp)
     ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .fillMaxWidth()
-        ) {
-            Text(
-                "Explore More",
-                style = TextStyle(
-                    fontWeight = FontWeight.W900,
-                    fontSize = 20.sp,
-                    fontFamily = interBold
+        item {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    "Explore More", style = TextStyle(
+                        fontWeight = FontWeight.W900, fontSize = 20.sp, fontFamily = interBold
+                    )
                 )
+            }
+        }
+        items(restaurantList) {
+
+            RestaurantCard(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                restaurantName = it.restaurantName,
+                restaurantAddress = it.restaurantAddress,
+                deliveryTime = it.timeToDeliver,
+                restaurantRating = it.restaurantRating
             )
         }
-        RestaurantCard(
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-        )
-        RestaurantCard(
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-        )
-        RestaurantCard(
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-        )
-        RestaurantCard(
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-        )
-        RestaurantCard(
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-        )
-        RestaurantCard(
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-        )
     }
 }
 
@@ -273,19 +320,17 @@ fun RestaurantsSection() {
 fun DealsSection(modifier: Modifier = Modifier) {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier.padding(vertical = 16.dp)
+        modifier = modifier
     ) {
         Row(
-            horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
         ) {
             Text(
-                "Deals",
-                style = TextStyle(
-                    fontWeight = FontWeight.W900,
-                    fontSize = 20.sp,
-                    fontFamily = interBold
+                "Deals", style = TextStyle(
+                    fontWeight = FontWeight.W900, fontSize = 20.sp, fontFamily = interBold
                 )
             )
             Icon(Icons.Outlined.ArrowForward, null)
@@ -298,17 +343,14 @@ fun DealsSection(modifier: Modifier = Modifier) {
 
         ) {
             RestaurantCard(
-                modifier = Modifier
-                    .width(240.dp)
+                modifier = Modifier.width(240.dp)
             )
             RestaurantCard(
-                modifier = Modifier
-                    .width(240.dp)
+                modifier = Modifier.width(240.dp)
             )
             RestaurantCard(
 
-                modifier = Modifier
-                    .width(240.dp)
+                modifier = Modifier.width(240.dp)
             )
         }
     }
@@ -367,11 +409,12 @@ private fun AddressTopAppBar(address: String, scrollBehavior: TopAppBarScrollBeh
 
 @Composable
 private fun CustomSearchBox(
+    modifier: Modifier = Modifier,
     query: String,
     onValueChange: (String) -> Unit,
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(colorScheme.primaryContainer)
 //            .align(Alignment.CenterHorizontally)
@@ -438,12 +481,12 @@ private fun BottomNavBar() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun BadgedFab(number: Int) {
+private fun BadgedFab(number: Int, onClick: () -> Unit) {
     Box {
 
 
         FloatingActionButton(
-            onClick = { /*TODO*/ }, Modifier.padding(5.dp)
+            onClick = onClick, Modifier.padding(5.dp)
         ) {
             Icon(
                 imageVector = Icons.Outlined.ShoppingCart,
@@ -468,40 +511,36 @@ private fun BadgedFab(number: Int) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CarrouselCards(numberOfCards: Int = 4) {
-    val pagerState = rememberPagerState {
-        numberOfCards
-    }
+// TODO: pass a callback to know which item was clicked
+fun CarrouselCards(items: List<String>) {
 
+    val pagerState = rememberPagerState(
+    ) {
+        items.size
+    }
     HorizontalPager(
-        contentPadding = PaddingValues(horizontal = 40.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        pageSpacing = 4.dp,
         state = pagerState,
-        modifier = Modifier
-        ) { index ->
+        modifier = Modifier,
+    ) { index ->
         Box(
             modifier = Modifier
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.wallpaperflare_com_wallpaper),
+            Image(painter = painterResource(id = R.drawable.wallpaperflare_com_wallpaper),
                 contentDescription = "Food image",
+
                 modifier = Modifier
                     .graphicsLayer {
-                        val pageOffset = (
-                                (pagerState.currentPage - index) + pagerState
-                                    .currentPageOffsetFraction
-                                ).absoluteValue
-                            val scale = lerp(
-                                start = 0.8f,
-                                stop = 1f,
-                                fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                            )
-                        scaleX = scale
+                        val pageOffset =
+                            ((pagerState.currentPage - index) + pagerState.currentPageOffsetFraction).absoluteValue
+                        val scale = lerp(
+                            start = 0.7f, stop = 1f, fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                        )
                         scaleY = scale
                     }
-//                    .padding(8.dp)
                     .clip(shape = RoundedCornerShape(16.dp))
-                    .align(Alignment.Center)
-            )
+                    .align(Alignment.Center))
 
         }
     }
@@ -528,42 +567,73 @@ fun CarrouselCards(numberOfCards: Int = 4) {
 
 }
 
+
 private fun lerp(start: Float, stop: Float, fraction: Float): Float {
     return (1 - fraction) * start + fraction * stop
 }
 
 // TODO: Move the restaurant card to its own file
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun RestaurantCard(modifier: Modifier = Modifier) {
+fun RestaurantCard(
+    modifier: Modifier = Modifier,
+    restaurantName: String = "test",
+    restaurantAddress: String = "test",
+    deliveryTime: String = "40",
+    imageUrl: String? = null,
+    restaurantRating: String = "0.0",
+) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp), modifier = modifier.fillMaxWidth()
 
     ) {
 
-        Box {
+        Box (modifier = Modifier
+            .fillMaxWidth()
+            .height(240.dp)
+            .clip(shape = RoundedCornerShape(16.dp))
+            .background(Color.Red)
+        ){
 
-            Image(
-                painter = painterResource(id = R.drawable.wallpaperflare_com_wallpaper),
-                contentDescription = "Food image",
-                modifier = Modifier.clip(shape = RoundedCornerShape(16.dp)),
-            )
-            Icon(
-                Icons.Outlined.FavoriteBorder, contentDescription = null,
-                tint = colorScheme.onSecondary,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(16.dp)
-                    .clip(CircleShape)
-                    .clickable {
+            if(imageUrl.isNullOrEmpty()) {
+                Image(
+                    painter = painterResource(id = R.drawable.wallpaperflare_com_wallpaper),
+                    contentDescription = "Food image",
+                    modifier = Modifier.clip(shape = RoundedCornerShape(16.dp)),
+                )
+            }else{
+                GlideImage(
+                    modifier = Modifier
+                        ,
+                    model = imageUrl,
+                    contentDescription = "restaurant image",
+                    loading = placeholder(R.drawable.wallpaperflare_com_wallpaper),
+                    contentScale = ContentScale.Crop,
+                    transition = CrossFade
+                    )
+            }
+
+
+                Icon(Icons.Outlined.FavoriteBorder,
+                    contentDescription = null,
+                        tint = colorScheme.surface,
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .shadow(elevation = 16.dp, shape = CircleShape, ambientColor = Color.Black)
+                        .align(Alignment.TopEnd)
+                        .clip(CircleShape)
+                        .background(colorScheme.primaryContainer.copy(alpha = 0.6f))
+                        .clickable {
 //                        TODO: add restaurant to favorites
-                        d("error", "added restaurant to favorites")
-                    }
-                    .background(colorScheme.secondaryContainer.copy(alpha = 0.4f))
-                    .padding(5.dp)
-                    .size(24.dp)
-            )
+                            d("error", "added restaurant to favorites")
+                        }
+                        .padding(5.dp)
+                        .size(24.dp)
+                )
+
+
             CustomBadge(
-                text = "40 min",
+                text = "$deliveryTime min",
 
                 Modifier
                     .align(Alignment.BottomStart)
@@ -576,13 +646,13 @@ fun RestaurantCard(modifier: Modifier = Modifier) {
         ) {
             Column {
                 Text(
-                    "Candy", style = Typography.titleLarge
+                    restaurantName, style = Typography.titleLarge
 //                    TextStyle(
 //                        fontSize = 20.sp, fontWeight = FontWeight.Bold, fontFamily = inter
 //                    )
                 )
                 Text(
-                    "Sweet tooth!", style = TextStyle(
+                    restaurantAddress, style = TextStyle(
                         color = gray2, fontSize = 16.sp, fontFamily = inter
                     )
                 )
@@ -590,9 +660,9 @@ fun RestaurantCard(modifier: Modifier = Modifier) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Icon(Icons.Filled.Star, tint = Color.Yellow, contentDescription = null)
+                Icon(Icons.Rounded.Star, tint = colorScheme.primary, contentDescription = null,)
                 Text(
-                    "4.5", style = Typography.titleLarge
+                    restaurantRating, style = Typography.titleLarge
                 )
             }
         }
@@ -603,6 +673,7 @@ fun RestaurantCard(modifier: Modifier = Modifier) {
 fun CustomBadge(text: String, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
+            .shadow(16.dp)
             .background(Color.White, shape = RoundedCornerShape(100))
             .padding(6.dp)
     ) {

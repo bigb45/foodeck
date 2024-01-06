@@ -23,13 +23,12 @@ import javax.inject.Inject
 
 class AuthRepositoryImplCustomApi @Inject constructor(private val authService: AuthApiService, private val tokenDataSource: AccessTokenLocalDataSource) :
     AuthRepository {
-    override fun createUser(user: UserSignUpModel): Flow<SignupAuthResponseModel> {
+    override suspend fun createUser(user: UserSignUpModel): Flow<SignupAuthResponseModel> {
         val credentials =
             NewUserCredentials(user.username, user.email, user.password)
         return try {
+            val res = authService.createUser(credentials)
             flow {
-                val res = authService.createUser(credentials)
-
                 emit(
                     when {
                         res.isSuccessful -> {
@@ -50,7 +49,7 @@ class AuthRepositoryImplCustomApi @Inject constructor(private val authService: A
             }
         } catch (e: Exception) {
             d("error", e.message.toString())
-            flow { SignupAuthResponseModel.InternalServerError }
+            flow { emit(SignupAuthResponseModel.InternalServerError) }
         }
     }
 
