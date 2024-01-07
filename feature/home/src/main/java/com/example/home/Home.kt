@@ -88,6 +88,7 @@ import com.example.compose.gray2
 import com.example.core.ui.theme.Typography
 import com.example.core.ui.theme.inter
 import com.example.core.ui.theme.interBold
+import com.example.data.models.OffersDto
 import com.example.data.models.RestaurantDto
 import com.example.fooddeliver.home.R
 import com.example.home.navigation.HomeScreenUiState
@@ -98,11 +99,9 @@ import kotlin.math.absoluteValue
 fun HomeScreen() {
     val viewModel: HomeViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
-    var restaurants = emptyList<RestaurantDto>()
 
     val number = 5
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-    var query by remember { mutableStateOf("") }
     Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
         AddressTopAppBar(
             address = "Ankara, Kecioren, Baglarbasi Mahllesi", scrollBehavior = scrollBehavior
@@ -118,66 +117,94 @@ fun HomeScreen() {
         when (uiState) {
 
             is HomeScreenUiState.Success -> {
-//                TODO: move this into separate composable
-                LazyColumn(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(padding),
-
-                    ) {
-                    item {
-                        CustomSearchBox(query = query, onValueChange = { query = it })
-                    }
-
-                    item {
-                        BentoSection(modifier = Modifier.padding(16.dp))
-                    }
-                    item {
-                        CarrouselCards(
-                            modifier = Modifier.padding(vertical = 16.dp), listOf(
-                                "A", "B", "C"
-                            )
-                        )
-                    }
-
-                    item { DealsSection(modifier = Modifier.padding(vertical = 16.dp)) }
-
-                    item {
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                                .fillMaxWidth()
-                        ) {
-                            Text(
-                                "Explore More", style = TextStyle(
-                                    fontWeight = FontWeight.W900,
-                                    fontSize = 20.sp,
-                                    fontFamily = interBold
-                                )
-                            )
-                        }
-                    }
-                    restaurants = (uiState as HomeScreenUiState.Success).restaurants
-                    items(restaurants) {
-                        RestaurantCard(
-                            modifier = Modifier.padding(16.dp),
-                            restaurantName = it.restaurantName,
-                            restaurantAddress = it.restaurantAddress,
-                            deliveryTime = it.timeToDeliver,
-                            imageUrl = it.coverImageUrl,
-                            restaurantRating = it.restaurantRating
-                        )
-                    }
+                val restaurants = (uiState as HomeScreenUiState.Success).restaurants
+                val offers = (uiState as HomeScreenUiState.Success).offers
+                Home(
+                    Modifier.padding(
+                        padding
+                    ),
+                    restaurants,
+                    offers,
+                ) { restaurant ->
+                    d(
+                        "error", "navigate to restaurant $restaurant"
+                    )
                 }
             }
 
-
             HomeScreenUiState.Loading -> {
-
                 LoadingIndicator()
-
             }
+
+//            TODO: Error state
+            is HomeScreenUiState.Error -> {
+                Text(
+                    "error" + (uiState as HomeScreenUiState.Error).message,
+                    modifier = Modifier.padding(padding)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun Home(
+    modifier: Modifier = Modifier,
+    restaurants: List<RestaurantDto>,
+    offers: List<OffersDto>,
+    onRestaurantClick: (String) -> Unit,
+) {
+    var query by remember { mutableStateOf("") }
+
+    LazyColumn(
+        modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 56.dp)
+
+    ) {
+        item {
+            CustomSearchBox(query = query, onValueChange = { query = it })
+        }
+
+        item {
+            BentoSection(modifier = Modifier.padding(16.dp))
+        }
+        item {
+            CarrouselCards(
+                modifier = Modifier.padding(vertical = 16.dp), offers
+            )
+        }
+
+        item {
+            DealsSection(
+                modifier = Modifier.padding(vertical = 16.dp),
+                restaurants = restaurants
+            )
+        }
+
+        item {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    "Explore More", style = TextStyle(
+                        fontWeight = FontWeight.W900, fontSize = 20.sp, fontFamily = interBold
+                    )
+                )
+            }
+        }
+        items(restaurants) {
+            RestaurantCard(
+                modifier = Modifier.padding(16.dp),
+                boxModifier = Modifier.height(240.dp),
+                restaurantName = it.restaurantName,
+                restaurantAddress = it.restaurantAddress,
+                deliveryTime = it.timeToDeliver,
+                imageUrl = it.coverImageUrl,
+                restaurantRating = it.restaurantRating,
+                onRestaurantClick
+            )
         }
     }
 }
@@ -185,8 +212,7 @@ fun HomeScreen() {
 @Composable
 fun LoadingIndicator() {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         CircularProgressIndicator(
             Modifier.align(Alignment.Center)
@@ -197,12 +223,11 @@ fun LoadingIndicator() {
 @Composable
 private fun BentoSection(modifier: Modifier = Modifier) {
     val gradientBrush = Brush.verticalGradient(
-        0.7f to Color.Transparent, 1F to Color.Black
+        0.5f to Color.Transparent, 1F to Color.Black.copy(alpha = 0.5f)
     )
 
     Box(
         modifier = modifier.fillMaxWidth()
-
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier
@@ -231,16 +256,15 @@ private fun BentoSection(modifier: Modifier = Modifier) {
                 }
             }
             Row(
-                horizontalArrangement = Arrangement.Absolute.Center,
+                horizontalArrangement = Arrangement.Absolute.spacedBy(16.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Box(Modifier.weight(1f)) {
-
                     Image(
-
-                        painter = painterResource(id = R.drawable.cover),
+                        painter = painterResource(id = R.drawable.wallpaperflare_com_wallpaper),
                         contentDescription = "Food image",
                         Modifier
+                            .height(160.dp)
                             .clip(shape = RoundedCornerShape(16.dp))
                             .drawWithCache {
                                 onDrawWithContent {
@@ -248,6 +272,7 @@ private fun BentoSection(modifier: Modifier = Modifier) {
                                     drawRect(gradientBrush)
                                 }
                             },
+                        contentScale = ContentScale.Crop
                     )
                     Column(
                         Modifier
@@ -262,12 +287,12 @@ private fun BentoSection(modifier: Modifier = Modifier) {
 
                     }
                 }
-                Box(Modifier) {
+                Box(Modifier.weight(1f)) {
                     Image(
-                        painter = painterResource(id = R.drawable.cover),
+                        painter = painterResource(id = R.drawable.wallpaperflare_com_wallpaper),
                         contentDescription = "Food image",
                         Modifier
-
+                            .height(160.dp)
                             .clip(shape = RoundedCornerShape(16.dp))
                             .drawWithCache {
                                 onDrawWithContent {
@@ -275,17 +300,17 @@ private fun BentoSection(modifier: Modifier = Modifier) {
                                     drawRect(gradientBrush)
                                 }
                             },
+                        contentScale = ContentScale.Crop
                     )
                     Column(
                         Modifier
                             .align(Alignment.BottomStart)
                             .padding(10.dp)
                     ) {
+                        Text("Salty", style = TextStyle(color = Color.White, fontSize = 20.sp))
                         Text(
-                            "Sweet", style = TextStyle(color = Color.White, fontSize = 20.sp)
-                        )
-                        Text(
-                            "Order a", style = TextStyle(color = Color.White, fontSize = 16.sp)
+                            "Fill up on Sodium!",
+                            style = TextStyle(color = Color.White, fontSize = 16.sp)
                         )
 
                     }
@@ -296,9 +321,8 @@ private fun BentoSection(modifier: Modifier = Modifier) {
 }
 
 
-
 @Composable
-fun DealsSection(modifier: Modifier = Modifier) {
+fun DealsSection(modifier: Modifier = Modifier, restaurants: List<RestaurantDto>) {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp), modifier = modifier
     ) {
@@ -322,16 +346,24 @@ fun DealsSection(modifier: Modifier = Modifier) {
                 .padding(horizontal = 16.dp)
 
         ) {
-            RestaurantCard(
-                modifier = Modifier.width(240.dp)
-            )
-            RestaurantCard(
-                modifier = Modifier.width(240.dp)
-            )
-            RestaurantCard(
+            repeat(restaurants.size) {
+                with(restaurants[it]) {
+                    RestaurantCard(
+                        modifier = Modifier
+                            .width(240.dp)
+                            .height(160.dp),
+                        boxModifier = Modifier.height(240.dp),
+                        restaurantName = this.restaurantName,
+                        restaurantAddress = this.restaurantAddress,
+                        deliveryTime = this.timeToDeliver,
+                        imageUrl = this.coverImageUrl,
+                        restaurantRating = this.restaurantRating,
+//                    onRestaurantClick
+                    )
+                }
 
-                modifier = Modifier.width(240.dp)
-            )
+            }
+
         }
     }
 }
@@ -489,10 +521,10 @@ private fun BadgedFab(number: Int, onClick: () -> Unit) {
 }
 
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 // TODO: pass a callback to know which item was clicked
-fun CarrouselCards(modifier: Modifier = Modifier, items: List<String>) {
+fun CarrouselCards(modifier: Modifier = Modifier, items: List<OffersDto>) {
 
     val pagerState = rememberPagerState {
         items.size
@@ -505,23 +537,66 @@ fun CarrouselCards(modifier: Modifier = Modifier, items: List<String>) {
         modifier = modifier,
     ) { index ->
         Box(
-            modifier = Modifier
+            modifier = Modifier.fillMaxSize()
         ) {
-            Image(painter = painterResource(id = R.drawable.wallpaperflare_com_wallpaper),
-                contentDescription = "Food image",
+//            Image(painter = painterResource(id = R.drawable.wallpaperflare_com_wallpaper),
+//                contentDescription = "Food image",
+//
+//                modifier = Modifier
+//                    .graphicsLayer {
+//                        val pageOffset =
+//                            ((pagerState.currentPage - index) + pagerState.currentPageOffsetFraction).absoluteValue
+//                        val scale = lerp(
+//                            start = 0.7f, stop = 1f, fraction = 1f - pageOffset.coerceIn(0f, 1f)
+//                        )
+//                        scaleY = scale
+//                    }
+//                    .clip(shape = RoundedCornerShape(16.dp))
+//                    .align(Alignment.Center))
 
-                modifier = Modifier
-                    .graphicsLayer {
-                        val pageOffset =
-                            ((pagerState.currentPage - index) + pagerState.currentPageOffsetFraction).absoluteValue
-                        val scale = lerp(
-                            start = 0.7f, stop = 1f, fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                        )
-                        scaleY = scale
+            val offer = items[index]
+            GlideImage(modifier = Modifier
+
+                .graphicsLayer {
+
+                    val pageOffset =
+                        ((pagerState.currentPage - index) + pagerState.currentPageOffsetFraction).absoluteValue
+                    val scale = lerp(
+                        start = 0.7f, stop = 1f, fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                    )
+                    scaleY = scale
+                }
+                .clip(shape = RoundedCornerShape(16.dp))
+                .align(Alignment.Center)
+                .drawWithCache {
+                    val brush = Brush.verticalGradient(
+                        0.4f to Color.Transparent, 1f to Color.Black
+                    )
+                    onDrawWithContent {
+                        drawContent()
+                        drawRect(brush)
                     }
-                    .clip(shape = RoundedCornerShape(16.dp))
-                    .align(Alignment.Center))
+                },
+                model = offer.offerImageUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop
+            )
+            Box(modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(16.dp)
+                .fillMaxWidth(0.7f)
 
+            ) {
+                Text(
+                    offer.offerName,
+                    style = TextStyle(
+                        fontFamily = interBold,
+                        fontSize = 48.sp,
+                        color = Color.White
+                    ),
+                )
+
+            }
         }
 
     }
@@ -582,22 +657,27 @@ private fun lerp(start: Float, stop: Float, fraction: Float): Float {
 @Composable
 fun RestaurantCard(
     modifier: Modifier = Modifier,
+    boxModifier: Modifier = Modifier,
     restaurantName: String = "test",
     restaurantAddress: String = "test",
     deliveryTime: String = "40",
     imageUrl: String? = null,
     restaurantRating: String = "0.0",
+    onRestaurantClick: ((String) -> Unit)? = null,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp), modifier = modifier.fillMaxWidth()
 
     ) {
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(240.dp)
-                .clip(shape = RoundedCornerShape(16.dp))
+        Box(modifier = boxModifier
+            .fillMaxWidth()
+            .clip(shape = RoundedCornerShape(16.dp))
+            .clickable {
+                if (onRestaurantClick != null) {
+                    onRestaurantClick(restaurantName)
+                }
+            }
 
         ) {
 
@@ -613,7 +693,7 @@ fun RestaurantCard(
                     model = imageUrl,
                     contentDescription = "restaurant image",
                     contentScale = ContentScale.Crop,
-                    transition = CrossFade(tween(1000)),
+                    transition = CrossFade(tween(500)),
 
                     )
             }

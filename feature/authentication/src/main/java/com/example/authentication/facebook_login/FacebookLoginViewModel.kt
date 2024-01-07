@@ -1,12 +1,10 @@
 package com.example.authentication.facebook_login
 
-import android.util.Log.d
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.authentication.AuthResult
 import com.example.common.Result
 import com.example.common.asResult
-import com.example.data.models.SignInAuthResponseModel
 import com.example.data.models.TokenAuthResponseModel
 import com.example.data.models.UserDetailsModel
 import com.example.domain.use_cases.AddUserInformationUseCase
