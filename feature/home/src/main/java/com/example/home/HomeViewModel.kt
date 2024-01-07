@@ -12,6 +12,7 @@ import com.example.home.navigation.HomeScreenUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,40 +26,62 @@ class HomeViewModel @Inject constructor(
     val uiState: StateFlow<HomeScreenUiState> = _state
 
     init {
-        loadRestaurants()
+//        loadRestaurants()
         loadOffers()
     }
 
     fun load() {
-        loadRestaurants()
+//        loadRestaurants()
         loadOffers()
     }
 
     private fun loadOffers() {
         viewModelScope.launch {
-            getOffers()
-                .ListAsResult().collect { result ->
-                    when (result) {
-                        is Result.Error -> {
-                            d("error", "${result.exception}")
-//                            TODO: change to error state
-                            _state.value = HomeScreenUiState.Error(result.exception?.message)
-
-                        }
-
-                        Result.Loading -> {
-                            _state.value = HomeScreenUiState.Loading
-                        }
-
-                        is Result.Success -> {
-                            d("error", "${result.data}")
-                            _state.value = HomeScreenUiState.Success(
-                                offers = result.data,
-                                restaurants = emptyList()
-                            )
-                        }
+            val restaurantsFlow = getRestaurants().ListAsResult()
+            val offersFlow = getOffers().ListAsResult()
+            combine(restaurantsFlow, offersFlow){
+                restaurantsResult, offersResult ->
+                when {
+                    restaurantsResult is Result.Error -> {
+                        _state.value = HomeScreenUiState.Error(restaurantsResult.exception?.message)
+                    }
+                    offersResult is Result.Error -> {
+                        _state.value = HomeScreenUiState.Error(offersResult.exception?.message)
+                    }
+                    restaurantsResult == Result.Loading || offersResult == Result.Loading -> {
+                        _state.value = HomeScreenUiState.Loading
+                    }
+                    restaurantsResult is Result.Success && offersResult is Result.Success -> {
+                        _state.value = HomeScreenUiState.Success(
+                            restaurants = restaurantsResult.data,
+                            offers = offersResult.data
+                        )
                     }
                 }
+            }.collect{}
+//            getOffers()
+//                .ListAsResult().collect { result ->
+//                    when (result) {
+//                        is Result.Error -> {
+//                            d("error", "${result.exception}")
+////                            TODO: change to error state
+//                            _state.value = HomeScreenUiState.Error(result.exception?.message)
+//
+//                        }
+//
+//                        Result.Loading -> {
+//                            _state.value = HomeScreenUiState.Loading
+//                        }
+//
+//                        is Result.Success -> {
+//                            d("error", "${result.data}")
+//                            _state.value = HomeScreenUiState.Success(
+//                                offers = result.data,
+//                                restaurants = emptyList()
+//                            )
+//                        }
+//                    }
+//                }
         }
     }
 
