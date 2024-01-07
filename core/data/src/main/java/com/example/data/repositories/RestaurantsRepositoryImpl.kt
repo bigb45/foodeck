@@ -34,7 +34,8 @@ class RestaurantsRepositoryImpl @Inject constructor(private val apiService: Rest
                 )
             }
         }catch (e: Exception){
-            throw(e)
+            d("error", "caught error ${e.message}")
+           flow { throw (e) }
         }
 
 
