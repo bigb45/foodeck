@@ -7,7 +7,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -41,6 +40,7 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Badge
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -58,7 +58,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -85,10 +84,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.bumptech.glide.integration.compose.CrossFade
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.bumptech.glide.integration.compose.placeholder
-import com.example.compose.gray1
 import com.example.compose.gray2
-import com.example.compose.gray6
 import com.example.core.ui.theme.Typography
 import com.example.core.ui.theme.inter
 import com.example.core.ui.theme.interBold
@@ -103,17 +99,7 @@ fun HomeScreen() {
     val viewModel: HomeViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
     var restaurants = emptyList<RestaurantDto>()
-    LaunchedEffect(key1 = uiState) {
-        when (uiState) {
-            is HomeScreenUiState.Success -> {
-                restaurants = (uiState as HomeScreenUiState.Success).restaurants
-            }
 
-            HomeScreenUiState.Loading -> {
-
-            }
-        }
-    }
     val number = 5
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     var query by remember { mutableStateOf("") }
@@ -129,57 +115,84 @@ fun HomeScreen() {
 
     ) { padding ->
 
-        LazyColumn(
-            Modifier
-                .fillMaxSize()
-                .padding(padding),
+        when (uiState) {
 
-            ) {
-            item {
-                CustomSearchBox(query = query, onValueChange = { query = it })
-            }
+            is HomeScreenUiState.Success -> {
+//                TODO: move this into separate composable
+                LazyColumn(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(padding),
 
-            item {
-                BentoSection(modifier = Modifier.padding(16.dp))
-            }
-            item {
-                CarrouselCards(
-                    modifier = Modifier.padding(vertical = 16.dp), listOf(
-                        "A", "B", "C"
-                    )
-                )
-            }
+                    ) {
+                    item {
+                        CustomSearchBox(query = query, onValueChange = { query = it })
+                    }
 
-            item { DealsSection(modifier = Modifier.padding(vertical = 16.dp)) }
-
-            item {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth()
-                ) {
-                    Text(
-                        "Explore More", style = TextStyle(
-                            fontWeight = FontWeight.W900, fontSize = 20.sp, fontFamily = interBold
+                    item {
+                        BentoSection(modifier = Modifier.padding(16.dp))
+                    }
+                    item {
+                        CarrouselCards(
+                            modifier = Modifier.padding(vertical = 16.dp), listOf(
+                                "A", "B", "C"
+                            )
                         )
-                    )
+                    }
+
+                    item { DealsSection(modifier = Modifier.padding(vertical = 16.dp)) }
+
+                    item {
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .fillMaxWidth()
+                        ) {
+                            Text(
+                                "Explore More", style = TextStyle(
+                                    fontWeight = FontWeight.W900,
+                                    fontSize = 20.sp,
+                                    fontFamily = interBold
+                                )
+                            )
+                        }
+                    }
+                    restaurants = (uiState as HomeScreenUiState.Success).restaurants
+                    items(restaurants) {
+                        RestaurantCard(
+                            modifier = Modifier.padding(16.dp),
+                            restaurantName = it.restaurantName,
+                            restaurantAddress = it.restaurantAddress,
+                            deliveryTime = it.timeToDeliver,
+                            imageUrl = it.coverImageUrl,
+                            restaurantRating = it.restaurantRating
+                        )
+                    }
                 }
             }
-            items(restaurants) {
-                RestaurantCard(
-                    modifier = Modifier.padding(16.dp),
-                    restaurantName = it.restaurantName,
-                    restaurantAddress = it.restaurantAddress,
-                    deliveryTime = it.timeToDeliver,
-                    imageUrl = it.coverImageUrl,
-                    restaurantRating = it.restaurantRating
-                )
+
+
+            HomeScreenUiState.Loading -> {
+
+                LoadingIndicator()
+
             }
         }
     }
 }
 
+@Composable
+fun LoadingIndicator() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        CircularProgressIndicator(
+            Modifier.align(Alignment.Center)
+        )
+    }
+}
 
 @Composable
 private fun BentoSection(modifier: Modifier = Modifier) {
@@ -282,38 +295,7 @@ private fun BentoSection(modifier: Modifier = Modifier) {
     }
 }
 
-@Composable
-fun RestaurantsSection(restaurantList: List<RestaurantDto>) {
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier.padding(vertical = 16.dp)
-    ) {
-        item {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth()
-            ) {
-                Text(
-                    "Explore More", style = TextStyle(
-                        fontWeight = FontWeight.W900, fontSize = 20.sp, fontFamily = interBold
-                    )
-                )
-            }
-        }
-        items(restaurantList) {
 
-            RestaurantCard(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                restaurantName = it.restaurantName,
-                restaurantAddress = it.restaurantAddress,
-                deliveryTime = it.timeToDeliver,
-                restaurantRating = it.restaurantRating
-            )
-        }
-    }
-}
 
 @Composable
 fun DealsSection(modifier: Modifier = Modifier) {
@@ -544,27 +526,6 @@ fun CarrouselCards(modifier: Modifier = Modifier, items: List<String>) {
 
     }
     PagerIndicatorRow(pagerState.pageCount, pagerState.currentPage)
-//    Row(
-//        Modifier
-//            .wrapContentHeight()
-//            .fillMaxWidth()
-//            .padding(vertical = 8.dp),
-//        horizontalArrangement = Arrangement.Center
-//    ) {
-//        repeat(pagerState.pageCount) { iteration ->
-//            val color =
-//                if (pagerState.currentPage == iteration) colorScheme.inversePrimary else Color.Transparent
-//            Box(
-//                modifier = Modifier
-//                    .padding(2.dp)
-//                    .clip(CircleShape)
-//                    .background(color)
-//                    .size(8.dp)
-//                    .border(color = colorScheme.secondary, width = 0.5.dp, shape = CircleShape)
-//            )
-//        }
-//    }
-
 }
 
 @Composable
@@ -589,8 +550,7 @@ private fun PagerIndicator(isSelected: Boolean) {
     val selectedWidth = 8.dp
     val unselectedWidth = 6.dp
     val animatedColor by animateColorAsState(
-        targetValue = (if (isSelected) colorScheme.inversePrimary else gray2),
-        label = "background"
+        targetValue = (if (isSelected) colorScheme.inversePrimary else gray2), label = "background"
     )
     val animatedWidth by animateDpAsState(
 
@@ -598,9 +558,7 @@ private fun PagerIndicator(isSelected: Boolean) {
             selectedWidth
         } else {
             unselectedWidth
-        },
-        animationSpec = tween(300),
-        label = "size"
+        }, animationSpec = tween(300), label = "size"
     )
     Box(
         modifier = Modifier
@@ -611,8 +569,7 @@ private fun PagerIndicator(isSelected: Boolean) {
 
 
     )
-//        }
-//    }
+
 }
 
 
@@ -641,7 +598,7 @@ fun RestaurantCard(
                 .fillMaxWidth()
                 .height(240.dp)
                 .clip(shape = RoundedCornerShape(16.dp))
-                .background(Color.Red)
+
         ) {
 
             if (imageUrl.isNullOrEmpty()) {
@@ -655,10 +612,10 @@ fun RestaurantCard(
                     modifier = Modifier,
                     model = imageUrl,
                     contentDescription = "restaurant image",
-                    loading = placeholder(R.drawable.wallpaperflare_com_wallpaper),
                     contentScale = ContentScale.Crop,
-                    transition = CrossFade
-                )
+                    transition = CrossFade(tween(1000)),
+
+                    )
             }
 
 
