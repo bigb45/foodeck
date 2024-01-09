@@ -47,7 +47,9 @@ class MainActivity : ComponentActivity() {
                         }
                     )
 
-                    homeScreen()
+                    homeScreen(onRestaurantClick = {
+                        navController.navigate("$homeRoute/$it")
+                    })
                 }
             }
         }

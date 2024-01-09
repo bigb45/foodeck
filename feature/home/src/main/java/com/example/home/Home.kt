@@ -91,12 +91,13 @@ import com.example.core.ui.theme.interBold
 import com.example.data.models.OffersDto
 import com.example.data.models.RestaurantDto
 import com.example.fooddeliver.home.R
-import com.example.home.navigation.HomeScreenUiState
 import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    onRestaurantClick: (restaurantId: String) -> Unit
+) {
     val viewModel: HomeViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
 
@@ -107,7 +108,7 @@ fun HomeScreen() {
             address = "Ankara, Kecioren, Baglarbasi Mahllesi", scrollBehavior = scrollBehavior
         )
     }, floatingActionButton = {
-        BadgedFab(number) { viewModel.load() }
+        BadgedFab(number) { onRestaurantClick("hello") }
     }, bottomBar = {
         BottomNavBar()
     }
@@ -768,5 +769,5 @@ fun CustomBadge(text: String, modifier: Modifier = Modifier) {
 @Preview
 @Composable
 fun HomePrev() {
-    HomeScreen()
+    HomeScreen({})
 }

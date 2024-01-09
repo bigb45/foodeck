@@ -1,4 +1,4 @@
-package com.example.home.navigation
+package com.example.home
 
 import com.example.data.models.OffersDto
 import com.example.data.models.RestaurantDto
