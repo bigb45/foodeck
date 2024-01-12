@@ -35,6 +35,7 @@ class CustomTopAppBarState(
         value = scrollOffset.coerceIn(0f, maxHeight.toFloat()), policy = structuralEqualityPolicy()
     )
 
+//    TODO: fix this, use a dynamic value instead of 250
     override val infoSectionHeight: Float
         get() = (250 - scrollOffset)
 
