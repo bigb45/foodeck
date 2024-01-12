@@ -1,6 +1,6 @@
 package com.example.domain.use_cases
 
-import com.example.data.util.ValidationResult
+import com.example.data.util.TextFieldMessages
 import com.example.data.util.ValidationUtil
 import com.example.data.models.FieldError
 
@@ -11,12 +11,12 @@ class ValidatePhoneNumberUseCase @Inject constructor(private val validationUtil:
 
         if (phoneNumber.isEmpty()) {
             return FieldError(
-                true, ValidationResult.EMPTY_PHONE_NUMBER
+                true, TextFieldMessages.EMPTY_PHONE_NUMBER
             )
         }
         if (!validationUtil.validatePhoneNumber(phoneNumber)) {
             return FieldError(
-                true, ValidationResult.PHONE_NUMBER_INVALID
+                true, TextFieldMessages.PHONE_NUMBER_INVALID
             )
         }
         return FieldError(false, null)

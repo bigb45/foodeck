@@ -72,6 +72,7 @@ dependencies {
     implementation(project(":core:domain"))
     implementation(project(":core:data"))
     implementation(project(":core:data"))
+    implementation(project(":core:common"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -89,8 +90,10 @@ dependencies {
     implementation(libs.androidx.hilt.navigation)
 
 
-    implementation( "androidx.compose.material:material-icons-extended")
+    implementation(libs.androidx.compose.material)
 
+    implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
+    implementation("io.github.ahmad-hamwi:tabsync-compose:1.0.0")
 
 
 //    Firebase

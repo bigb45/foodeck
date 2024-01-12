@@ -13,7 +13,6 @@ class PreferencesManager(private val context: Context) {
         }
     }
 
-
     fun getToken(name: Int): String?{
         return sharedPreferences.getString(context.getString(name), null)
     }

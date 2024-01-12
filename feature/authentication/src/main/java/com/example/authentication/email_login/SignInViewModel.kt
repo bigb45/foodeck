@@ -9,7 +9,7 @@ import com.example.data.models.FieldError
 import com.example.data.models.UserSignInModel
 import com.example.authentication.AuthEvent
 import com.example.common.asResult
-import com.example.data.util.ValidationResult
+import com.example.data.util.TextFieldMessages
 import com.example.domain.use_cases.SignUserInUseCase
 import com.example.domain.use_cases.ValidateEmailUseCase
 import com.example.domain.use_cases.ValidatePasswordUseCase
@@ -22,6 +22,7 @@ import com.example.data.models.InvalidCredentialsException
 import com.example.data.models.SignInAuthResponseModel
 import com.example.data.models.UserDetailsModel
 import com.example.data.models.UserNotFoundException
+import com.firebase.ui.auth.ui.idp.SingleSignInActivity
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
@@ -30,7 +31,7 @@ class SignInViewModel @Inject constructor(
     private val signUserInUseCase: SignUserInUseCase,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(SignInScreenState())
+    private val _uiState: MutableStateFlow<SignInScreenState> = MutableStateFlow(SignInScreenState())
     private var _authResult: MutableStateFlow<AuthResult> = MutableStateFlow(AuthResult.SignedOut)
     val authResult: StateFlow<AuthResult> = _authResult
     val signInUiState = _uiState
@@ -113,7 +114,7 @@ class SignInViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(
                     emailError = FieldError(
                         isError = true,
-                        ValidationResult.UNREGISTERED_USER
+                        TextFieldMessages.UNREGISTERED_USER
                     )
                 )
             }
@@ -122,7 +123,7 @@ class SignInViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(
                     passwordError = FieldError(
                         isError = true,
-                        ValidationResult.INVALID_CREDENTIALS
+                        TextFieldMessages.INVALID_CREDENTIALS
                     )
                 )
             }
@@ -133,9 +134,7 @@ class SignInViewModel @Inject constructor(
 //                )
 //            }
 
-            else -> {
 
-            }
         }
 
     }

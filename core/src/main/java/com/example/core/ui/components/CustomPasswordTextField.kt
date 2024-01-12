@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.example.compose.gray2
 import com.example.core.ui.theme.inter
 import com.example.data.models.FieldError
-import com.example.data.util.ValidationResult
+import com.example.data.util.TextFieldMessages
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -127,7 +127,7 @@ fun getStringResourceFromFieldError(fieldError: FieldError): String {
 }
 
 @Composable
-fun getStringResourceFromFieldError(fieldError: ValidationResult?): String {
+fun getStringResourceFromFieldError(fieldError: TextFieldMessages?): String {
     val id = fieldError?.message ?: return ""
     return stringResource(id = id)
 }

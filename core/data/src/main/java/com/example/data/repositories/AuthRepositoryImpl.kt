@@ -3,6 +3,7 @@ package com.example.data.repositories
 
 import com.example.data.models.SignInAuthResponseModel
 import com.example.data.models.SignupAuthResponseModel
+import com.example.data.models.TokenAuthResponseModel
 import com.example.data.models.UserDetailsModel
 import com.example.data.models.UserSignInModel
 import com.example.data.models.UserSignUpModel
@@ -23,7 +24,7 @@ import kotlin.coroutines.resume
 class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : AuthRepository {
     private val db = Firebase.database.reference
 
-    override fun createUser(user: UserSignUpModel): Flow<SignupAuthResponseModel> {
+    override suspend fun createUser(user: UserSignUpModel): Flow<SignupAuthResponseModel> {
 
         return flow {
             if (checkDuplicatePhoneNumber(user.phoneNumber)) {
@@ -53,17 +54,14 @@ class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : A
         db.child("users").child(userData.userId ?: "error").setValue(userData)
     }
 
+    override suspend fun authenticateUserWithToken(token: String, provider: String): Flow<TokenAuthResponseModel> {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun signUserIn(user: UserSignInModel): Flow<SignInAuthResponseModel> {
         return flow {
             val result = auth.signInWithEmailAndPassword(user.email, user.password).await()
-            val userData = UserDetailsModel(
-                username = result.user?.displayName ?: "Unknown user",
-                userId = result.user?.uid ?: "test_id",
-                email = user.email,
-                profilePictureUrl = null
-            )
 
-//            emit(userData)
             emit(SignInAuthResponseModel.Loading)
         }
 

@@ -1,34 +1,38 @@
 package com.example.data.repositories
 
-import android.util.Log
 import android.util.Log.d
 import com.example.data.api_services.AuthApiService
+import com.example.data.models.AuthenticationResponseDto
 import com.example.data.models.InternalServerException
 import com.example.data.models.InvalidCredentialsException
 import com.example.data.models.SignInAuthResponseModel
 import com.example.data.models.SignupAuthResponseModel
+import com.example.data.models.TokenAuthResponseModel
+import com.example.data.models.TokenDto
+import com.example.data.models.UnknownException
 import com.example.data.models.UserDetailsModel
-import com.example.data.models.UserSignInModel
 import com.example.data.models.UserNotFoundException
+import com.example.data.models.UserSignInModel
 import com.example.data.models.UserSignUpModel
+import com.example.data.util.AccessTokenLocalDataSource
+import com.example.data.util.PreferencesManager
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class AuthRepositoryImplCustomApi @Inject constructor(private val authService: AuthApiService) :
+class AuthRepositoryImplCustomApi @Inject constructor(private val authService: AuthApiService, private val tokenDataSource: AccessTokenLocalDataSource) :
     AuthRepository {
-    override fun createUser(user: UserSignUpModel): Flow<SignupAuthResponseModel> {
+    override suspend fun createUser(user: UserSignUpModel): Flow<SignupAuthResponseModel> {
         val credentials =
-            NewUserCredentials(user.username, user.email, user.password, )
+            NewUserCredentials(user.username, user.email, user.password)
         return try {
+            val res = authService.createUser(credentials)
             flow {
-                val res = authService.createUser(credentials)
-
                 emit(
                     when {
                         res.isSuccessful -> {
-
+                            writeTokens(res.body())
                             SignupAuthResponseModel.SignupSuccess(res.body()!!)
                         }
 
@@ -45,9 +49,11 @@ class AuthRepositoryImplCustomApi @Inject constructor(private val authService: A
             }
         } catch (e: Exception) {
             d("error", e.message.toString())
-            flow { SignupAuthResponseModel.InternalServerError }
+            flow { emit(SignupAuthResponseModel.InternalServerError) }
         }
     }
+
+
 
     override suspend fun signUserIn(user: UserSignInModel): Flow<SignInAuthResponseModel> {
         val userCredentials = UserCredentials(email = user.email, password = user.password)
@@ -59,27 +65,28 @@ class AuthRepositoryImplCustomApi @Inject constructor(private val authService: A
                 emit(
                     when {
                         res.isSuccessful -> {
+                            writeTokens(res.body())
                             SignInAuthResponseModel.SignInSuccess(res.body()!!)
                         }
 
                         res.code() == 403 -> {
                             SignInAuthResponseModel.InvalidCredentials
-                            throw(InvalidCredentialsException("Invalid credentials"))
+                            throw (InvalidCredentialsException("Invalid credentials"))
                         }
 
                         res.code() == 404 -> {
                             SignInAuthResponseModel.UserNotFound
-                            throw(UserNotFoundException("User does not exist"))
+                            throw (UserNotFoundException("User does not exist"))
                         }
 
                         res.code() == 500 -> {
                             SignInAuthResponseModel.InternalServerError
-                            throw(InternalServerException("Internal server error"))
+                            throw (InternalServerException("Internal server error"))
                         }
 
                         else -> {
                             SignInAuthResponseModel.SignInFailure(res.code())
-                            throw(UnknownError("Unknown error"))
+                            throw (UnknownException("Unknown error"))
                         }
                     }
                 )
@@ -87,7 +94,41 @@ class AuthRepositoryImplCustomApi @Inject constructor(private val authService: A
 
         } catch (e: Exception) {
             d("error", e.message.toString())
-            flow { throw(UnknownError("exception caught")) }
+            flow { throw (UnknownError("exception caught")) }
+        }
+    }
+
+    override suspend fun authenticateUserWithToken(
+        token: String,
+        provider: String,
+    ): Flow<TokenAuthResponseModel> {
+        return try {
+            val res = authService.authenticateWithGoogleToken(provider, TokenDto(token))
+            flow {
+                emit(
+                    when {
+                        res.isSuccessful -> {
+                            writeTokens(res.body())
+                            TokenAuthResponseModel.SignInSuccess(res.body()!!)
+                        }
+                        res.code() == 500 -> {
+                            TokenAuthResponseModel.InternalServerError
+                            throw (InternalServerException("Error while inserting data"))
+                        }
+
+                        else -> {
+                            TokenAuthResponseModel.SignInFailure(res.code())
+                            throw (UnknownException("Unknown error"))
+                        }
+                    }
+                )
+            }
+        } catch (e: Exception) {
+            d("error", e.message.toString())
+            return flow {
+                TokenAuthResponseModel.UnknownError
+                throw(UnknownException("Unknown error: ${e.message.toString()}"))
+            }
         }
     }
 
@@ -108,8 +149,18 @@ class AuthRepositoryImplCustomApi @Inject constructor(private val authService: A
         d("error", userData.toString())
     }
 
+
     override suspend fun checkDuplicatePhoneNumber(phoneNumber: String): Boolean {
         TODO("Not yet implemented")
+    }
+
+    private fun writeTokens(body: AuthenticationResponseDto?) {
+        if(body == null){
+            throw UnknownException("Empty response body returned")
+        }
+        tokenDataSource.writeAccessToken(body.accessToken)
+        tokenDataSource.writeRefreshToken(body.refreshToken)
+
     }
 }
 

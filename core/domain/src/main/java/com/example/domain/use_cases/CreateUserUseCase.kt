@@ -9,7 +9,7 @@ import javax.inject.Named
 
 
 class CreateUserUseCase @Inject constructor(@Named("customApi") private val repository: AuthRepository) {
-    operator fun invoke(user: UserSignUpModel): Flow<SignupAuthResponseModel> {
+    suspend operator fun invoke(user: UserSignUpModel): Flow<SignupAuthResponseModel> {
         return repository.createUser(user)
 
     }

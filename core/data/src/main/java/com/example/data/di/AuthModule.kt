@@ -6,6 +6,8 @@ import com.example.data.api_services.AuthApiService
 import com.example.data.repositories.AuthRepository
 import com.example.data.repositories.AuthRepositoryImpl
 import com.example.data.repositories.AuthRepositoryImplCustomApi
+import com.example.data.util.AccessTokenLocalDataSource
+import com.example.data.util.PreferencesManager
 import com.example.data.util.ValidationUtil
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -39,8 +41,10 @@ object AuthModule {
     @Provides
     @Singleton
     @Named("customApi")
-    fun provideCustomApiAuthRepository(authService: AuthApiService): AuthRepository {
-        return AuthRepositoryImplCustomApi(authService)
+    fun provideCustomApiAuthRepository(authService: AuthApiService, tokenStorageManager: PreferencesManager): AuthRepository {
+        return AuthRepositoryImplCustomApi(authService, AccessTokenLocalDataSource(
+            tokenStorageManager
+        ))
     }
 
     @Provides

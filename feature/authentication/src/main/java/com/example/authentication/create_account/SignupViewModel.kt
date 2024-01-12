@@ -8,12 +8,11 @@ import com.example.authentication.AuthResult
 import com.example.common.Result
 import com.example.common.asResult
 import com.example.data.models.FieldError
-import com.example.data.models.SignInAuthResponseModel
 import com.example.data.models.SignupAuthResponseModel
 import com.example.data.models.UserDetailsModel
 import com.example.data.models.UserSignUpModel
 import com.example.data.repositories.AuthRepositoryImpl
-import com.example.data.util.ValidationResult
+import com.example.data.util.TextFieldMessages
 import com.example.domain.use_cases.CreateUserUseCase
 import com.example.domain.use_cases.ValidateEmailUseCase
 import com.example.domain.use_cases.ValidatePasswordUseCase
@@ -136,9 +135,7 @@ class SignupViewModel @Inject constructor(
                             "user data ${(result.data as SignupAuthResponseModel.SignupSuccess).tokens.userId}"
                         )
                     }
-
                 }
-
             }
         }
     }
@@ -148,7 +145,7 @@ class SignupViewModel @Inject constructor(
             is FirebaseAuthUserCollisionException -> {
                 _uiState.value = _uiState.value.copy(
                     emailError = FieldError(
-                        isError = true, ValidationResult.DUPLICATE_EMAIL
+                        isError = true, TextFieldMessages.DUPLICATE_EMAIL
                     )
                 )
             }
@@ -156,7 +153,7 @@ class SignupViewModel @Inject constructor(
             is AuthRepositoryImpl.DuplicatePhoneNumberError -> {
                 _uiState.value = _uiState.value.copy(
                     phoneNumberError = FieldError(
-                        isError = true, ValidationResult.DUPLICATE_PHONE_NUMBER
+                        isError = true, TextFieldMessages.DUPLICATE_PHONE_NUMBER
                     )
                 )
             }

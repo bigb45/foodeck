@@ -12,6 +12,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -69,6 +70,7 @@ fun CustomTextField(
         ) {
 
             OutlinedTextField(
+
                 label = {
                     Text(
                         label,
@@ -81,12 +83,12 @@ fun CustomTextField(
                 onValueChange = onValueChange,
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
+                colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.Transparent,
                     unfocusedBorderColor = Color.Transparent,
+                    errorBorderColor = Color.Transparent,
                     focusedLabelColor = colorScheme.primary,
                     unfocusedLabelColor = gray2,
-                    errorBorderColor = Color.Transparent
                 ),
 
                 modifier = Modifier

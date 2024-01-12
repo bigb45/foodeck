@@ -58,7 +58,7 @@ fun LoginMethods(
     val context = LocalContext.current
 
     val viewModel: GoogleSignInViewModel = hiltViewModel()
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.authResult.collectAsState()
 
 //    Initiate Google sign in
     val scope = rememberCoroutineScope()

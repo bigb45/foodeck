@@ -6,6 +6,7 @@ import com.example.common.Constants.usersEndpoint
 import com.example.data.api_services.UserApiService
 import com.example.data.repositories.UsersRepository
 import com.example.data.repositories.UsersRepositoryImpl
+import com.example.data.util.AccessTokenLocalDataSource
 import com.example.data.util.PreferencesManager
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -34,9 +35,9 @@ object UsersModule {
     @Singleton
     fun provideUsersRepository(
         usersService: UserApiService,
-        sharedPrefs: PreferencesManager,
+        tokenDataSource: AccessTokenLocalDataSource,
     ): UsersRepository {
-        return UsersRepositoryImpl(usersService, sharedPrefs)
+        return UsersRepositoryImpl(usersService, tokenDataSource)
     }
 
     @Provides

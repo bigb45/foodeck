@@ -1,4 +1,4 @@
-package com.example.home.welcome
+package com.example.welcome
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -25,7 +26,7 @@ import com.example.fooddeliver.home.R
 @Composable
 fun Welcome(onContinueClick: () -> Unit, onSignOut: () -> Unit) {
     val viewModel: WelcomeViewModel = hiltViewModel()
-    val user by viewModel.user.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
     Column(
         verticalArrangement = Arrangement.spacedBy(30.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -34,21 +35,28 @@ fun Welcome(onContinueClick: () -> Unit, onSignOut: () -> Unit) {
             .padding(30.dp)
     ) {
 
-        Icon(
-            imageVector = Icons.Filled.CheckCircle,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(120.dp)
+        when(uiState){
+            is WelcomeScreenUiState.Success -> {
+                Icon(
+                    imageVector = Icons.Filled.CheckCircle,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(120.dp)
 
-        )
-        // TODO: move text into resource string file
-        Text(stringResource(R.string.signed_in_successfully), style = MaterialTheme.typography.titleLarge)
-        Text("Signed in as ${user.username}")
-        PrimaryButton(
-            text = "Continue to Foodeck", enabled = true, onClick = {viewModel.getUserFromId("1")}
-        )
-        SecondaryButton(
-            text = "Sign out", enabled = true, onClick = onSignOut
-        )
+                )
+                Text(stringResource(R.string.signed_in_successfully), style = MaterialTheme.typography.titleLarge)
+                Text("Signed in as ${(uiState as WelcomeScreenUiState.Success).user.username}")
+                PrimaryButton(
+                    text = "Continue to Foodeck", enabled = true, onClick = onContinueClick
+                )
+                SecondaryButton(
+                    text = "Sign out", enabled = true, onClick = onSignOut
+                )
+            }
+
+            is WelcomeScreenUiState.Loading -> {
+                CircularProgressIndicator()
+            }
+        }
     }
 }

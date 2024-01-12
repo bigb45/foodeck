@@ -1,63 +1,54 @@
 package com.example.authentication.facebook_login
 
-import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.authentication.AuthResult
+import com.example.common.Result
+import com.example.common.asResult
+import com.example.data.models.TokenAuthResponseModel
 import com.example.data.models.UserDetailsModel
 import com.example.domain.use_cases.AddUserInformationUseCase
+import com.example.domain.use_cases.AuthenticateUserWithTokenUseCase
 import com.facebook.FacebookException
-import com.facebook.GraphRequest
 import com.facebook.login.LoginResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FacebookLoginViewModel @Inject constructor(private val addAdditionalUserInformation: AddUserInformationUseCase) :
+class FacebookLoginViewModel @Inject constructor(
+    private val authenticateWithToken: AuthenticateUserWithTokenUseCase,
+) :
     ViewModel() {
     private val _authResult = MutableStateFlow<AuthResult>(AuthResult.Loading)
     val authResult: StateFlow<AuthResult> = _authResult
 
     fun handleLogInSuccess(result: LoginResult) {
-        val graphRequest = GraphRequest.newMeRequest(
-            result.accessToken
-        ) { user, _ ->
-            if (user != null) {
-                val userId = user.getString("id")
-                val username = user.getString("name")
-                val email = user.getString("email")
-                val profilePictureUrl = "https://graph.facebook.com/$userId/picture?type=large"
-
-                val data = UserDetailsModel(
-                    userId = userId,
-                    email = email,
-                    username = username,
-                    profilePictureUrl = profilePictureUrl
-                )
-
-                addUserInfo(data)
-
-                _authResult.value = AuthResult.Success(
-                    data = data
-                )
-            }
-        }
-        val parameters = Bundle()
-        parameters.putString("fields", "email,id,name")
-        graphRequest.parameters = parameters
-        graphRequest.executeAsync()
-
-    }
-
-    private fun addUserInfo(data: UserDetailsModel) {
         viewModelScope.launch {
-//          TODO: handle error here ↘️↘️
-            addAdditionalUserInformation(data)
+            authenticateWithToken(token=result.accessToken.token, provider="facebook").asResult().collect{ result ->
+                when(result){
+                    is Result.Error -> {
+                        _authResult.value = AuthResult.Error(result.exception?.message ?: "An unknown occurred")
+                    }
+                    Result.Loading -> {
+                        _authResult.value = AuthResult.Loading
+
+                    }
+                    is Result.Success -> {
+                        _authResult.value = AuthResult.Success(UserDetailsModel(userId = (result.data as TokenAuthResponseModel.SignInSuccess).tokens.userId))
+
+                    }
+                }
+            }
+
+
         }
+
     }
+
 
     fun cancelLogin() {
         _authResult.value = AuthResult.Cancelled
