@@ -1,12 +1,20 @@
 package com.example.core.ui.theme
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.googlefonts.Font
 import androidx.compose.ui.text.googlefonts.GoogleFont
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fooddelivery.R
 
@@ -64,3 +72,24 @@ val Typography = Typography(
     )
     */
 )
+
+@Preview
+@Composable
+fun TextStylePreview() {
+    Column(
+        modifier = Modifier
+            .background(Color.White),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ){
+    Text(text = "The Quick Brown Fox", style = Typography.titleLarge)
+    Text(text = "The Quick Brown Fox", style = Typography.titleMedium)
+    Text(text = "The Quick Brown Fox", style = Typography.titleSmall)
+    Text(text = "The Quick Brown Fox", style = Typography.bodyLarge)
+    Text(text = "The Quick Brown Fox", style = Typography.bodyMedium)
+    Text(text = "The Quick Brown Fox", style = Typography.bodySmall)
+    Text(text = "The Quick Brown Fox", style = Typography.labelLarge)
+    Text(text = "The Quick Brown Fox", style = Typography.labelMedium)
+    Text(text = "The Quick Brown Fox", style = Typography.labelSmall)
+
+    }
+}
