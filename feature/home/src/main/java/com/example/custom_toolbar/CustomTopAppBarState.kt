@@ -19,6 +19,7 @@ class CustomTopAppBarState(
         }
     }
 
+
     val maxHeight: Int
     val minHeight: Int
 
@@ -30,9 +31,12 @@ class CustomTopAppBarState(
     private val rangeDifference = maxHeight - minHeight
     private var _consumed: Float = 0f
 
-    var _scrollOffset by mutableStateOf(
+    private var _scrollOffset by mutableStateOf(
         value = scrollOffset.coerceIn(0f, maxHeight.toFloat()), policy = structuralEqualityPolicy()
     )
+
+    override val infoSectionHeight: Float
+        get() = (250 - scrollOffset)
 
     override val offset: Float
         get() = if (scrollOffset > rangeDifference) {

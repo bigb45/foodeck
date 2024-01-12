@@ -134,7 +134,7 @@ fun HomeScreen(
             }
 
             HomeScreenUiState.Loading -> {
-                LoadingIndicator()
+                onRestaurantClick("test")
             }
 
 //            TODO: Error state

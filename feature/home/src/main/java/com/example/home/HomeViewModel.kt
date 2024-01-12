@@ -23,11 +23,7 @@ class HomeViewModel @Inject constructor(
     val uiState: StateFlow<HomeScreenUiState> = _state
 
     init {
-        fetchRestaurantData()
-    }
-
-    fun load() {
-        fetchRestaurantData()
+//        fetchRestaurantData()
     }
 
     private fun fetchRestaurantData() {

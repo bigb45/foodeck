@@ -1,25 +1,17 @@
 package com.example.custom_toolbar
 
-import android.util.Log.d
 import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.animation.core.animateDecay
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyListLayoutInfo
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material.icons.outlined.ArrowBack
@@ -34,14 +26,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
@@ -60,11 +47,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.example.compose.gray2
 import com.example.core.ui.theme.inter
 import com.example.core.ui.theme.interBold
 import com.example.data.models.RestaurantDto
 import com.example.fooddeliver.home.R
+import com.example.restaurant.Category
+import com.example.restaurant.TabSync
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
@@ -73,9 +61,62 @@ val restaurantInfoHeight = 120.dp
 
 
 @Composable
-fun RestaurantInfo(restaurant: RestaurantDto, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+fun RestaurantPageHeader(
+    toolbarState: ToolbarState,
+    restaurant: RestaurantDto,
+    foodItems: List<Category>,
+    onNavigateUp: () -> Unit,
+    onFavoriteClick: () -> Unit,
+    onShareClick: () -> Unit,
+    onMoreClick: () -> Unit,
+    onSearchClick: () -> Unit,
+    selectedTabIndex: Int,
+    setSelectedTabIndex: (Int) -> Unit,
+) {
+    Column {
+        CollapsingToolbar(
+            coverImageUrl = null,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(with(LocalDensity.current) { toolbarState.height.toDp() })
+                .graphicsLayer { translationY = toolbarState.offset },
+            progress = toolbarState.progress,
+            restaurantName = restaurant.restaurantName,
+            restaurantAddress = restaurant.restaurantAddress,
+            onNavigateUp = onNavigateUp,
+            onFavoriteClick = onFavoriteClick,
+            onShareClick = onShareClick,
+            onMoreClick = onMoreClick,
+            onSearchClick = onSearchClick,
+
+            )
+//        RestaurantInfo(restaurant = restaurant,
+//            modifier = Modifier
+//
+//                .height(with(LocalDensity.current) { (toolbarState.infoSectionHeight).toDp() }) /*TODO: toolbarState.bottomSectionHeight*/
+//                .graphicsLayer { translationY = toolbarState.offset }
+////                TODO: calculate height of info section in toolbarState
+//                .background(colorScheme.surface)
+//        ) {
+//
+//        }
+//        //        TODO: translate this based on scroll position
+//        TabSync(modifier = Modifier.graphicsLayer { translationY = toolbarState.offset },
+//            categories = foodItems,
+//            selectedTabIndex = selectedTabIndex,
+//            setSelectedTabIndex = setSelectedTabIndex)
+    }
+}
+
+@Composable
+fun RestaurantInfo(
+    modifier: Modifier = Modifier,
+    restaurant: RestaurantDto,
+    content: @Composable () -> Unit,
+) {
     Box(
         modifier = modifier
+
             .height(restaurantInfoHeight)
             .fillMaxWidth()
             .shadow(10.dp, spotColor = Color.Transparent)
@@ -85,8 +126,8 @@ fun RestaurantInfo(restaurant: RestaurantDto, modifier: Modifier = Modifier, con
             horizontalArrangement = Arrangement.SpaceAround,
 
             modifier = Modifier
+                .align(Alignment.Center)
                 .fillMaxWidth()
-                .padding(vertical = 24.dp)
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -117,104 +158,8 @@ fun RestaurantInfo(restaurant: RestaurantDto, modifier: Modifier = Modifier, con
             }
         }
 
-        Box(Modifier.align(Alignment.BottomCenter)){ content() }
+//        Box(Modifier.align(Alignment.BottomCenter)) { content() }
     }
-}
-
-
-// TODO: Move this to a separate file
-@Composable
-fun Tabs(modifier: Modifier = Modifier, foodItems: List<String>) {
-    val lazyListState = rememberLazyListState()
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
-
-    LaunchedEffect(selectedTabIndex) {
-        lazyListState.animateScrollToItemCenter(selectedTabIndex)
-    }
-
-    LazyRow(
-        modifier = modifier,
-        contentPadding = PaddingValues(horizontal = 24.dp),
-        horizontalArrangement = Arrangement.spacedBy(space = 24.dp, Alignment.CenterHorizontally),
-        state = lazyListState,
-    ) {
-        itemsIndexed(foodItems) { index, foodItem ->
-            Tab(
-                state = if (index == selectedTabIndex) TabState.Selected else TabState.Unselected,
-                onTabSelect = { newState ->
-                    if (newState == TabState.Unselected) {
-                        selectedTabIndex = index
-                    }
-                },
-                tabText = foodItem
-            )
-        }
-    }
-}
-
-sealed interface TabState {
-    object Selected : TabState
-    object Unselected : TabState
-}
-
-@Composable
-fun Tab(state: TabState, onTabSelect: (TabState) -> Unit, tabText: String) {
-    Box(modifier = Modifier
-        .fillMaxWidth()
-        .height(32.dp)
-//                TODO: remove click indication, make custom clickable
-        .clickable {
-//            selected = currentItemIndex
-            onTabSelect(state)
-        }) {
-        val tabColor = if (state is TabState.Selected) colorScheme.primary else gray2
-
-        Text(
-            tabText, style = TextStyle(
-                fontFamily = interBold, color = tabColor
-            )
-        )
-        if (state is TabState.Selected) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(100))
-                    .background(colorScheme.primary)
-                    .height(4.dp)
-                    .align(Alignment.BottomCenter)
-            ) {
-//                        we do this so the indicator is the same width as the text
-//                        NOTE: I could calculate it but I don't know how it would behave on
-//                        different sized screens
-                Text(
-                    tabText, style = TextStyle(
-                        fontFamily = interBold, color = colorScheme.primary
-                    )
-                )
-            }
-        }
-    }
-}
-
-
-// Stackoverflow code
-suspend fun LazyListState.animateScrollToItemCenter(index: Int) {
-    layoutInfo.resolveItemOffsetToCenter(index)?.let {
-        animateScrollToItem(index, it)
-        return
-    }
-
-    scrollToItem(index)
-
-    layoutInfo.resolveItemOffsetToCenter(index)?.let {
-        animateScrollToItem(index, it)
-    }
-}
-
-private fun LazyListLayoutInfo.resolveItemOffsetToCenter(index: Int): Int? {
-    val itemInfo = visibleItemsInfo.firstOrNull { it.index == index } ?: return null
-    val containerSize = viewportSize.width - beforeContentPadding - afterContentPadding
-    return -(containerSize - itemInfo.size) / 2
 }
 
 
@@ -225,12 +170,14 @@ fun CustomToolbar(
     scope: CoroutineScope,
     lazyListState: LazyListState,
     restaurant: RestaurantDto,
+    selectedTabIndex: Int,
+    foodItems: List<Category>,
     onNavigateUp: () -> Unit,
     onFavoriteClick: () -> Unit,
     onShareClick: () -> Unit,
     onMoreClick: () -> Unit,
     onSearchClick: () -> Unit,
-    foodItems: List<String>,
+    setSelectedTabIndex: (Int) -> Unit,
     content: @Composable () -> Unit,
 ) {
 
@@ -279,59 +226,19 @@ fun CustomToolbar(
             onFavoriteClick = onFavoriteClick,
             onShareClick = onShareClick,
             onMoreClick = onMoreClick,
-            onSearchClick = onSearchClick
+            onSearchClick = onSearchClick,
+            selectedTabIndex,
+            setSelectedTabIndex,
         )
 
     }
 }
 
-@Composable
-fun RestaurantPageHeader(
-    toolbarState: ToolbarState,
-    restaurant: RestaurantDto,
-    foodItems: List<String>,
-    onNavigateUp: () -> Unit,
-    onFavoriteClick: () -> Unit,
-    onShareClick: () -> Unit,
-    onMoreClick: () -> Unit,
-    onSearchClick: () -> Unit,
-) {
-    Column {
-        CollapsingToolbar(
-            coverImageUrl = null,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(with(LocalDensity.current) { toolbarState.height.toDp() })
-                .graphicsLayer { translationY = toolbarState.offset },
-            progress = toolbarState.progress,
-            restaurantName = restaurant.restaurantName,
-            restaurantAddress = restaurant.restaurantAddress,
-            onNavigateUp = onNavigateUp,
-            onFavoriteClick = onFavoriteClick,
-            onShareClick = onShareClick,
-            onMoreClick = onMoreClick,
-            onSearchClick = onSearchClick,
-
-            )
-        RestaurantInfo(restaurant = restaurant,
-            Modifier
-                .graphicsLayer { translationY = toolbarState.offset }
-                .background(colorScheme.surface)){
-
-                Tabs(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    foodItems = foodItems,
-                )
-        }
-
-    }
-}
 
 @Composable
 fun CollapsingToolbar(
-    coverImageUrl: String?,
     modifier: Modifier = Modifier,
+    coverImageUrl: String?,
     progress: Float,
     restaurantName: String,
     restaurantAddress: String,
@@ -342,9 +249,6 @@ fun CollapsingToolbar(
     onSearchClick: () -> Unit,
 
     ) {
-    LaunchedEffect(key1 = progress) {
-        d("error", progress.toString())
-    }
 
     Box(modifier = modifier) {
         RestaurantCoverImage(coverImageUrl = coverImageUrl)
@@ -361,7 +265,10 @@ fun CollapsingToolbar(
             )
         } else {
             CollapsedToolbar(
-                restaurantName = restaurantName, progress = progress, onNavigateUp, onSearchClick
+                restaurantName = restaurantName,
+                progress = progress,
+                onNavigateUp = onNavigateUp,
+                onSearchClick = onSearchClick
             )
         }
 
@@ -404,7 +311,7 @@ fun CollapsedToolbar(
         .graphicsLayer {
             alpha = 1 - progress
         }
-        .background(color = colorScheme.secondaryContainer.copy(alpha = 1 - progress)),
+        .background(color = colorScheme.primary.copy(alpha = 1 - progress)),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically) {
         IconButton(onClick = onNavigateUp) {
@@ -422,8 +329,6 @@ fun CollapsedToolbar(
         IconButton(onClick = onSearchClick) {
             Icon(Icons.Outlined.Search, null, tint = Color.White)
         }
-
-
     }
 }
 
@@ -503,6 +408,8 @@ fun ExpandedToolbar(
 
                 )
 
+
         }
+//        TODO: add restaurant info here
     }
 }
