@@ -2,6 +2,7 @@ package com.example.home
 
 import android.util.Log.d
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -35,7 +36,7 @@ import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material.icons.outlined.PersonOutline
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.rounded.Star
@@ -56,8 +57,12 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.PullToRefreshState
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -85,6 +90,7 @@ import com.bumptech.glide.integration.compose.CrossFade
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.compose.gray2
+import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.core.ui.theme.Typography
 import com.example.core.ui.theme.inter
 import com.example.core.ui.theme.interBold
@@ -100,109 +106,150 @@ fun HomeScreen(
 ) {
     val viewModel: HomeViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
-
+    val pullToRefreshState = rememberPullToRefreshState()
     val number = 5
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-    Scaffold(modifier = Modifier
-        .nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
-        AddressTopAppBar(
-            address = "Ankara, Kecioren, Baglarbasi Mahllesi", scrollBehavior = scrollBehavior
-        )
-    }, floatingActionButton = {
-        BadgedFab(number) { onRestaurantClick("hello") }
-    }, bottomBar = {
-        BottomNavBar()
+
+    if(pullToRefreshState.isRefreshing){
+        LaunchedEffect(true){
+            viewModel.load()
+            pullToRefreshState.endRefresh()
+        }
     }
 
-    ) { padding ->
 
-        when (uiState) {
+    FoodDeliveryTheme{
+        Scaffold(modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
+            AddressTopAppBar(
+                address = "Ankara, Kecioren, Baglarbasi Mahllesi",
+                scrollBehavior = scrollBehavior
+            )
+        }, floatingActionButton = {
+            BadgedFab(number) { onRestaurantClick("hello") }
+        }, bottomBar = {
+            BottomNavBar()
+        }
 
-            is HomeScreenUiState.Success -> {
-                val restaurants = (uiState as HomeScreenUiState.Success).restaurants
-                val offers = (uiState as HomeScreenUiState.Success).offers
-                Home(
-                    Modifier.padding(
-                        padding
-                    ),
-                    restaurants,
-                    offers,
-                    onRestaurantClick = onRestaurantClick
-                )
-            }
+        ) { padding ->
 
-            HomeScreenUiState.Loading -> {
-                CircularProgressIndicator()
-            }
+            when (uiState) {
+
+                is HomeScreenUiState.Success -> {
+                    val restaurants = (uiState as HomeScreenUiState.Success).restaurants
+                    val offers = (uiState as HomeScreenUiState.Success).offers
+
+                    Home(
+                        Modifier.padding(
+                            padding
+                        ),
+                        restaurants,
+                        offers,
+                        onRestaurantClick = onRestaurantClick,
+                        pullToRefreshState = pullToRefreshState
+                    )
+
+                }
+
+                HomeScreenUiState.Loading -> {
+//                CircularProgressIndicator()
+                    LoadingIndicator()
+                }
 
 //            TODO: Error state
-            is HomeScreenUiState.Error -> {
-                Text(
-                    "error" + (uiState as HomeScreenUiState.Error).message,
-                    modifier = Modifier.padding(padding)
-                )
+                is HomeScreenUiState.Error -> {
+                    Text(
+                        "error" + (uiState as HomeScreenUiState.Error).message,
+                        modifier = Modifier.padding(padding)
+                    )
+                }
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Home(
     modifier: Modifier = Modifier,
     restaurants: List<RestaurantDto>,
     offers: List<OffersDto>,
     onRestaurantClick: (String) -> Unit,
+    pullToRefreshState: PullToRefreshState,
 ) {
+
+
+
     var query by remember { mutableStateOf("") }
+    val scaleFraction = if (pullToRefreshState.isRefreshing) 1f else
+        LinearOutSlowInEasing.transform(pullToRefreshState.progress).coerceIn(0f, 1f)
 
-    LazyColumn(
-        modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 56.dp)
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .nestedScroll(pullToRefreshState.nestedScrollConnection)
+        ){
 
-    ) {
-        item {
-            CustomSearchBox(query = query, onValueChange = { query = it })
-        }
 
-        item {
-            BentoSection(modifier = Modifier.padding(16.dp))
-        }
-        item {
-            CarrouselCards(
-                modifier = Modifier.padding(vertical = 16.dp), offers
-            )
-        }
+            LazyColumn(
+                Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 56.dp)
 
-        item {
-            DealsSection(
-                modifier = Modifier.padding(vertical = 16.dp),
-                restaurants = restaurants,
-                onRestaurantClick = onRestaurantClick
-            )
-        }
-
-        item {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth()
             ) {
-                Text(
-                    "Explore More", style = TextStyle(
-                        fontWeight = FontWeight.W900, fontSize = 20.sp, fontFamily = interBold
+                item {
+                    CustomSearchBox(query = query, onValueChange = { query = it })
+                }
+
+                item {
+                    BentoSection(modifier = Modifier.padding(16.dp))
+                }
+                item {
+                    CarrouselCards(
+                        modifier = Modifier.padding(vertical = 16.dp), offers
                     )
-                )
+                }
+
+                item {
+                    DealsSection(
+                        modifier = Modifier.padding(vertical = 16.dp),
+                        restaurants = restaurants,
+                        onRestaurantClick = onRestaurantClick
+                    )
+                }
+
+                item {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            "Explore More", style = TextStyle(
+                                fontWeight = FontWeight.W900,
+                                fontSize = 20.sp,
+                                fontFamily = interBold
+                            )
+                        )
+                    }
+                }
+                items(restaurants) {
+                    RestaurantCard(
+                        modifier = Modifier.padding(16.dp),
+                        boxModifier = Modifier.height(240.dp),
+                        restaurant = it,
+                        onRestaurantClick
+                    )
+                }
+
+
             }
-        }
-        items(restaurants) {
-            RestaurantCard(
-                modifier = Modifier.padding(16.dp),
-                boxModifier = Modifier.height(240.dp),
-                restaurant = it,
-                onRestaurantClick
+            PullToRefreshContainer(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .graphicsLayer(scaleX = scaleFraction, scaleY = scaleFraction),
+                state = pullToRefreshState,
             )
         }
-    }
 }
 
 @Composable
@@ -246,7 +293,7 @@ private fun BentoSection(modifier: Modifier = Modifier) {
                         .align(Alignment.BottomStart)
                         .padding(10.dp)
                 ) {
-                    Text("Candy", style = TextStyle(color = Color.White, fontSize = 20.sp))
+                    Text(text = "Candy", style = TextStyle(color = Color.White, fontSize = 20.sp))
                     Text("Sweet tooth!", style = TextStyle(color = Color.White, fontSize = 16.sp))
 
                 }
@@ -477,7 +524,7 @@ private fun BottomNavBar() {
             label = { Text("Notifications") })
         NavigationBarItem(selected = false,
             onClick = { },
-            icon = { Icon(Icons.Outlined.PersonOutline, null) },
+            icon = { Icon(Icons.Outlined.Person, null) },
             label = { Text("Profile") })
     }
 }
@@ -583,7 +630,7 @@ fun CarrouselCards(modifier: Modifier = Modifier, items: List<OffersDto>) {
 fun PagerIndicatorRow(pageCount: Int, selectedPage: Int, modifier: Modifier = Modifier) {
     Row(
         modifier
-            .wrapContentHeight()
+            .height(30.dp)
             .fillMaxWidth()
             .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.Center,

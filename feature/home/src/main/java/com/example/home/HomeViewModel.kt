@@ -25,8 +25,12 @@ class HomeViewModel @Inject constructor(
     init {
         fetchRestaurantData()
     }
+    fun load(){
 
+        fetchRestaurantData()
+    }
     private fun fetchRestaurantData() {
+        _state.value = HomeScreenUiState.Loading
         viewModelScope.launch {
             val restaurantsFlow = getRestaurants().ListAsResult()
             val offersFlow = getOffers().ListAsResult()

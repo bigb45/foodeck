@@ -1,15 +1,19 @@
 package com.example.restaurant
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.AccessTime
-import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.MoreVert
@@ -19,13 +23,14 @@ import androidx.compose.material.icons.rounded.StarBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.example.custom_toolbar.ToolbarState
@@ -83,7 +88,11 @@ internal fun RestaurantPageHeader(
             restaurantAddress = restaurant.restaurantAddress,
             navigationButton = {
                 IconButton(onClick = onNavigateUp) {
-                    Icon(Icons.Outlined.ArrowBack, null, tint = Color.White)
+                    Icon(
+                        Icons.AutoMirrored.Outlined.ArrowBack,
+                        null,
+                        tint = if (toolbarState.progress > TRIGGER_VISIBILITY_THRESHOLD) Color.White else colorScheme.onSurface
+                    )
                 }
             },
             expandedActions = {
@@ -111,15 +120,16 @@ internal fun RestaurantPageHeader(
             },
             collapsedActions = {
                 IconButton(onClick = onSearchClick) {
-                    Icon(Icons.Outlined.Search, null, tint = Color.White)
+                    Icon(Icons.Outlined.Search, null, tint = colorScheme.onSurface)
                 }
             }
 
-            )
-        RestaurantInfo(restaurant = restaurant,
+        )
+        RestaurantInfo(
+            restaurant = restaurant,
             modifier = Modifier
                 .height(with(LocalDensity.current) { (toolbarState.infoSectionHeight).toDp() })
-                .background(MaterialTheme.colorScheme.surface)
+                .background(colorScheme.surface)
         )
         TabSync(
             modifier = Modifier,
@@ -138,40 +148,59 @@ fun RestaurantInfo(
 ) {
     Box(
         modifier = modifier
-            .fillMaxWidth()
             .shadow(10.dp, spotColor = Color.Transparent)
+            .padding(horizontal = 24.dp)
+            .fillMaxWidth()
     ) {
 
         Row(
-            horizontalArrangement = Arrangement.SpaceAround,
+            horizontalArrangement = Arrangement.spacedBy(30.dp),
 
             modifier = Modifier
                 .align(Alignment.Center)
                 .fillMaxWidth()
         ) {
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier = Modifier
+                    .weight(1f)
+                    .clip(RoundedCornerShape(16.dp))
+                    .clickable { },
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Rounded.StarBorder, contentDescription = "Restaurant rating"
+                    imageVector = Icons.Rounded.StarBorder,
+                    contentDescription = "Restaurant rating",
+                    modifier = Modifier
+                        .size(24.dp)
                 )
                 Text(restaurant.restaurantRating)
             }
 
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier = Modifier
+                    .weight(1f)
+                    .clip(RoundedCornerShape(16.dp))
+                    .clickable { },
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Outlined.AccessTime, contentDescription = "Time to deliver"
+                    imageVector = Icons.Outlined.AccessTime, contentDescription = "Time to deliver",
                 )
                 Text(restaurant.timeToDeliver)
             }
 
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier = Modifier
+                    .weight(1f)
+                    .clip(RoundedCornerShape(16.dp))
+                    .clickable { },
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Outlined.LocationOn, contentDescription = "Distance"
+                    imageVector = Icons.Outlined.LocationOn, contentDescription = "Distance",
                 )
 //                    TODO: add distance to restaurant dto
                 Text("1.4km")

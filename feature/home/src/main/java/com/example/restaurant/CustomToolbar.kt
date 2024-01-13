@@ -153,7 +153,7 @@ fun CollapsedToolbar(
 
         Row(
             modifier = Modifier
-                .background(color = colorScheme.primary.copy(alpha = 1 - progress))
+                .background(color = colorScheme.primaryContainer.copy(alpha = 1 - progress))
                 .fillMaxSize(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
@@ -162,7 +162,7 @@ fun CollapsedToolbar(
 
             Text(
                 restaurantName, style = TextStyle(
-                    color = colorScheme.onSecondary,
+                    color = colorScheme.onSurface,
                     fontSize = 24.sp,
                     fontFamily = interBold,
 

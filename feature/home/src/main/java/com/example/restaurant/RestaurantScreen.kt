@@ -44,7 +44,7 @@ fun RestaurantScreen(restaurantId: String = "0", onNavigateUp: () -> Unit) {
     }
     val meals = listOf(
         Meal(
-            "Meal1", null, "1 regular burger with croquette and hot cocoa", "99.99", "$"
+            "Meal1", null, "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa", "99.99", "$"
         ), Meal(
             "Meal2", null, "1 regular burger with croquette and hot cocoa", "99.99", "$"
         ), Meal(

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,7 +20,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.example.compose.gray1
 import com.example.core.ui.theme.Typography
+import com.example.core.ui.theme.interBold
 import com.example.fooddeliver.home.R
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -51,10 +54,13 @@ fun MealCard(
                 GlideImage(model = meal.imageUrl ?: R.drawable.cover, contentDescription = "Food")
             }
 
-            Column {
-                Text(meal.name, style = Typography.titleLarge)
-                Text(meal.contents, style = Typography.bodyMedium)
-                Text("${meal.currency}${meal.price}", style = Typography.labelLarge)
+            Column(modifier = Modifier
+                .fillMaxHeight(),
+                verticalArrangement = Arrangement.spacedBy(space = 4.dp, alignment = Alignment.CenterVertically )) {
+                Text(meal.name, style = Typography.titleMedium)
+                Text(meal.contents, style = Typography.bodyMedium.copy(color = gray1))
+                Text("${meal.currency}${meal.price}", style = Typography.titleMedium.copy(fontFamily = interBold), modifier = Modifier.padding(top=8.dp))
+
             }
         }
     }
