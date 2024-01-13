@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -167,9 +168,8 @@ fun CategorySection(category: Category) {
                         }, meal = category.items[it]
                 )
 
-                Divider(
+                HorizontalDivider(
                     color = colorScheme.surface
-
                 )
             }
         }

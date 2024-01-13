@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,7 +28,7 @@ import com.example.fooddeliver.home.R
 @Composable
 fun MealCard(
     modifier: Modifier = Modifier,
-    meal: Meal
+    meal: Meal,
 ) {
     Box(
         modifier
@@ -37,7 +36,7 @@ fun MealCard(
             .fillMaxWidth()
             .height(110.dp)
 
-    ){
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
@@ -54,12 +53,21 @@ fun MealCard(
                 GlideImage(model = meal.imageUrl ?: R.drawable.cover, contentDescription = "Food")
             }
 
-            Column(modifier = Modifier
-                .fillMaxHeight(),
-                verticalArrangement = Arrangement.spacedBy(space = 4.dp, alignment = Alignment.CenterVertically )) {
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.spacedBy(
+                    space = 4.dp,
+                    alignment = Alignment.CenterVertically
+                )
+            ) {
                 Text(meal.name, style = Typography.titleMedium)
                 Text(meal.contents, style = Typography.bodyMedium.copy(color = gray1))
-                Text("${meal.currency}${meal.price}", style = Typography.titleMedium.copy(fontFamily = interBold), modifier = Modifier.padding(top=8.dp))
+                Text(
+                    "${meal.currency}${meal.price}",
+                    style = Typography.titleMedium.copy(fontFamily = interBold),
+                    modifier = Modifier.padding(top = 8.dp)
+                )
 
             }
         }
@@ -71,5 +79,5 @@ data class Meal(
     val imageUrl: String?,
     val contents: String,
     val price: String,
-    val currency: String
+    val currency: String,
 )

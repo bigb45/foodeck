@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -50,6 +49,7 @@ import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 
 const val TRIGGER_VISIBILITY_THRESHOLD = 0.6f
+
 @Composable
 fun CustomToolbar(
     modifier: Modifier = Modifier,
@@ -67,7 +67,7 @@ fun CustomToolbar(
         RestaurantCoverImage(coverImageUrl = coverImageUrl)
 
         var expandedProgressBarVisible by remember { mutableStateOf(true) }
-        LaunchedEffect(progress){
+        LaunchedEffect(progress) {
             expandedProgressBarVisible = progress > TRIGGER_VISIBILITY_THRESHOLD
         }
         AnimatedVisibility(
@@ -151,31 +151,31 @@ fun CollapsedToolbar(
     actions: @Composable (() -> Unit)?,
 ) {
 
-        Row(
+    Row(
+        modifier = Modifier
+            .background(color = colorScheme.primaryContainer.copy(alpha = 1 - progress))
+            .fillMaxSize(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        navigationButton()
+
+        Text(
+            restaurantName, style = TextStyle(
+                color = colorScheme.onSurface,
+                fontSize = 24.sp,
+                fontFamily = interBold,
+
+                ), maxLines = 1, overflow = TextOverflow.Ellipsis,
             modifier = Modifier
-                .background(color = colorScheme.primaryContainer.copy(alpha = 1 - progress))
-                .fillMaxSize(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            navigationButton()
+                .weight(1f)
 
-            Text(
-                restaurantName, style = TextStyle(
-                    color = colorScheme.onSurface,
-                    fontSize = 24.sp,
-                    fontFamily = interBold,
+        )
 
-                    ), maxLines = 1, overflow = TextOverflow.Ellipsis,
-                modifier = Modifier
-                    .weight(1f)
-
-            )
-
-            if (actions != null) {
-                actions()
-            }
+        if (actions != null) {
+            actions()
         }
+    }
 
 }
 

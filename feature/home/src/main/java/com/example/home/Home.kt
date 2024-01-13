@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
@@ -30,7 +29,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowForward
+import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.LocationOn
@@ -102,7 +101,7 @@ import kotlin.math.absoluteValue
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onRestaurantClick: (restaurantId: String) -> Unit
+    onRestaurantClick: (restaurantId: String) -> Unit,
 ) {
     val viewModel: HomeViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
@@ -110,15 +109,15 @@ fun HomeScreen(
     val number = 5
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
-    if(pullToRefreshState.isRefreshing){
-        LaunchedEffect(true){
+    if (pullToRefreshState.isRefreshing) {
+        LaunchedEffect(true) {
             viewModel.load()
             pullToRefreshState.endRefresh()
         }
     }
 
 
-    FoodDeliveryTheme{
+    FoodDeliveryTheme {
         Scaffold(modifier = Modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
             AddressTopAppBar(
@@ -179,77 +178,76 @@ fun Home(
 ) {
 
 
-
     var query by remember { mutableStateOf("") }
     val scaleFraction = if (pullToRefreshState.isRefreshing) 1f else
         LinearOutSlowInEasing.transform(pullToRefreshState.progress).coerceIn(0f, 1f)
 
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .nestedScroll(pullToRefreshState.nestedScrollConnection)
-        ){
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .nestedScroll(pullToRefreshState.nestedScrollConnection)
+    ) {
 
 
-            LazyColumn(
-                Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 56.dp)
+        LazyColumn(
+            Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 56.dp)
 
-            ) {
-                item {
-                    CustomSearchBox(query = query, onValueChange = { query = it })
-                }
-
-                item {
-                    BentoSection(modifier = Modifier.padding(16.dp))
-                }
-                item {
-                    CarrouselCards(
-                        modifier = Modifier.padding(vertical = 16.dp), offers
-                    )
-                }
-
-                item {
-                    DealsSection(
-                        modifier = Modifier.padding(vertical = 16.dp),
-                        restaurants = restaurants,
-                        onRestaurantClick = onRestaurantClick
-                    )
-                }
-
-                item {
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth()
-                    ) {
-                        Text(
-                            "Explore More", style = TextStyle(
-                                fontWeight = FontWeight.W900,
-                                fontSize = 20.sp,
-                                fontFamily = interBold
-                            )
-                        )
-                    }
-                }
-                items(restaurants) {
-                    RestaurantCard(
-                        modifier = Modifier.padding(16.dp),
-                        boxModifier = Modifier.height(240.dp),
-                        restaurant = it,
-                        onRestaurantClick
-                    )
-                }
-
-
+        ) {
+            item {
+                CustomSearchBox(query = query, onValueChange = { query = it })
             }
-            PullToRefreshContainer(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .graphicsLayer(scaleX = scaleFraction, scaleY = scaleFraction),
-                state = pullToRefreshState,
-            )
+
+            item {
+                BentoSection(modifier = Modifier.padding(16.dp))
+            }
+            item {
+                CarrouselCards(
+                    modifier = Modifier.padding(vertical = 16.dp), offers
+                )
+            }
+
+            item {
+                DealsSection(
+                    modifier = Modifier.padding(vertical = 16.dp),
+                    restaurants = restaurants,
+                    onRestaurantClick = onRestaurantClick
+                )
+            }
+
+            item {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        "Explore More", style = TextStyle(
+                            fontWeight = FontWeight.W900,
+                            fontSize = 20.sp,
+                            fontFamily = interBold
+                        )
+                    )
+                }
+            }
+            items(restaurants) {
+                RestaurantCard(
+                    modifier = Modifier.padding(16.dp),
+                    boxModifier = Modifier.height(240.dp),
+                    restaurant = it,
+                    onRestaurantClick
+                )
+            }
+
+
         }
+        PullToRefreshContainer(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .graphicsLayer(scaleX = scaleFraction, scaleY = scaleFraction),
+            state = pullToRefreshState,
+        )
+    }
 }
 
 @Composable
@@ -365,7 +363,11 @@ private fun BentoSection(modifier: Modifier = Modifier) {
 
 
 @Composable
-fun DealsSection(modifier: Modifier = Modifier, restaurants: List<RestaurantDto>, onRestaurantClick: (String) -> Unit) {
+fun DealsSection(
+    modifier: Modifier = Modifier,
+    restaurants: List<RestaurantDto>,
+    onRestaurantClick: (String) -> Unit,
+) {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp), modifier = modifier
     ) {
@@ -380,7 +382,7 @@ fun DealsSection(modifier: Modifier = Modifier, restaurants: List<RestaurantDto>
                     fontWeight = FontWeight.W900, fontSize = 20.sp, fontFamily = interBold
                 )
             )
-            Icon(Icons.Outlined.ArrowForward, null)
+            Icon(Icons.AutoMirrored.Outlined.ArrowForward, null)
         }
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -604,10 +606,11 @@ fun CarrouselCards(modifier: Modifier = Modifier, items: List<OffersDto>) {
                 contentDescription = null,
                 contentScale = ContentScale.Crop
             )
-            Box(modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(16.dp)
-                .fillMaxWidth(0.7f)
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(16.dp)
+                    .fillMaxWidth(0.7f)
 
             ) {
                 Text(
@@ -701,10 +704,9 @@ fun RestaurantCard(
         ) {
 
 
-
             GlideImage(
                 modifier = Modifier,
-                model = restaurant.coverImageUrl?: R.drawable.wallpaperflare_com_wallpaper,
+                model = restaurant.coverImageUrl ?: R.drawable.wallpaperflare_com_wallpaper,
                 contentDescription = "restaurant image",
                 contentScale = ContentScale.Crop,
                 transition = CrossFade(tween(500)),
