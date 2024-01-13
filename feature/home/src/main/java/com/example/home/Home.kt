@@ -103,7 +103,8 @@ fun HomeScreen(
 
     val number = 5
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-    Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
+    Scaffold(modifier = Modifier
+        .nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
         AddressTopAppBar(
             address = "Ankara, Kecioren, Baglarbasi Mahllesi", scrollBehavior = scrollBehavior
         )
@@ -126,15 +127,12 @@ fun HomeScreen(
                     ),
                     restaurants,
                     offers,
-                ) { restaurant ->
-                    d(
-                        "error", "navigate to restaurant $restaurant"
-                    )
-                }
+                    onRestaurantClick = onRestaurantClick
+                )
             }
 
             HomeScreenUiState.Loading -> {
-                onRestaurantClick("test")
+                CircularProgressIndicator()
             }
 
 //            TODO: Error state
@@ -177,7 +175,8 @@ fun Home(
         item {
             DealsSection(
                 modifier = Modifier.padding(vertical = 16.dp),
-                restaurants = restaurants
+                restaurants = restaurants,
+                onRestaurantClick = onRestaurantClick
             )
         }
 
@@ -199,11 +198,7 @@ fun Home(
             RestaurantCard(
                 modifier = Modifier.padding(16.dp),
                 boxModifier = Modifier.height(240.dp),
-                restaurantName = it.restaurantName,
-                restaurantAddress = it.restaurantAddress,
-                deliveryTime = it.timeToDeliver,
-                imageUrl = it.coverImageUrl,
-                restaurantRating = it.restaurantRating,
+                restaurant = it,
                 onRestaurantClick
             )
         }
@@ -323,7 +318,7 @@ private fun BentoSection(modifier: Modifier = Modifier) {
 
 
 @Composable
-fun DealsSection(modifier: Modifier = Modifier, restaurants: List<RestaurantDto>) {
+fun DealsSection(modifier: Modifier = Modifier, restaurants: List<RestaurantDto>, onRestaurantClick: (String) -> Unit) {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp), modifier = modifier
     ) {
@@ -354,12 +349,8 @@ fun DealsSection(modifier: Modifier = Modifier, restaurants: List<RestaurantDto>
                             .width(240.dp)
                             .height(160.dp),
                         boxModifier = Modifier.height(240.dp),
-                        restaurantName = this.restaurantName,
-                        restaurantAddress = this.restaurantAddress,
-                        deliveryTime = this.timeToDeliver,
-                        imageUrl = this.coverImageUrl,
-                        restaurantRating = this.restaurantRating,
-//                    onRestaurantClick
+                        restaurant = this,
+                        onRestaurantClick = onRestaurantClick
                     )
                 }
 
@@ -430,7 +421,6 @@ private fun CustomSearchBox(
         modifier = modifier
             .fillMaxWidth()
             .background(colorScheme.primaryContainer)
-//            .align(Alignment.CenterHorizontally)
     ) {
         OutlinedTextField(
 
@@ -540,21 +530,6 @@ fun CarrouselCards(modifier: Modifier = Modifier, items: List<OffersDto>) {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-//            Image(painter = painterResource(id = R.drawable.wallpaperflare_com_wallpaper),
-//                contentDescription = "Food image",
-//
-//                modifier = Modifier
-//                    .graphicsLayer {
-//                        val pageOffset =
-//                            ((pagerState.currentPage - index) + pagerState.currentPageOffsetFraction).absoluteValue
-//                        val scale = lerp(
-//                            start = 0.7f, stop = 1f, fraction = 1f - pageOffset.coerceIn(0f, 1f)
-//                        )
-//                        scaleY = scale
-//                    }
-//                    .clip(shape = RoundedCornerShape(16.dp))
-//                    .align(Alignment.Center))
-
             val offer = items[index]
             GlideImage(modifier = Modifier
 
@@ -563,7 +538,7 @@ fun CarrouselCards(modifier: Modifier = Modifier, items: List<OffersDto>) {
                     val pageOffset =
                         ((pagerState.currentPage - index) + pagerState.currentPageOffsetFraction).absoluteValue
                     val scale = lerp(
-                        start = 0.7f, stop = 1f, fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                        start = 0.8f, stop = 1f, fraction = 1f - pageOffset.coerceIn(0f, 1f)
                     )
                     scaleY = scale
                 }
@@ -659,11 +634,7 @@ private fun lerp(start: Float, stop: Float, fraction: Float): Float {
 fun RestaurantCard(
     modifier: Modifier = Modifier,
     boxModifier: Modifier = Modifier,
-    restaurantName: String = "test",
-    restaurantAddress: String = "test",
-    deliveryTime: String = "40",
-    imageUrl: String? = null,
-    restaurantRating: String = "0.0",
+    restaurant: RestaurantDto = RestaurantDto(),
     onRestaurantClick: ((String) -> Unit)? = null,
 ) {
     Column(
@@ -676,29 +647,22 @@ fun RestaurantCard(
             .clip(shape = RoundedCornerShape(16.dp))
             .clickable {
                 if (onRestaurantClick != null) {
-                    onRestaurantClick(restaurantName)
+                    onRestaurantClick(restaurant.restaurantId)
                 }
             }
 
         ) {
 
-            if (imageUrl.isNullOrEmpty()) {
-                Image(
-                    painter = painterResource(id = R.drawable.wallpaperflare_com_wallpaper),
-                    contentDescription = "Food image",
-                    modifier = Modifier.clip(shape = RoundedCornerShape(16.dp)),
+
+
+            GlideImage(
+                modifier = Modifier,
+                model = restaurant.coverImageUrl?: R.drawable.wallpaperflare_com_wallpaper,
+                contentDescription = "restaurant image",
+                contentScale = ContentScale.Crop,
+                transition = CrossFade(tween(500)),
+
                 )
-            } else {
-                GlideImage(
-                    modifier = Modifier,
-                    model = imageUrl,
-                    contentDescription = "restaurant image",
-                    contentScale = ContentScale.Crop,
-                    transition = CrossFade(tween(500)),
-
-                    )
-            }
-
 
             Icon(Icons.Outlined.FavoriteBorder,
                 contentDescription = null,
@@ -718,7 +682,7 @@ fun RestaurantCard(
 
 
             CustomBadge(
-                text = "$deliveryTime min",
+                text = "${restaurant.timeToDeliver} min",
 
                 Modifier
                     .align(Alignment.BottomStart)
@@ -731,13 +695,11 @@ fun RestaurantCard(
         ) {
             Column {
                 Text(
-                    restaurantName, style = Typography.titleLarge
-//                    TextStyle(
-//                        fontSize = 20.sp, fontWeight = FontWeight.Bold, fontFamily = inter
-//                    )
+                    restaurant.restaurantName,
+                    style = Typography.titleLarge,
                 )
                 Text(
-                    restaurantAddress, style = TextStyle(
+                    restaurant.restaurantAddress, style = TextStyle(
                         color = gray2, fontSize = 16.sp, fontFamily = inter
                     )
                 )
@@ -747,7 +709,7 @@ fun RestaurantCard(
             ) {
                 Icon(Icons.Rounded.Star, tint = colorScheme.primary, contentDescription = null)
                 Text(
-                    restaurantRating, style = Typography.titleLarge
+                    restaurant.restaurantRating, style = Typography.titleLarge
                 )
             }
         }
@@ -769,5 +731,5 @@ fun CustomBadge(text: String, modifier: Modifier = Modifier) {
 @Preview
 @Composable
 fun HomePrev() {
-    HomeScreen({})
+    HomeScreen {}
 }

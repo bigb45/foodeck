@@ -15,6 +15,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -36,29 +37,18 @@ const val MIN_TOOLBAR_HEIGHT = 68
 const val MAX_TOOLBAR_HEIGHT = 200
 
 @Composable
-fun RestaurantScreen(restaurantId: String = "0") {
-    //    data coming from api after loading page
+fun RestaurantScreen(restaurantId: String = "0", onNavigateUp: () -> Unit) {
+    //    data coming from api after loading the page
+    LaunchedEffect(Unit){
+        d("error", restaurantId)
+    }
     val meals = listOf(
         Meal(
-            "Meal1",
-            null,
-            "1 regular burger with croquette and hot cocoa",
-            "99.99",
-            "$"
-        ),
-        Meal(
-            "Meal2",
-            null,
-            "1 regular burger with croquette and hot cocoa",
-            "99.99",
-            "$"
-        ),
-        Meal(
-            "Meal3",
-            null,
-            "1 regular burger with croquette and hot cocoa",
-            "99.99",
-            "$"
+            "Meal1", null, "1 regular burger with croquette and hot cocoa", "99.99", "$"
+        ), Meal(
+            "Meal2", null, "1 regular burger with croquette and hot cocoa", "99.99", "$"
+        ), Meal(
+            "Meal3", null, "1 regular burger with croquette and hot cocoa", "99.99", "$"
         )
     )
     val categories = listOf(
@@ -69,8 +59,7 @@ fun RestaurantScreen(restaurantId: String = "0") {
         Category(categoryName = "Sweet", items = meals),
         Category(categoryName = "Extra", items = meals),
         Category(
-            categoryName = "Firindan lezzetleri",
-            items = meals
+            categoryName = "Firindan lezzetleri", items = meals
         ),
     )
 //   data coming from previous page
@@ -88,13 +77,14 @@ fun RestaurantScreen(restaurantId: String = "0") {
         Restaurant(
             restaurant = restaurant,
             categories = categories,
+            onNavigateUp = onNavigateUp
         )
     }
 }
 
 
 @Composable
-internal fun Restaurant(restaurant: RestaurantDto, categories: List<Category>) {
+internal fun Restaurant(restaurant: RestaurantDto, categories: List<Category>, onNavigateUp: () -> Unit) {
 
 
     val toolbarRange = with(LocalDensity.current) {
@@ -104,11 +94,9 @@ internal fun Restaurant(restaurant: RestaurantDto, categories: List<Category>) {
     val toolbarState = rememberToolbarState(toolbarRange)
     val scope = rememberCoroutineScope()
 
-    val (selectedTabIndex, setSelectedTabIndex, lazyListState) =
-        lazyListTabSync(syncedIndices = categories.indices.toList())
+    val (selectedTabIndex, setSelectedTabIndex, lazyListState) = lazyListTabSync(syncedIndices = categories.indices.toList())
 
-    val nestedScrollConnection =
-        rememberCustomNestedConnection(toolbarState, lazyListState, scope)
+    val nestedScrollConnection = rememberCustomNestedConnection(toolbarState, lazyListState, scope)
 
     Column(
         modifier = Modifier.nestedScroll(nestedScrollConnection)
@@ -118,7 +106,7 @@ internal fun Restaurant(restaurant: RestaurantDto, categories: List<Category>) {
             toolbarState = toolbarState,
             restaurant = restaurant,
             foodItems = categories,
-            onNavigateUp = {},
+            onNavigateUp = onNavigateUp,
             onFavoriteClick = {},
             onShareClick = {},
             onMoreClick = {},
@@ -143,9 +131,7 @@ fun Meals(
     lazyListState: LazyListState,
 ) {
     LazyColumn(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        state = lazyListState
+        modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp), state = lazyListState
     ) {
         items(categories) {
             CategorySection(category = it)
@@ -166,23 +152,19 @@ fun CategorySection(category: Category) {
             Text(
                 text = category.categoryName,
                 style = TextStyle(
-                    fontSize = 24.sp,
-                    fontFamily = interBold
+                    fontSize = 24.sp, fontFamily = interBold
                 ),
-                modifier = Modifier
-                    .padding(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 8.dp)
+                modifier = Modifier.padding(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 8.dp)
             )
             repeat(category.items.size) {
 
                 MealCard(
-                    modifier = Modifier
-                        .clickable {
+                    modifier = Modifier.clickable {
                             d(
                                 "error",
                                 "clicked item ${category.items[it]} in category ${category.categoryName}"
                             )
-                        },
-                    meal = category.items[it]
+                        }, meal = category.items[it]
                 )
 
                 Divider(
@@ -204,6 +186,8 @@ private fun rememberToolbarState(toolbarHeightRange: IntRange): ToolbarState {
 
 @Preview
 @Composable
-fun Test() {
-    RestaurantScreen()
+fun RestaurantScreenPreview() {
+     RestaurantScreen(
+        "test"
+     ) {}
 }

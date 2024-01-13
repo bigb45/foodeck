@@ -4,6 +4,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
+import com.example.data.models.RestaurantDto
 import com.example.home.HomeScreen
 import com.example.restaurant.RestaurantScreen
 
@@ -14,7 +15,7 @@ fun NavController.navigateToHome(navOptions: NavOptions? = null){
     this.navigate(homeRoute, navOptions)
 }
 
-fun NavGraphBuilder.homeScreen(onRestaurantClick: (String) -> Unit){
+fun NavGraphBuilder.homeScreen(onRestaurantClick: (String) -> Unit, onNavigateUp: () -> Unit){
     composable(
         route = homeRoute
     ){
@@ -29,7 +30,7 @@ fun NavGraphBuilder.homeScreen(onRestaurantClick: (String) -> Unit){
 
         val restaurantId = it.arguments?.getString("restaurantId")
         restaurantId?.let {
-            RestaurantScreen(it)
+            RestaurantScreen(restaurantId = it,  onNavigateUp)
         }
     }
 }
