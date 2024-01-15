@@ -1,4 +1,4 @@
-package com.example.home
+package com.example.main_screen
 
 import android.util.Log.d
 import androidx.compose.animation.animateColorAsState
@@ -57,7 +57,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
-import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -103,11 +102,14 @@ import kotlin.math.absoluteValue
 fun HomeScreen(
     onRestaurantClick: (restaurantId: String) -> Unit,
 ) {
-    val viewModel: HomeViewModel = hiltViewModel()
+    val viewModel: MainScreenViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
     val pullToRefreshState = rememberPullToRefreshState()
     val number = 5
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val scaleFraction = if (pullToRefreshState.isRefreshing) 1f else
+        LinearOutSlowInEasing.transform(pullToRefreshState.progress).coerceIn(0f, 1f)
+
 
     if (pullToRefreshState.isRefreshing) {
         LaunchedEffect(true) {
@@ -132,62 +134,68 @@ fun HomeScreen(
 
         ) { padding ->
 
-            when (uiState) {
-
-                is HomeScreenUiState.Success -> {
-                    val restaurants = (uiState as HomeScreenUiState.Success).restaurants
-                    val offers = (uiState as HomeScreenUiState.Success).offers
-
-                    Home(
-                        Modifier.padding(
-                            padding
-                        ),
-                        restaurants,
-                        offers,
-                        onRestaurantClick = onRestaurantClick,
-                        pullToRefreshState = pullToRefreshState
+            Box(
+                modifier = Modifier
+                    .padding(
+                        padding
                     )
+                    .fillMaxSize()
+                    .nestedScroll(pullToRefreshState.nestedScrollConnection)
+            ){
+                when (uiState) {
 
-                }
+                    is MainScreenUiState.Success -> {
+                        val restaurants = (uiState as MainScreenUiState.Success).restaurants
+                        val offers = (uiState as MainScreenUiState.Success).offers
 
-                HomeScreenUiState.Loading -> {
-//                CircularProgressIndicator()
-                    LoadingIndicator()
-                }
+                        Home(
+                            restaurants = restaurants,
+                            offers = offers,
+                            onRestaurantClick = onRestaurantClick,
+                        )
+
+                    }
+
+                    MainScreenUiState.Loading -> {
+                        LoadingIndicator()
+                    }
 
 //            TODO: Error state
-                is HomeScreenUiState.Error -> {
-                    Text(
-                        "error" + (uiState as HomeScreenUiState.Error).message,
-                        modifier = Modifier.padding(padding)
-                    )
+                    is MainScreenUiState.Error -> {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ){
+                           item {
+                                Text(
+                                    "${(uiState as MainScreenUiState.Error).message}",
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            }
+                        }
+                    }
+
                 }
+                PullToRefreshContainer(
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .graphicsLayer(scaleX = scaleFraction, scaleY = scaleFraction),
+                    state = pullToRefreshState,
+                )
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Home(
-    modifier: Modifier = Modifier,
     restaurants: List<RestaurantDto>,
     offers: List<OffersDto>,
     onRestaurantClick: (String) -> Unit,
-    pullToRefreshState: PullToRefreshState,
 ) {
 
 
     var query by remember { mutableStateOf("") }
-    val scaleFraction = if (pullToRefreshState.isRefreshing) 1f else
-        LinearOutSlowInEasing.transform(pullToRefreshState.progress).coerceIn(0f, 1f)
-
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .nestedScroll(pullToRefreshState.nestedScrollConnection)
-    ) {
-
 
         LazyColumn(
             Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 56.dp)
@@ -239,14 +247,6 @@ fun Home(
                 )
             }
 
-
-        }
-        PullToRefreshContainer(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .graphicsLayer(scaleX = scaleFraction, scaleY = scaleFraction),
-            state = pullToRefreshState,
-        )
     }
 }
 
@@ -432,7 +432,8 @@ private fun AddressTopAppBar(address: String, scrollBehavior: TopAppBarScrollBeh
                 Icon(
                     imageVector = Icons.Outlined.LocationOn,
                     contentDescription = "delivery address",
-                    modifier = Modifier.weight(0.5f)
+                    modifier = Modifier.weight(0.5f),
+                    tint = colorScheme.onPrimaryContainer
                 )
                 Text(
                     text = address,
@@ -440,6 +441,7 @@ private fun AddressTopAppBar(address: String, scrollBehavior: TopAppBarScrollBeh
                     overflow = TextOverflow.Ellipsis,
                     style = TextStyle(
                         fontSize = 20.sp,
+                        color = colorScheme.onPrimaryContainer
                     ),
                     modifier = Modifier.weight(4f)
                 )
@@ -448,7 +450,8 @@ private fun AddressTopAppBar(address: String, scrollBehavior: TopAppBarScrollBeh
                     contentDescription = "open dropdown menu",
                     Modifier
                         .size(32.dp)
-                        .weight(0.5f)
+                        .weight(0.5f),
+                    tint = colorScheme.onPrimaryContainer
                 )
             }
         }
@@ -758,7 +761,7 @@ fun RestaurantCard(
             ) {
                 Icon(Icons.Rounded.Star, tint = colorScheme.primary, contentDescription = null)
                 Text(
-                    restaurant.restaurantRating, style = Typography.titleLarge
+                    restaurant.restaurantRating, style = Typography.titleMedium
                 )
             }
         }

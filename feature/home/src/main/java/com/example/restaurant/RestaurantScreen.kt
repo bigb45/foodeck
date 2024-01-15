@@ -11,9 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ahmadhamwi.tabsync_compose.lazyListTabSync
+import com.example.compose.gray6
 import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.core.ui.theme.interBold
 import com.example.custom_toolbar.CustomTopAppBarState
@@ -38,18 +37,37 @@ const val MIN_TOOLBAR_HEIGHT = 68
 const val MAX_TOOLBAR_HEIGHT = 200
 
 @Composable
-fun RestaurantScreen(restaurantId: String = "0", onNavigateUp: () -> Unit) {
+fun RestaurantScreen(
+    restaurantId: String = "0",
+    onNavigateUp: () -> Unit,
+    onItemClick: (String) -> Unit,
+) {
     //    data coming from api after loading the page
-    LaunchedEffect(Unit){
+    LaunchedEffect(Unit) {
         d("error", restaurantId)
     }
     val meals = listOf(
         Meal(
-            "Meal1", null, "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa", "99.99", "$"
+            id = "1",
+            name = "Meal1",
+            imageUrl = null,
+            contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
+            price = "99.99",
+            currency = "$"
         ), Meal(
-            "Meal2", null, "1 regular burger with croquette and hot cocoa", "99.99", "$"
+            id = "2",
+            name = "Meal2",
+            imageUrl = null,
+            contents = "1 regular burger with croquette and hot cocoa",
+            price = "99.99",
+            currency = "$"
         ), Meal(
-            "Meal3", null, "1 regular burger with croquette and hot cocoa", "99.99", "$"
+            id = "3",
+            name = "Meal3",
+            imageUrl = null,
+            contents = "1 regular burger with croquette and hot cocoa",
+            price = "99.99",
+            currency = "$"
         )
     )
     val categories = listOf(
@@ -60,7 +78,7 @@ fun RestaurantScreen(restaurantId: String = "0", onNavigateUp: () -> Unit) {
         Category(categoryName = "Sweet", items = meals),
         Category(categoryName = "Extra", items = meals),
         Category(
-            categoryName = "Firindan lezzetleri", items = meals
+            categoryName = "Firindan lezzetler", items = meals
         ),
     )
 //   data coming from previous page
@@ -78,14 +96,21 @@ fun RestaurantScreen(restaurantId: String = "0", onNavigateUp: () -> Unit) {
         Restaurant(
             restaurant = restaurant,
             categories = categories,
-            onNavigateUp = onNavigateUp
-        )
+            onNavigateUp = onNavigateUp,
+            onItemClick = onItemClick,
+
+            )
     }
 }
 
 
 @Composable
-internal fun Restaurant(restaurant: RestaurantDto, categories: List<Category>, onNavigateUp: () -> Unit) {
+internal fun Restaurant(
+    restaurant: RestaurantDto,
+    categories: List<Category>,
+    onNavigateUp: () -> Unit,
+    onItemClick: (String) -> Unit,
+) {
 
 
     val toolbarRange = with(LocalDensity.current) {
@@ -119,6 +144,7 @@ internal fun Restaurant(restaurant: RestaurantDto, categories: List<Category>, o
             modifier = Modifier,
             categories = categories,
             lazyListState = lazyListState,
+            onItemClick = onItemClick,
         )
 
     }
@@ -130,18 +156,19 @@ fun Meals(
     modifier: Modifier = Modifier,
     categories: List<Category>,
     lazyListState: LazyListState,
+    onItemClick: (String) -> Unit,
 ) {
     LazyColumn(
         modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp), state = lazyListState
     ) {
         items(categories) {
-            CategorySection(category = it)
+            CategorySection(category = it, onItemClick = onItemClick)
         }
     }
 }
 
 @Composable
-fun CategorySection(category: Category) {
+fun CategorySection(category: Category, onItemClick: (String) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -161,15 +188,16 @@ fun CategorySection(category: Category) {
 
                 MealCard(
                     modifier = Modifier.clickable {
-                            d(
-                                "error",
-                                "clicked item ${category.items[it]} in category ${category.categoryName}"
-                            )
-                        }, meal = category.items[it]
+                        onItemClick(category.items[it].id!!)
+                        d(
+                            "error",
+                            "clicked item ${category.items[it]} in category ${category.categoryName}"
+                        )
+                    }, meal = category.items[it]
                 )
 
                 HorizontalDivider(
-                    color = colorScheme.surface
+                    color = gray6
                 )
             }
         }
@@ -187,7 +215,8 @@ private fun rememberToolbarState(toolbarHeightRange: IntRange): ToolbarState {
 @Preview
 @Composable
 fun RestaurantScreenPreview() {
-     RestaurantScreen(
-        "test"
-     ) {}
+    RestaurantScreen(
+        "test",
+        {}
+    ) {}
 }

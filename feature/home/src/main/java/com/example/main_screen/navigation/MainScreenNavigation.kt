@@ -1,16 +1,16 @@
-package com.example.home.navigation
+package com.example.main_screen.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.example.home.HomeScreen
+import com.example.main_screen.HomeScreen
+import com.example.navigation.homeRoute
 import com.example.restaurant.RestaurantScreen
 
-const val homeRoute = "home_route"
 
 
-fun NavController.navigateToHome(navOptions: NavOptions? = null) {
+fun NavController.navigateToMainScreen(navOptions: NavOptions? = null) {
     this.navigate(homeRoute, navOptions)
 }
 
@@ -29,7 +29,7 @@ fun NavGraphBuilder.homeScreen(onRestaurantClick: (String) -> Unit, onNavigateUp
 
         val restaurantId = it.arguments?.getString("restaurantId")
         restaurantId?.let {
-            RestaurantScreen(restaurantId = it, onNavigateUp)
+            RestaurantScreen(restaurantId = it, onNavigateUp, {})
         }
     }
 }

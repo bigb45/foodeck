@@ -1,4 +1,4 @@
-package com.example.home
+package com.example.main_screen
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

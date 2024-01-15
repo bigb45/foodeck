@@ -35,7 +35,7 @@ class UsersRepositoryImpl @Inject constructor(private val usersService: UserApiS
 
 
         } catch (e: Exception){
-            d("error", e.message.toString())
+            d("error", "${e.message}")
             return UserDetailsModel(null)
         }
 

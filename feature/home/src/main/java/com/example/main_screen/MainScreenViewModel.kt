@@ -1,4 +1,4 @@
-package com.example.home
+package com.example.main_screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,13 +14,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(
+class MainScreenViewModel @Inject constructor(
     private val getRestaurants: GetAllRestaurantsUseCase,
     private val getOffers: GetOffersUseCase,
 ) : ViewModel() {
-    private val _state: MutableStateFlow<HomeScreenUiState> =
-        MutableStateFlow(HomeScreenUiState.Loading)
-    val uiState: StateFlow<HomeScreenUiState> = _state
+    private val _state: MutableStateFlow<MainScreenUiState> =
+        MutableStateFlow(MainScreenUiState.Loading)
+    val uiState: StateFlow<MainScreenUiState> = _state
 
     init {
         fetchRestaurantData()
@@ -30,7 +30,7 @@ class HomeViewModel @Inject constructor(
         fetchRestaurantData()
     }
     private fun fetchRestaurantData() {
-        _state.value = HomeScreenUiState.Loading
+        _state.value = MainScreenUiState.Loading
         viewModelScope.launch {
             val restaurantsFlow = getRestaurants().ListAsResult()
             val offersFlow = getOffers().ListAsResult()
@@ -38,20 +38,21 @@ class HomeViewModel @Inject constructor(
                 restaurantsResult, offersResult ->
                 when {
                     restaurantsResult is Result.Error -> {
-                        _state.value = HomeScreenUiState.Error(restaurantsResult.exception?.message)
+                        _state.value = MainScreenUiState.Error(restaurantsResult.exception?.message)
                     }
                     offersResult is Result.Error -> {
-                        _state.value = HomeScreenUiState.Error(offersResult.exception?.message)
+                        _state.value = MainScreenUiState.Error(offersResult.exception?.message)
                     }
                     restaurantsResult == Result.Loading || offersResult == Result.Loading -> {
-                        _state.value = HomeScreenUiState.Loading
+                        _state.value = MainScreenUiState.Loading
                     }
                     restaurantsResult is Result.Success && offersResult is Result.Success -> {
-                        _state.value = HomeScreenUiState.Success(
+                        _state.value = MainScreenUiState.Success(
                             restaurants = restaurantsResult.data,
                             offers = offersResult.data
                         )
                     }
+
                 }
             }.collect{}
         }

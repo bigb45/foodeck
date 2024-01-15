@@ -34,10 +34,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import com.example.authentication.create_account.navigation.navigateToCreateAccount
-import com.example.authentication.email_login.navigation.navigateToEmail
-import com.example.authentication.facebook_login.navigation.navigateToFacebook
 import com.example.compose.facebook_color
 import com.example.compose.google_color
 import com.example.compose.seed
@@ -52,8 +48,10 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun LoginMethods(
-    navController: NavController,
-    onGoogleAuthenticationSuccess: (String) -> Unit,
+    onAuthenticationSuccess: (String) -> Unit,
+    navigateToEmail: () -> Unit,
+    navigateToCreateAccount: () -> Unit,
+    navigateToFacebook: () -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -77,7 +75,7 @@ fun LoginMethods(
             }
 
             is AuthResult.Success -> {
-                onGoogleAuthenticationSuccess((state as AuthResult.Success).data.userId.toString())
+                onAuthenticationSuccess((state as AuthResult.Success).data.userId.toString())
 
             }
 
@@ -163,7 +161,7 @@ fun LoginMethods(
                 PrimaryButton(
                     text = stringResource(R.string.login_with_facebook),
                     onClick = {
-                        navController.navigateToFacebook()
+                        navigateToFacebook()
                     },
                     enabled = true,
                     colors = ButtonDefaults.buttonColors(
@@ -173,7 +171,7 @@ fun LoginMethods(
                 PrimaryButton(
                     text = stringResource(R.string.login_via_email),
                     onClick = {
-                        navController.navigateToEmail()
+                        navigateToEmail()
                     },
                     enabled = true,
                     colors = ButtonDefaults.buttonColors(
@@ -186,7 +184,7 @@ fun LoginMethods(
                     text = stringResource(R.string.create_an_account),
                     enabled = true,
                     onClick = {
-                        navController.navigateToCreateAccount()
+                        navigateToCreateAccount()
                     })
 
                 Hyperlink(

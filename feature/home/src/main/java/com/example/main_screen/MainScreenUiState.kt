@@ -1,17 +1,17 @@
-package com.example.home
+package com.example.main_screen
 
 import com.example.data.models.OffersDto
 import com.example.data.models.RestaurantDto
 
-sealed class HomeScreenUiState {
+sealed class MainScreenUiState {
     data class Success(
         val restaurants: List<RestaurantDto>,
         val offers: List<OffersDto>,
 
-        ): HomeScreenUiState()
+        ): MainScreenUiState()
 
-    object Loading: HomeScreenUiState()
-    data class Error(val message: String?) : HomeScreenUiState() {
+    object Loading: MainScreenUiState()
+    data class Error(val message: String?) : MainScreenUiState() {
 
     }
 }
