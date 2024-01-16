@@ -76,7 +76,6 @@ fun LoginMethods(
 
             is AuthResult.Success -> {
                 onAuthenticationSuccess((state as AuthResult.Success).data.userId.toString())
-
             }
 
             AuthResult.Loading -> {

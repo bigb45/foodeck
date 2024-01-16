@@ -25,6 +25,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.ahmadhamwi.tabsync_compose.lazyListTabSync
 import com.example.compose.gray6
 import com.example.core.ui.theme.FoodDeliveryTheme
@@ -38,14 +39,12 @@ const val MAX_TOOLBAR_HEIGHT = 200
 
 @Composable
 fun RestaurantScreen(
-    restaurantId: String = "0",
     onNavigateUp: () -> Unit,
     onItemClick: (String) -> Unit,
 ) {
-    //    data coming from api after loading the page
-    LaunchedEffect(Unit) {
-        d("error", restaurantId)
-    }
+    val viewModel: RestaurantViewModel = hiltViewModel()
+
+//    make request using viewmodel
     val meals = listOf(
         Meal(
             id = "1",
@@ -189,10 +188,6 @@ fun CategorySection(category: Category, onItemClick: (String) -> Unit) {
                 MealCard(
                     modifier = Modifier.clickable {
                         onItemClick(category.items[it].id!!)
-                        d(
-                            "error",
-                            "clicked item ${category.items[it]} in category ${category.categoryName}"
-                        )
                     }, meal = category.items[it]
                 )
 
@@ -212,11 +207,3 @@ private fun rememberToolbarState(toolbarHeightRange: IntRange): ToolbarState {
     }
 }
 
-@Preview
-@Composable
-fun RestaurantScreenPreview() {
-    RestaurantScreen(
-        "test",
-        {}
-    ) {}
-}

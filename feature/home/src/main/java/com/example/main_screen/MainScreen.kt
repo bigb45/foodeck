@@ -99,7 +99,7 @@ import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(
+fun MainScreen(
     onRestaurantClick: (restaurantId: String) -> Unit,
 ) {
     val viewModel: MainScreenViewModel = hiltViewModel()
@@ -783,5 +783,5 @@ fun CustomBadge(text: String, modifier: Modifier = Modifier) {
 @Preview
 @Composable
 fun HomePrev() {
-    HomeScreen {}
+    MainScreen {}
 }

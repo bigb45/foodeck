@@ -16,7 +16,6 @@ const val welcomeRoute = "welcome_route"
 
 fun NavController.navigateToWelcome(navOptions: NavOptions? = null, userId: String){
     val encodedUserId = URLEncoder.encode(userId, URL_CHARACTER_ENCODING)
-
     this.navigate(route = "$welcomeRoute/$encodedUserId", navOptions = navOptions)
 }
 
