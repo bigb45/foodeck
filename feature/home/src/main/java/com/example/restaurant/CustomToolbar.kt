@@ -1,5 +1,6 @@
 package com.example.restaurant
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.animation.core.animateDecay
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -50,6 +52,7 @@ import kotlinx.coroutines.launch
 
 const val TRIGGER_VISIBILITY_THRESHOLD = 0.6f
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun CustomToolbar(
     modifier: Modifier = Modifier,
@@ -63,22 +66,39 @@ fun CustomToolbar(
 
     ) {
 
-    Box(modifier = modifier) {
-        RestaurantCoverImage(coverImageUrl = coverImageUrl)
+    Box(modifier = modifier.background(Color.Red)) {
+//        RestaurantCoverImage(coverImageUrl = coverImageUrl)
+        GlideImage(
+            model = coverImageUrl ?: R.drawable.wallpaperflare_com_wallpaper,
+            contentDescription = "Restaurant cover image",
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier
+                .drawWithCache {
+                    onDrawWithContent {
+                        val gradientDown = Brush.verticalGradient(
+                            0.6f to Color.Black.copy(alpha = 0.4f), 1f to Color.Transparent
+                        )
+                        val gradientUp = Brush.verticalGradient(
+                            0.1f to Color.Transparent, 1f to Color.Black.copy(alpha = 0.4f)
+                        )
+                        drawContent()
+                        drawRect(gradientDown)
+                        drawRect(gradientUp)
+                    }
+                },
 
-        var expandedProgressBarVisible by remember { mutableStateOf(true) }
+            )
+        var expandedToolBarVisible by remember { mutableStateOf(true) }
         LaunchedEffect(progress) {
-            expandedProgressBarVisible = progress > TRIGGER_VISIBILITY_THRESHOLD
+            expandedToolBarVisible = progress > TRIGGER_VISIBILITY_THRESHOLD
         }
+
         AnimatedVisibility(
-            visible = expandedProgressBarVisible,
-            enter = fadeIn(
+            visible = expandedToolBarVisible, enter = fadeIn(
                 animationSpec = tween(100),
                 initialAlpha = 0.1f,
-            ),
-            exit = fadeOut(
-                animationSpec = tween(100),
-                targetAlpha = 0f
+            ), exit = fadeOut(
+                animationSpec = tween(100), targetAlpha = 0f
             )
         ) {
             ExpandedToolbar(
@@ -92,20 +112,16 @@ fun CustomToolbar(
         }
 
         AnimatedVisibility(
-            visible = !expandedProgressBarVisible,
-            enter = fadeIn(
-                animationSpec = tween(100),
-                initialAlpha = 0.6f
-            ),
-            exit = fadeOut(
+            visible = !expandedToolBarVisible, enter = fadeIn(
+                animationSpec = tween(100), initialAlpha = 0.6f
+            ), exit = fadeOut(
                 animationSpec = tween(100),
 
                 targetAlpha = 0f
             )
         ) {
             CollapsedToolbar(
-                modifier = Modifier
-                    .align(Alignment.TopCenter),
+                modifier = Modifier.align(Alignment.TopCenter),
                 restaurantName = restaurantName,
                 progress = progress,
                 navigationButton = navigationButton,
@@ -125,7 +141,8 @@ fun RestaurantCoverImage(coverImageUrl: String?) {
         model = coverImageUrl ?: R.drawable.wallpaperflare_com_wallpaper,
         contentDescription = "Restaurant cover image",
         contentScale = ContentScale.Crop,
-        modifier = Modifier.drawWithCache {
+        modifier = Modifier
+            .drawWithCache {
             onDrawWithContent {
                 val gradientDown = Brush.verticalGradient(
                     0.6f to Color.Black.copy(alpha = 0.4f), 1f to Color.Transparent
@@ -166,9 +183,7 @@ fun CollapsedToolbar(
                 fontSize = 24.sp,
                 fontFamily = interBold,
 
-                ), maxLines = 1, overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .weight(1f)
+                ), maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f)
 
         )
 
@@ -260,7 +275,7 @@ fun rememberCustomNestedConnection(
                         initialValue = toolbarState.height + toolbarState.offset,
                         initialVelocity = available.y,
                         animationSpec = FloatExponentialDecaySpec()
-                    ) { value, velocity ->
+                    ) { value, _ ->
                         toolbarState.scrollTopLimitReached =
                             lazyListState.firstVisibleItemIndex == 0 && lazyListState.firstVisibleItemScrollOffset == 0
                         toolbarState.scrollOffset =
