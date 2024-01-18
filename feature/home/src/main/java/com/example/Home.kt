@@ -32,7 +32,7 @@ fun Home() {
         }
 
         menuItemScreen(
-
+            onNavigateUp = navController::navigateUp
         )
 
     }

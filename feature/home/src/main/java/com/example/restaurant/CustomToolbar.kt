@@ -1,6 +1,7 @@
 package com.example.restaurant
 
 import android.util.Log
+import android.util.Log.d
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.animation.core.animateDecay
@@ -52,7 +53,6 @@ import kotlinx.coroutines.launch
 
 const val TRIGGER_VISIBILITY_THRESHOLD = 0.6f
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun CustomToolbar(
     modifier: Modifier = Modifier,
@@ -66,28 +66,9 @@ fun CustomToolbar(
 
     ) {
 
-    Box(modifier = modifier.background(Color.Red)) {
-//        RestaurantCoverImage(coverImageUrl = coverImageUrl)
-        GlideImage(
-            model = coverImageUrl ?: R.drawable.wallpaperflare_com_wallpaper,
-            contentDescription = "Restaurant cover image",
-            contentScale = ContentScale.FillBounds,
-            modifier = Modifier
-                .drawWithCache {
-                    onDrawWithContent {
-                        val gradientDown = Brush.verticalGradient(
-                            0.6f to Color.Black.copy(alpha = 0.4f), 1f to Color.Transparent
-                        )
-                        val gradientUp = Brush.verticalGradient(
-                            0.1f to Color.Transparent, 1f to Color.Black.copy(alpha = 0.4f)
-                        )
-                        drawContent()
-                        drawRect(gradientDown)
-                        drawRect(gradientUp)
-                    }
-                },
+    Box(modifier = modifier) {
+        RestaurantCoverImage(coverImageUrl = coverImageUrl)
 
-            )
         var expandedToolBarVisible by remember { mutableStateOf(true) }
         LaunchedEffect(progress) {
             expandedToolBarVisible = progress > TRIGGER_VISIBILITY_THRESHOLD
@@ -140,21 +121,21 @@ fun RestaurantCoverImage(coverImageUrl: String?) {
     GlideImage(
         model = coverImageUrl ?: R.drawable.wallpaperflare_com_wallpaper,
         contentDescription = "Restaurant cover image",
-        contentScale = ContentScale.Crop,
+        contentScale = ContentScale.FillBounds,
         modifier = Modifier
             .drawWithCache {
-            onDrawWithContent {
-                val gradientDown = Brush.verticalGradient(
-                    0.6f to Color.Black.copy(alpha = 0.4f), 1f to Color.Transparent
-                )
-                val gradientUp = Brush.verticalGradient(
-                    0.1f to Color.Transparent, 1f to Color.Black.copy(alpha = 0.4f)
-                )
-                drawContent()
-                drawRect(gradientDown)
-                drawRect(gradientUp)
-            }
-        },
+                onDrawWithContent {
+                    val gradientDown = Brush.verticalGradient(
+                        0.6f to Color.Black.copy(alpha = 0.4f), 1f to Color.Transparent
+                    )
+                    val gradientUp = Brush.verticalGradient(
+                        0.1f to Color.Transparent, 1f to Color.Black.copy(alpha = 0.4f)
+                    )
+                    drawContent()
+                    drawRect(gradientDown)
+                    drawRect(gradientUp)
+                }
+            },
 
         )
 }

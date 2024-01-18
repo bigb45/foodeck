@@ -28,13 +28,13 @@ fun NavController.navigateToMenuItem(navOptions: NavOptions? = null, menuItemId:
     )
 }
 
-fun NavGraphBuilder.menuItemScreen() {
+fun NavGraphBuilder.menuItemScreen(onNavigateUp: () -> Unit) {
     composable(
         route = "$restaurantRoute/{$restaurantIdArgument}/{$menuItemIdArgument}",
         arguments = listOf(
             navArgument(menuItemIdArgument) { type = NavType.StringType },
         ),
     ) {
-        MenuItemScreen()
+        MenuItemScreen(onNavigateUp = onNavigateUp)
     }
 }

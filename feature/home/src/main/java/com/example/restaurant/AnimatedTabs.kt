@@ -1,11 +1,11 @@
 package com.example.restaurant
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
@@ -14,14 +14,14 @@ import com.example.compose.gray2
 import com.example.core.ui.theme.interBold
 
 @Composable
-fun TabSync(
+fun AnimatedTabs(
     modifier: Modifier = Modifier,
     categories: List<Category>,
     selectedTabIndex: Int,
     setSelectedTabIndex: (Int) -> Unit,
 ) {
 
-    TabSyncInternal(
+    TabSync(
         modifier = modifier.fillMaxWidth(),
         categories,
         selectedTabIndex
@@ -29,14 +29,15 @@ fun TabSync(
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun TabSyncInternal(
+internal fun TabSync(
     modifier: Modifier = Modifier,
     categories: List<Category>,
     selectedTabIndex: Int,
     onTabSelect: (Int, Category) -> Unit,
 ) {
-    ScrollableTabRow(modifier = modifier, selectedTabIndex = selectedTabIndex, edgePadding = 0.dp) {
+    PrimaryScrollableTabRow(modifier = modifier, selectedTabIndex = selectedTabIndex, edgePadding = 0.dp) {
         categories.forEachIndexed { index, category ->
             Tab(selected = index == selectedTabIndex,
                 onClick = { onTabSelect(index, category) },

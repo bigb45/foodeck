@@ -15,6 +15,8 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -122,7 +124,12 @@ internal fun Restaurant(
     val (selectedTabIndex, setSelectedTabIndex, lazyListState) = lazyListTabSync(syncedIndices = categories.indices.toList())
 
     val nestedScrollConnection = rememberCustomNestedConnection(toolbarState, lazyListState, scope)
-
+    LaunchedEffect(key1 =  lazyListState.firstVisibleItemScrollOffset){
+//        d("error", "${lazyListState.firstVisibleItemScrollOffset}")
+//        this side effect statement fixes a bug where if the scrollOffset of the first element is
+//        more than 0, it does not scroll back up until you scroll down to the second element and
+//        then scroll back up
+    }
     Column(
         modifier = Modifier.nestedScroll(nestedScrollConnection)
     ) {
@@ -201,7 +208,7 @@ fun CategorySection(category: Category, onItemClick: (String) -> Unit) {
 
 
 @Composable
-private fun rememberToolbarState(toolbarHeightRange: IntRange): ToolbarState {
+fun rememberToolbarState(toolbarHeightRange: IntRange): ToolbarState {
     return rememberSaveable(saver = CustomTopAppBarState.Saver) {
         CustomTopAppBarState(toolbarHeightRange)
     }
