@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -238,7 +239,7 @@ fun ExpandedToolbar(
 @Composable
 fun rememberCustomNestedConnection(
     toolbarState: ToolbarState,
-    lazyListState: LazyListState,
+    lazyListState: LazyListState = rememberLazyListState(),
     scope: CoroutineScope,
 ) = remember {
     object : NestedScrollConnection {

@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -20,8 +22,11 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
@@ -33,9 +38,11 @@ import com.ahmadhamwi.tabsync_compose.lazyListTabSync
 import com.example.compose.gray6
 import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.core.ui.theme.interBold
+import com.example.custom_toolbar.CollapsingToolbar
 import com.example.custom_toolbar.CustomTopAppBarState
 import com.example.custom_toolbar.ToolbarState
 import com.example.data.models.RestaurantDto
+import com.example.fooddeliver.home.R
 
 const val MIN_TOOLBAR_HEIGHT = 68
 const val MAX_TOOLBAR_HEIGHT = 200
@@ -63,15 +70,16 @@ fun RestaurantScreen(
             contents = "1 regular burger with croquette and hot cocoa",
             price = "99.99",
             currency = "$"
-        ), Meal(
+        ),
+        Meal(
             id = "3",
             name = "Meal3",
             imageUrl = null,
             contents = "1 regular burger with croquette and hot cocoa",
             price = "99.99",
             currency = "$"
+        ),
         )
-    )
     val categories = listOf(
         Category(categoryName = "Popular", items = meals),
         Category(categoryName = "Wraps", items = meals),
@@ -127,37 +135,55 @@ internal fun Restaurant(
     val toolbarState = rememberToolbarState(toolbarRange)
     val scope = rememberCoroutineScope()
 
-    val (selectedTabIndex, setSelectedTabIndex, lazyListState) = lazyListTabSync(syncedIndices = categories.indices.toList())
+    val lazyListState = rememberLazyListState()
 
-    val nestedScrollConnection = rememberCustomNestedConnection(toolbarState, lazyListState, scope)
-    LaunchedEffect(key1 =  lazyListState.firstVisibleItemScrollOffset){
-//        d("error", "${lazyListState.firstVisibleItemScrollOffset}")
-//        this side effect statement fixes a bug where if the scrollOffset of the first element is
-//        more than 0, it does not scroll back up until you scroll down to the second element and
-//        then scroll back up
-    }
-    Column(
+    val (selectedTabIndex, setSelectedTabIndex) = lazyListTabSync(
+        syncedIndices = categories.indices.toList(),
+        lazyListState = lazyListState)
+
+    val nestedScrollConnection = rememberCustomNestedConnection(
+        lazyListState = lazyListState,
+        toolbarState = toolbarState,
+        scope = scope
+    )
+//    LaunchedEffect(key1 =  lazyListState.firstVisibleItemScrollOffset){
+////        d("error", "${lazyListState.firstVisibleItemScrollOffset}")
+////        this side effect statement fixes a bug where if the scrollOffset of the first element is
+////        more than 0, it does not scroll back up until you scroll down to the second element and
+////        then scroll back up
+//    }
+    Box(
         modifier = Modifier.nestedScroll(nestedScrollConnection)
     ) {
 
-        RestaurantHeader(
-            toolbarState = toolbarState,
-            restaurant = restaurant,
-            foodItems = categories,
-            onNavigateUp = onNavigateUp,
-            onFavoriteClick = {},
-            onShareClick = {},
-            onMoreClick = {},
-            onSearchClick = {},
-            selectedTabIndex = selectedTabIndex,
-            setSelectedTabIndex = setSelectedTabIndex,
-        )
         Meals(
-            modifier = Modifier,
+            modifier = Modifier
+                .graphicsLayer { translationY = toolbarState.height + toolbarState.offset },
             categories = categories,
             lazyListState = lazyListState,
             onItemClick = onItemClick,
         )
+        CollapsingToolbar(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(with(LocalDensity.current) { toolbarState.height.toDp() })
+                .graphicsLayer { translationY = toolbarState.offset },
+            backgroundImageResId = R.drawable.wallpaperflare_com_wallpaper,
+            progress = toolbarState.progress,
+        )
+//        RestaurantHeader(
+//            toolbarState = toolbarState,
+//            restaurant = restaurant,
+//            foodItems = categories,
+//            onNavigateUp = onNavigateUp,
+//            onFavoriteClick = {},
+//            onShareClick = {},
+//            onMoreClick = {},
+//            onSearchClick = {},
+//            selectedTabIndex = selectedTabIndex,
+//            setSelectedTabIndex = setSelectedTabIndex,
+//        )
+
 
     }
 }
@@ -174,7 +200,23 @@ fun Meals(
         modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp), state = lazyListState
     ) {
         items(categories) {
-            CategorySection(category = it, onItemClick = onItemClick)
+            category ->
+
+//                Text(
+//                    text = category.categoryName,
+//                    style = TextStyle(
+//                        fontSize = 24.sp, fontFamily = interBold
+//                    ),
+//                    modifier = Modifier.padding(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 8.dp)
+//                )
+
+            CategorySection(category = category, onItemClick = onItemClick)
+//            Text("",
+//                Modifier
+//                    .padding(vertical = 70.dp)
+//                    .fillMaxWidth())
+            HorizontalDivider()
+
         }
     }
 }
