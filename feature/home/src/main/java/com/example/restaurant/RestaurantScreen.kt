@@ -1,13 +1,14 @@
 package com.example.restaurant
 
-import android.util.Log.d
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -17,20 +18,14 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -40,13 +35,13 @@ import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.core.ui.theme.interBold
 import com.example.custom_toolbar.CollapsingToolbar
 import com.example.custom_toolbar.CustomTopAppBarState
+import com.example.custom_toolbar.FixedScrollFlagState
 import com.example.custom_toolbar.ToolbarState
 import com.example.data.models.RestaurantDto
-import com.example.fooddeliver.home.R
 
-const val MIN_TOOLBAR_HEIGHT = 68
-const val MAX_TOOLBAR_HEIGHT = 200
-
+val MIN_TOOLBAR_HEIGHT = 68.dp
+val MAX_TOOLBAR_HEIGHT = 176.dp
+val TAB_LAYOUT_HEIGHT = 40.dp
 @Composable
 fun RestaurantScreen(
     onNavigateUp: () -> Unit,
@@ -129,7 +124,7 @@ internal fun Restaurant(
 
 
     val toolbarRange = with(LocalDensity.current) {
-        MIN_TOOLBAR_HEIGHT.dp.roundToPx()..MAX_TOOLBAR_HEIGHT.dp.roundToPx()
+        MIN_TOOLBAR_HEIGHT.roundToPx()..MAX_TOOLBAR_HEIGHT.roundToPx()
     }
 
     val toolbarState = rememberToolbarState(toolbarRange)
@@ -158,7 +153,9 @@ internal fun Restaurant(
 
         Meals(
             modifier = Modifier
-                .graphicsLayer { translationY = toolbarState.height + toolbarState.offset },
+                .graphicsLayer { translationY = toolbarState.height + toolbarState.offset + TAB_LAYOUT_HEIGHT.toPx()}
+            ,
+            contentPadding = PaddingValues(bottom = TAB_LAYOUT_HEIGHT),
             categories = categories,
             lazyListState = lazyListState,
             onItemClick = onItemClick,
@@ -167,10 +164,24 @@ internal fun Restaurant(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(with(LocalDensity.current) { toolbarState.height.toDp() })
-                .graphicsLayer { translationY = toolbarState.offset },
-            backgroundImageResId = R.drawable.wallpaperflare_com_wallpaper,
+                .graphicsLayer { translationY = toolbarState.offset }
+            ,
+
+            coverImageUrl = null,
             progress = toolbarState.progress,
-        )
+        ){
+            Column{
+                AnimatedTabs(
+                    modifier = Modifier
+                        .graphicsLayer { translationY = toolbarState.offset }
+                    ,
+                    categories = categories,
+                    selectedTabIndex = selectedTabIndex,
+                    setSelectedTabIndex = setSelectedTabIndex
+                )
+            }
+        }
+
 //        RestaurantHeader(
 //            toolbarState = toolbarState,
 //            restaurant = restaurant,
@@ -193,10 +204,12 @@ internal fun Restaurant(
 fun Meals(
     modifier: Modifier = Modifier,
     categories: List<Category>,
+    contentPadding: PaddingValues,
     lazyListState: LazyListState,
     onItemClick: (String) -> Unit,
 ) {
     LazyColumn(
+        contentPadding = contentPadding,
         modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp), state = lazyListState
     ) {
         items(categories) {

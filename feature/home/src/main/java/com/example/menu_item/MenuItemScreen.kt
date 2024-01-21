@@ -33,7 +33,7 @@ import com.example.restaurant.rememberToolbarState
 @Composable
 fun MenuItemScreen(onNavigateUp: () -> Unit) {
     val toolbarRange = with(LocalDensity.current) {
-        MIN_TOOLBAR_HEIGHT.dp.roundToPx()..MAX_TOOLBAR_HEIGHT.dp.roundToPx()
+        MIN_TOOLBAR_HEIGHT.roundToPx()..MAX_TOOLBAR_HEIGHT.roundToPx()
     }
 
     val toolbarState = rememberToolbarState(toolbarRange)

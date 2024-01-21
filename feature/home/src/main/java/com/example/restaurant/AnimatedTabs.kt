@@ -1,6 +1,9 @@
 package com.example.restaurant
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.PrimaryScrollableTabRow
@@ -8,6 +11,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.example.compose.gray2
@@ -39,7 +43,8 @@ internal fun TabSync(
 ) {
     PrimaryScrollableTabRow(modifier = modifier, selectedTabIndex = selectedTabIndex, edgePadding = 0.dp) {
         categories.forEachIndexed { index, category ->
-            Tab(selected = index == selectedTabIndex,
+            Tab(
+                selected = index == selectedTabIndex,
                 onClick = { onTabSelect(index, category) },
                 text = {
                     Text(

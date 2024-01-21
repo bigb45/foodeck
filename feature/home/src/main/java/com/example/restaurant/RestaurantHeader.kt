@@ -131,7 +131,6 @@ internal fun RestaurantPageHeader(
         RestaurantInfo(
             restaurant = restaurant,
             modifier = Modifier
-                .height(with(LocalDensity.current) { (toolbarState.infoSectionHeight).toDp() })
                 .background(colorScheme.surface)
         )
         AnimatedTabs(
