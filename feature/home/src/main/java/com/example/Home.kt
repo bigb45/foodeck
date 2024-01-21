@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.main_screen.navigation.mainScreen
 import com.example.menu_item.MenuItemScreen
 import com.example.menu_item.navigation.menuItemScreen
@@ -16,24 +17,27 @@ import com.example.restaurant.navigation.restaurant
 fun Home() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = mainScreenRoute) {
-        mainScreen(
-            onRestaurantClick = { restaurantId ->
-                navController.navigateToRestaurant(restaurantId = restaurantId)
-            },
-            onNavigateUp = {
-                navController.popBackStack()
-            },
-        )
+    FoodDeliveryTheme{
+        NavHost(navController = navController, startDestination = mainScreenRoute) {
+            mainScreen(
+                onRestaurantClick = { restaurantId ->
+                    navController.navigateToRestaurant(restaurantId = restaurantId)
+                },
+                onNavigateUp = {
+                    navController.popBackStack()
+                },
+            )
 
-        restaurant(onNavigateUp = navController::navigateUp
-        ) {
-            navController.navigateToMenuItem(menuItemId = it)
+            restaurant(
+                onNavigateUp = navController::navigateUp
+            ) {
+                navController.navigateToMenuItem(menuItemId = it)
+            }
+
+            menuItemScreen(
+                onNavigateUp = navController::navigateUp
+            )
+
         }
-
-        menuItemScreen(
-            onNavigateUp = navController::navigateUp
-        )
-
     }
 }

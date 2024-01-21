@@ -1,4 +1,4 @@
-package com.example.custom_toolbar
+package com.example.restaurant
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
@@ -10,10 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -49,14 +46,20 @@ private const val Alpha = 1f
 @Composable
 fun CollapsingToolbar(
     modifier: Modifier = Modifier,
+    title: String,
+    subTitle: String,
     coverImageUrl: String? = null,
     progress: Float,
+    onNavigateUp: () -> Unit,
+    preContent: (@Composable () -> Unit)? = null,
+    expandedActions: @Composable () -> Unit,
+    collapsedActions: @Composable () -> Unit,
     content: @Composable () -> Unit,
 ) {
     val topBarItemsColor = animateColorAsState(
         targetValue = if (progress > 0.3) Color.White else colorScheme.onPrimaryContainer,
         animationSpec = tween(100),
-        label = "top bar buttons and text color"
+        label = "animated top bar buttons and text color"
     )
     Column {
 
@@ -76,11 +79,11 @@ fun CollapsingToolbar(
                         .fillMaxSize()
                 ) {
                     CollapsingToolbarLayout(progress = progress) {
-                        IconButton({}) {
+                        IconButton(onNavigateUp) {
                             Icon(Icons.AutoMirrored.Outlined.ArrowBack, null, tint = topBarItemsColor.value)
                         }
                         Text(
-                            "The Foodeck Shop",
+                            title,
                             style = TextStyle(
                                 color = topBarItemsColor.value,
                                 fontSize = 24.sp,
@@ -91,33 +94,31 @@ fun CollapsingToolbar(
                             modifier = Modifier.layoutId("title")
 
                         )
+
                         Row {
-                            IconButton({}) {
-                                Icon(Icons.Outlined.FavoriteBorder, null, tint = topBarItemsColor.value)
-                            }
-                            IconButton({}) {
-                                Icon(Icons.Outlined.Share, null, tint = topBarItemsColor.value)
-                            }
-                            IconButton({}) {
-                                Icon(Icons.Outlined.MoreVert, null, tint = topBarItemsColor.value)
-                            }
+                            expandedActions()
                         }
-                        IconButton(onClick = { /*TODO*/ }) {
-                            Icon(Icons.Outlined.Search, null, tint = topBarItemsColor.value)
-                        }
-                        Text("Golbasi, anka",
+
+                        collapsedActions()
+
+                        Text(
+                            text = subTitle,
                             color = topBarItemsColor.value,
                             fontSize = 18.sp,
                             fontFamily = inter,
                             modifier = Modifier.graphicsLayer {
                                 alpha = progress
                             }
-
                         )
+
                     }
                 }
 
             }
+
+        }
+        if (preContent != null) {
+            preContent()
         }
         content()
 
