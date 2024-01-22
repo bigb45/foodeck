@@ -6,6 +6,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,6 +21,7 @@ import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -32,8 +35,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.compose.gray2
 import com.example.compose.gray6
@@ -59,7 +64,8 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
     val viewModel: MenuItemViewModel = hiltViewModel()
 
     Column(
-        modifier = Modifier.nestedScroll(nestedScrollConnection)
+        modifier = Modifier
+            .nestedScroll(nestedScrollConnection)
             .background(gray6)
     ) {
 
@@ -71,16 +77,9 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
             progress = toolbarState.progress,
             onNavigateUp = onNavigateUp,
             expandedActions = { MealActions() },
-            collapsedActions = {
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(Icons.Outlined.Search, null)
-                }
-            },
             title = "Meal name",
             subTitle = "Restaurant name, address",
-        ) {
-
-        }
+        )
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
             state = lazyListState,
@@ -95,11 +94,38 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
             item {
                 Instructions(onTextChange = { /*TODO*/ }, text = "")
             }
+
+            item {
+                CartBottomBar(onAddToCartClick = { /*TODO*/ }, totalPrice = "20")
+            }
         }
     }
 
 }
 
+@Composable
+fun CartBottomBar(
+    onAddToCartClick: () -> Unit,
+    totalPrice: String,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(colorScheme.surface)
+            .padding(24.dp),
+        horizontalArrangement = Arrangement.spacedBy(24.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text("$$totalPrice", style = TextStyle(fontFamily = interBold, fontSize = 32.sp), modifier = Modifier.weight(1f))
+        Button(onClick = onAddToCartClick, shape = RoundedCornerShape(16.dp)) {
+            Text(
+                "Add to cart",
+                style = Typography.titleLarge.copy(fontFamily = interBold, color = Color.White),
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+        }
+    }
+}
 
 @Composable
 fun Counter(

@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -35,7 +34,6 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.core.ui.theme.inter
 import com.example.core.ui.theme.interBold
-import kotlin.math.roundToInt
 
 
 private val ContentPadding = 8.dp
@@ -51,10 +49,10 @@ fun CollapsingToolbar(
     coverImageUrl: String? = null,
     progress: Float,
     onNavigateUp: () -> Unit,
-    preContent: (@Composable () -> Unit)? = null,
-    expandedActions: @Composable () -> Unit,
-    collapsedActions: @Composable () -> Unit,
-    content: @Composable () -> Unit,
+    preContent: @Composable () -> Unit = {},
+    expandedActions: @Composable () -> Unit = {},
+    collapsedActions: @Composable () -> Unit = {},
+    content: @Composable () -> Unit = {},
 ) {
     val topBarItemsColor = animateColorAsState(
         targetValue = if (progress > 0.3) Color.White else colorScheme.onPrimaryContainer,
@@ -80,7 +78,11 @@ fun CollapsingToolbar(
                 ) {
                     CollapsingToolbarLayout(progress = progress) {
                         IconButton(onNavigateUp) {
-                            Icon(Icons.AutoMirrored.Outlined.ArrowBack, null, tint = topBarItemsColor.value)
+                            Icon(
+                                Icons.AutoMirrored.Outlined.ArrowBack,
+                                null,
+                                tint = topBarItemsColor.value
+                            )
                         }
                         Text(
                             title,
@@ -99,7 +101,7 @@ fun CollapsingToolbar(
                             expandedActions()
                         }
 
-                        collapsedActions()
+                        Row{ collapsedActions() }
 
                         Text(
                             text = subTitle,
@@ -117,9 +119,7 @@ fun CollapsingToolbar(
             }
 
         }
-        if (preContent != null) {
-            preContent()
-        }
+        preContent()
         content()
 
     }
@@ -135,8 +135,8 @@ private fun CollapsingToolbarLayout(
         modifier = modifier, content = content
     ) { measurables, constraints ->
         val placeables = measurables.filter { it.layoutId != "title" }.map {
-                it.measure(constraints)
-            }
+            it.measure(constraints)
+        }
         val navigationButton = placeables[0]
         val optionsRow = placeables[1]
         val searchButton = placeables[2]
@@ -148,9 +148,6 @@ private fun CollapsingToolbarLayout(
         )
         val titlePlaceable = measurables.first { it.layoutId == "title" }.measure(titleConstraints)
 
-
-        val expandedHorizontalGuideline = (constraints.maxHeight * 0.4f).roundToInt()
-        val collapsedHorizontalGuideline = (constraints.maxHeight * 0.5f).roundToInt()
 
         layout(
             width = constraints.maxWidth, height = constraints.maxHeight
