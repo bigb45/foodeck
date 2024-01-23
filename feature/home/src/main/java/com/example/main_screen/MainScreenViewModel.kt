@@ -2,7 +2,7 @@ package com.example.main_screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.common.ListAsResult
+import com.example.common.listAsResult
 import com.example.common.Result
 import com.example.domain.use_cases.GetAllRestaurantsUseCase
 import com.example.domain.use_cases.GetOffersUseCase
@@ -32,8 +32,8 @@ class MainScreenViewModel @Inject constructor(
     private fun fetchRestaurantData() {
         _state.value = MainScreenUiState.Loading
         viewModelScope.launch {
-            val restaurantsFlow = getRestaurants().ListAsResult()
-            val offersFlow = getOffers().ListAsResult()
+            val restaurantsFlow = getRestaurants().listAsResult()
+            val offersFlow = getOffers().listAsResult()
             combine(restaurantsFlow, offersFlow){
                 restaurantsResult, offersResult ->
                 when {

@@ -6,6 +6,7 @@ import com.example.data.api_services.RestaurantsApiService
 import com.example.data.models.InternalServerException
 import com.example.data.models.OffersDto
 import com.example.data.models.RestaurantDto
+import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.Response
@@ -29,6 +30,16 @@ class RestaurantsRepositoryImpl @Inject constructor(private val apiService: Rest
             flow { emit(res.toDto { it.toDto() }) }
         } catch (e: Exception) {
             flow { throw ((e)) }
+        }
+    }
+
+    override suspend fun getMealOptions(): Flow<List<Section>> {
+        return try{
+            val res = handleRequest { apiService.getMealSections() }
+            flow{ emit( res.sections ) }
+        }catch (e: Exception){
+            d("error", "${e.message}")
+            flow{throw(e)}
         }
     }
 
@@ -56,12 +67,27 @@ class RestaurantsRepositoryImpl @Inject constructor(private val apiService: Rest
             throw (NetworkError("Error while fetching data."))
         } catch (e: Exception) {
             d("error", "Unknown error ${e.message}")
-            throw (Exception("An unknown exception has occurred"))
+            throw (Exception("An unknown exception has occur    red"))
         }
     }
 }
 
+data class Menu(
+    val sections: List<Section>
+)
+data class Section(
+    @SerializedName("type")     val sectionType:   String,
+    @SerializedName("title")    val sectionTitle: String,
+    @SerializedName("options")  val options:    List<Option>,
+    @SerializedName("required") val required:  Boolean,
+    @SerializedName("currency") val currency:  String,
 
+)
+
+data class Option(
+    @SerializedName("option") val optionName: String,
+    @SerializedName("price" ) val price: Float,
+)
 fun <T, R> List<T>.toDto(converter: (T) -> R): List<R> {
     return map { converter(it) }
 }

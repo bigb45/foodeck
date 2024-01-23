@@ -8,4 +8,5 @@ import kotlinx.coroutines.flow.Flow
 interface RestaurantsRepository {
     suspend fun getRestaurants(): Flow<List<RestaurantDto>>
     suspend fun getOffers(): Flow<List<OffersDto>>
+    suspend fun getMealOptions(): Flow<List<Section>>
 }

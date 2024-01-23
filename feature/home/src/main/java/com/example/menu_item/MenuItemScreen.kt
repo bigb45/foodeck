@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -66,9 +67,15 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
 
     val nestedScrollConnection = rememberCustomNestedConnection(toolbarState, lazyListState, scope)
     val viewModel: MenuItemViewModel = hiltViewModel()
-    val selectedOptions = remember {
+
+    val options = viewModel.options.collectAsState()
+
+    val checkboxSelectedOptions = remember {
         mutableStateOf(setOf<String>())
     }
+
+    var radioSelectedOption by remember { mutableStateOf("") }
+
 
     Column(
         modifier = Modifier
@@ -95,58 +102,47 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
 
-
-                item {
-                    var selectedOption by remember { mutableStateOf("") }
-                    RadioSelector(data = RadioSelectorData(
-                        title = "Size",
-                        options = mapOf(
-                            "Large" to 12f, "Medium" to 8f, "Small" to 7f
-                        ),
-                        currency = "$",
-                        required = true,
-                    ), selectedOption = selectedOption, onSelectionChange = {
-                        selectedOption = it
-                    })
-                }
-
-
-                item {
-
-                    CheckBoxSelector(
-                        data = CheckBoxSelectorData(
-                            title = "Extra Toppings",
-                            options = mapOf(
-                                "Mushroom" to 5f,
-                                "Pepperoni" to 5f,
-                                "Margarita" to 4f,
-                                "Onion" to 3.5f,
-                                "Green Pepper" to 3.5f,
-                                "Black Olive" to 3.5f,
-                                "Sausage" to 4.5f,
-                                "Anchovy" to 4.5f,
-                                "Bacon" to 4.5f,
-                                "Ham" to 4f,
-                                "Pineapple" to 3.5f,
-                                "Spinach" to 4f,
-                                "Tomato" to 3.5f,
-                                "Chicken" to 4.5f,
-                                "Broccoli" to 3.5f
-                            ),
-                            currency = "$",
-                            required = false
-                        ), selectedOptions = selectedOptions
-                    ) { option, isSelected ->
-                        val currentSelected = selectedOptions.value.toMutableSet()
-                        if (isSelected) {
-                            currentSelected.add(option)
-                        } else {
-                            currentSelected.remove(option)
+                items(options.value) { section ->
+                    if (section.sectionType == "checkbox") {
+//                        TODO: change section and only pass options.data instead of creating data class here
+                        CheckBoxSelector(
+                            data = CheckBoxSelectorData(
+                                title = section.sectionTitle,
+                                options = section.options.associate { option ->
+                                    Pair(option.optionName, option.price)
+                                },
+                                currency = section.currency,
+                                required = section.required,
+                            ), selectedOptions = checkboxSelectedOptions
+                        ) { option, isSelected ->
+                            val currentSelected = checkboxSelectedOptions.value.toMutableSet()
+                            if (isSelected) {
+                                currentSelected.add(option)
+                            } else {
+                                currentSelected.remove(option)
+                            }
+                            checkboxSelectedOptions.value = currentSelected
+                            d("error", checkboxSelectedOptions.value.toString())
                         }
-                        selectedOptions.value = currentSelected
-                        d("error", selectedOptions.value.toString())
+
+                    } else if (section.sectionType == "radio") {
+
+                        RadioSelector(data = RadioSelectorData(
+                            title = section.sectionTitle,
+                            options = section.options.associate { option ->
+                                Pair(option.optionName, option.price)
+                            },
+                            currency = section.currency,
+                            required = section.required,
+                        ),
+                            selectedOption = radioSelectedOption,
+                            onSelectionChange = { newSelection ->
+                                radioSelectedOption = newSelection
+                            })
 
                     }
+
+
                 }
 
                 item {
@@ -161,10 +157,10 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
                 }
             }
 
-
-            CartBottomBar(modifier = Modifier.align(Alignment.BottomCenter),
-                onAddToCartClick = onNavigateUp,
-                totalPrice = "20"
+            CartBottomBar(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                onAddToCartClick = { viewModel.getOptions() },
+                totalPrice = "186.00"
             )
 
         }
@@ -192,7 +188,11 @@ fun CartBottomBar(
             style = TextStyle(fontFamily = interBold, fontSize = 32.sp),
             modifier = Modifier.weight(1f)
         )
-        Button(onClick = onAddToCartClick, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxHeight()) {
+        Button(
+            onClick = onAddToCartClick,
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.fillMaxHeight()
+        ) {
             Text(
                 "Add to cart",
                 style = Typography.titleLarge.copy(fontFamily = interBold, color = Color.White),
