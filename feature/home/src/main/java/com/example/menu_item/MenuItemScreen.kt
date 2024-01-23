@@ -4,10 +4,11 @@ import android.util.Log.d
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,7 +20,6 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Remove
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -29,7 +29,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -62,6 +66,9 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
 
     val nestedScrollConnection = rememberCustomNestedConnection(toolbarState, lazyListState, scope)
     val viewModel: MenuItemViewModel = hiltViewModel()
+    val selectedOptions = remember {
+        mutableStateOf(setOf<String>())
+    }
 
     Column(
         modifier = Modifier
@@ -80,24 +87,86 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
             title = "Meal name",
             subTitle = "Restaurant name, address",
         )
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
-            state = lazyListState,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            item {
-                Counter(modifier = Modifier,
-                    counter = viewModel.counter.collectAsState().value,
-                    increment = { viewModel.incrementCounter() },
-                    decrement = { viewModel.decrementCounter() })
-            }
-            item {
-                Instructions(onTextChange = { /*TODO*/ }, text = "")
+        Box {
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(bottom = 108.dp),
+                state = lazyListState,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+
+
+                item {
+                    var selectedOption by remember { mutableStateOf("") }
+                    RadioSelector(data = RadioSelectorData(
+                        title = "Size",
+                        options = mapOf(
+                            "Large" to 12f, "Medium" to 8f, "Small" to 7f
+                        ),
+                        currency = "$",
+                        required = true,
+                    ), selectedOption = selectedOption, onSelectionChange = {
+                        selectedOption = it
+                    })
+                }
+
+
+                item {
+
+                    CheckBoxSelector(
+                        data = CheckBoxSelectorData(
+                            title = "Extra Toppings",
+                            options = mapOf(
+                                "Mushroom" to 5f,
+                                "Pepperoni" to 5f,
+                                "Margarita" to 4f,
+                                "Onion" to 3.5f,
+                                "Green Pepper" to 3.5f,
+                                "Black Olive" to 3.5f,
+                                "Sausage" to 4.5f,
+                                "Anchovy" to 4.5f,
+                                "Bacon" to 4.5f,
+                                "Ham" to 4f,
+                                "Pineapple" to 3.5f,
+                                "Spinach" to 4f,
+                                "Tomato" to 3.5f,
+                                "Chicken" to 4.5f,
+                                "Broccoli" to 3.5f
+                            ),
+                            currency = "$",
+                            required = false
+                        ), selectedOptions = selectedOptions
+                    ) { option, isSelected ->
+                        val currentSelected = selectedOptions.value.toMutableSet()
+                        if (isSelected) {
+                            currentSelected.add(option)
+                        } else {
+                            currentSelected.remove(option)
+                        }
+                        selectedOptions.value = currentSelected
+                        d("error", selectedOptions.value.toString())
+
+                    }
+                }
+
+                item {
+                    Counter(modifier = Modifier.fillMaxHeight(),
+                        counter = viewModel.counter.collectAsState().value,
+                        increment = { viewModel.incrementCounter() },
+                        decrement = { viewModel.decrementCounter() })
+                }
+
+                item {
+                    Instructions(onTextChange = { /*TODO*/ }, text = "")
+                }
             }
 
-            item {
-                CartBottomBar(onAddToCartClick = { /*TODO*/ }, totalPrice = "20")
-            }
+
+            CartBottomBar(modifier = Modifier.align(Alignment.BottomCenter),
+                onAddToCartClick = onNavigateUp,
+                totalPrice = "20"
+            )
+
         }
     }
 
@@ -105,23 +174,29 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
 
 @Composable
 fun CartBottomBar(
+    modifier: Modifier = Modifier,
     onAddToCartClick: () -> Unit,
     totalPrice: String,
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
+            .height(100.dp)
             .background(colorScheme.surface)
             .padding(24.dp),
         horizontalArrangement = Arrangement.spacedBy(24.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text("$$totalPrice", style = TextStyle(fontFamily = interBold, fontSize = 32.sp), modifier = Modifier.weight(1f))
-        Button(onClick = onAddToCartClick, shape = RoundedCornerShape(16.dp)) {
+        Text(
+            "$$totalPrice",
+            style = TextStyle(fontFamily = interBold, fontSize = 32.sp),
+            modifier = Modifier.weight(1f)
+        )
+        Button(onClick = onAddToCartClick, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxHeight()) {
             Text(
                 "Add to cart",
                 style = Typography.titleLarge.copy(fontFamily = interBold, color = Color.White),
-                modifier = Modifier.padding(vertical = 8.dp)
+                modifier = Modifier
             )
         }
     }

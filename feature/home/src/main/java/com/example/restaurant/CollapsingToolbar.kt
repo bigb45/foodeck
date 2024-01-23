@@ -2,6 +2,7 @@ package com.example.restaurant
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -139,10 +140,10 @@ private fun CollapsingToolbarLayout(
         }
         val navigationButton = placeables[0]
         val optionsRow = placeables[1]
-        val searchButton = placeables[2]
+        val collapsedAction = placeables[2]
         val address = placeables[3]
 
-        val titleWidth = constraints.maxWidth - navigationButton.width - searchButton.width
+        val titleWidth = constraints.maxWidth - navigationButton.width - collapsedAction.width
         val titleConstraints = Constraints.fixedWidth(
             width = titleWidth
         )
@@ -174,8 +175,8 @@ private fun CollapsingToolbarLayout(
                     x = constraints.maxWidth - optionsRow.width, y = 30
                 )
             } else {
-                searchButton.placeRelative(
-                    x = constraints.maxWidth - searchButton.width, y = 30
+                collapsedAction.placeRelative(
+                    x = constraints.maxWidth - collapsedAction.width, y = 30
                 )
             }
         }
