@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,12 +24,14 @@ import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
@@ -49,6 +53,7 @@ import com.example.compose.gray2
 import com.example.compose.gray6
 import com.example.core.ui.theme.Typography
 import com.example.core.ui.theme.interBold
+import com.example.custom_toolbar.ToolbarState
 import com.example.restaurant.CollapsingToolbar
 import com.example.restaurant.MAX_TOOLBAR_HEIGHT
 import com.example.restaurant.MIN_TOOLBAR_HEIGHT
@@ -68,7 +73,7 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
     val nestedScrollConnection = rememberCustomNestedConnection(toolbarState, lazyListState, scope)
     val viewModel: MenuItemViewModel = hiltViewModel()
 
-    val options = viewModel.options.collectAsState()
+    val screenState = viewModel.screenState.collectAsState()
 
     val checkboxSelectedOptions = remember {
         mutableStateOf(setOf<String>())
@@ -76,7 +81,51 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
 
     var radioSelectedOption by remember { mutableStateOf("") }
 
+    when(screenState.value){
 
+        is MenuItemUiState.Loading -> {
+            CircularProgressIndicator()
+        }
+
+        is MenuItemUiState.Error -> {
+            Text("error")
+        }
+
+        is MenuItemUiState.Success -> {
+            MenuItem(
+                nestedScrollConnection = nestedScrollConnection,
+                toolbarState = toolbarState,
+                onNavigateUp = onNavigateUp,
+                lazyListState = lazyListState,
+                screenState = screenState.value as MenuItemUiState.Success,
+                viewModel = viewModel,
+                checkboxSelectedOptions = checkboxSelectedOptions,
+                radioSelectedOption = radioSelectedOption,
+                onSelectionChange = { newSelection ->
+                    radioSelectedOption = newSelection
+                }
+            )
+        }
+
+    }
+
+
+
+}
+
+
+@Composable
+fun MenuItem(
+    nestedScrollConnection: NestedScrollConnection,
+    toolbarState: ToolbarState,
+    onNavigateUp: () -> Unit,
+    lazyListState: LazyListState,
+    screenState: MenuItemUiState.Success,
+    viewModel: MenuItemViewModel,
+    checkboxSelectedOptions: MutableState<Set<String>>,
+    radioSelectedOption: String,
+    onSelectionChange: (String) -> Unit
+) {
     Column(
         modifier = Modifier
             .nestedScroll(nestedScrollConnection)
@@ -102,7 +151,8 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
 
-                items(options.value) { section ->
+
+                items(screenState.sections) { section ->
                     if (section.sectionType == "checkbox") {
 //                        TODO: change section and only pass options.data instead of creating data class here
                         CheckBoxSelector(
@@ -136,12 +186,9 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
                             required = section.required,
                         ),
                             selectedOption = radioSelectedOption,
-                            onSelectionChange = { newSelection ->
-                                radioSelectedOption = newSelection
-                            })
+                            onSelectionChange = onSelectionChange)
 
                     }
-
 
                 }
 
@@ -159,15 +206,13 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
 
             CartBottomBar(
                 modifier = Modifier.align(Alignment.BottomCenter),
-                onAddToCartClick = { viewModel.getOptions() },
+                onAddToCartClick = {  },
                 totalPrice = "186.00"
             )
 
         }
     }
-
 }
-
 @Composable
 fun CartBottomBar(
     modifier: Modifier = Modifier,

@@ -11,7 +11,5 @@ sealed class MainScreenUiState {
         ): MainScreenUiState()
 
     object Loading: MainScreenUiState()
-    data class Error(val message: String?) : MainScreenUiState() {
-
-    }
+    data class Error(val message: String?) : MainScreenUiState()
 }
