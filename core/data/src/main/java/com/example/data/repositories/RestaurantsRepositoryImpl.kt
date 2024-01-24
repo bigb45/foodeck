@@ -76,15 +76,17 @@ data class Menu(
     val sections: List<Section>
 )
 data class Section(
+    @SerializedName("id") val id: String,
     @SerializedName("type")     val sectionType:   String,
     @SerializedName("title")    val sectionTitle: String,
     @SerializedName("options")  val options:    List<Option>,
     @SerializedName("required") val required:  Boolean,
     @SerializedName("currency") val currency:  String,
 
-)
+    )
 
 data class Option(
+    @SerializedName("id") val id: String,
     @SerializedName("option") val optionName: String,
     @SerializedName("price" ) val price: Float,
 )

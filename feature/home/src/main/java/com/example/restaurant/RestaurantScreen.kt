@@ -43,6 +43,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ahmadhamwi.tabsync_compose.lazyListTabSync
+import com.example.common.AnimatedTabs
+import com.example.common.Category
+import com.example.common.CollapsingToolbar
 import com.example.compose.gray6
 import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.core.ui.theme.interBold
