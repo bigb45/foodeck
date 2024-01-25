@@ -77,6 +77,7 @@ data class Menu(
 )
 data class Section(
     @SerializedName("id") val id: String,
+//    TODO: create a DTO and a MODEL and change the section type to the enum value
     @SerializedName("type")     val sectionType:   String,
     @SerializedName("title")    val sectionTitle: String,
     @SerializedName("options")  val options:    List<Option>,
@@ -86,6 +87,7 @@ data class Section(
     )
 
 data class Option(
+//    TODO: move this into the models folder
     @SerializedName("id") val id: String,
     @SerializedName("option") val optionName: String,
     @SerializedName("price" ) val price: Float,

@@ -83,7 +83,6 @@ class MenuItemViewModel @Inject constructor(
         val mutableMap = _radioButtonStateList.value.toMutableMap()
         mutableMap[key] = newSelection
         _radioButtonStateList.value = mutableMap
-        d("errora", _radioButtonStateList.value.toString())
     }
 
 }

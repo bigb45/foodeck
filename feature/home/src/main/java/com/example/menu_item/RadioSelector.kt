@@ -67,7 +67,6 @@ fun RadioSelector(
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     RadioButton(selected = selected, onClick = {
-                        d("error", "$selected, ${data.title}, $option, $selectedOption")
                         onSelectionChange(data.title, id)
                     })
 
