@@ -34,12 +34,12 @@ class RestaurantsRepositoryImpl @Inject constructor(private val apiService: Rest
     }
 
     override suspend fun getMealOptions(): Flow<List<Section>> {
-        return try{
+        return try {
             val res = handleRequest { apiService.getMealSections() }
-            flow{ emit( res.sections ) }
-        }catch (e: Exception){
+            flow { emit(res.sections) }
+        } catch (e: Exception) {
             d("error", "${e.message}")
-            flow{throw(e)}
+            flow { throw (e) }
         }
     }
 
@@ -48,9 +48,9 @@ class RestaurantsRepositoryImpl @Inject constructor(private val apiService: Rest
             val res = apiRequest()
             d("error", "${res.code()}, ${res.message()}")
 
-        return when {
+            return when {
                 res.isSuccessful -> {
-                    d("error", "${res.body()}")
+//                    d("error", "${res.body()}")
                     res.body()!!
                 }
 
@@ -73,16 +73,17 @@ class RestaurantsRepositoryImpl @Inject constructor(private val apiService: Rest
 }
 
 data class Menu(
-    val sections: List<Section>
+    val sections: List<Section>,
 )
+
 data class Section(
     @SerializedName("id") val id: String,
 //    TODO: create a DTO and a MODEL and change the section type to the enum value
-    @SerializedName("type")     val sectionType:   String,
-    @SerializedName("title")    val sectionTitle: String,
-    @SerializedName("options")  val options:    List<Option>,
-    @SerializedName("required") val required:  Boolean,
-    @SerializedName("currency") val currency:  String,
+    @SerializedName("type") val sectionType: String,
+    @SerializedName("title") val sectionTitle: String,
+    @SerializedName("options") val options: List<Option>,
+    @SerializedName("required") val required: Boolean,
+    @SerializedName("currency") val currency: String,
 
     )
 
@@ -90,8 +91,9 @@ data class Option(
 //    TODO: move this into the models folder
     @SerializedName("id") val id: String,
     @SerializedName("option") val optionName: String,
-    @SerializedName("price" ) val price: Float,
+    @SerializedName("price") val price: Float,
 )
+
 fun <T, R> List<T>.toDto(converter: (T) -> R): List<R> {
     return map { converter(it) }
 }

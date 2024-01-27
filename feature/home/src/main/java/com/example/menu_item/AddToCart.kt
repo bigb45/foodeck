@@ -1,5 +1,6 @@
 package com.example.menu_item
 
+import android.util.Log.d
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,13 +22,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.core.ui.theme.Typography
 import com.example.core.ui.theme.interBold
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun CartBottomBar(
     modifier: Modifier = Modifier,
     onAddToCartClick: () -> Unit,
-    totalPrice: String,
+    totalPrice: Float,
 ) {
+    d("error", "${totalPrice}")
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -37,7 +41,7 @@ fun CartBottomBar(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            "$$totalPrice",
+            "$${totalPrice}",
             style = TextStyle(fontFamily = interBold, fontSize = 32.sp),
             modifier = Modifier.weight(1f)
         )

@@ -25,23 +25,26 @@ import com.example.data.repositories.Option
 @Composable
 fun RadioSelector(
     data: RadioSelectorData,
-    selectedOption: String?,
-    onSelectionChange: (String, String) -> Unit,
-
+    selectedOption: Option?,
+    onSelectionChange: (String, Option) -> Unit,
     ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val titleStyle = remember { Typography.titleLarge.copy(fontFamily = interBold) }
+    val bodyLargeStyle = remember { Typography.bodyLarge }
+    val gray2Color = remember { gray2 }
+
     Column(
         modifier = Modifier
             .background(colorScheme.surface)
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        val interactionSource = remember { MutableInteractionSource() }
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ){
-            Text(data.title, style = Typography.titleLarge.copy(fontFamily = interBold))
+            Text(data.title, style = titleStyle.copy(fontFamily = interBold))
             if (data.required) {
                 Text("required", color = colorScheme.primary)
             }
@@ -54,26 +57,25 @@ fun RadioSelector(
                 val id = it.id
                 val option = it.optionName
                 val formattedPrice = String.format("%.2f", it.price)
-                val selected = selectedOption == id
+                val selected = selectedOption?.id == id
                 Row(
                     modifier = Modifier
                         .clickable(
                             indication = null,
-                            onClick = { onSelectionChange(data.title, id)
-                            },
+                            onClick = { onSelectionChange(data.id, it) },
                             interactionSource = interactionSource
                         ),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     RadioButton(selected = selected, onClick = {
-                        onSelectionChange(data.title, id)
+                        onSelectionChange(data.id, it)
                     })
 
-                    Text(option, style = Typography.bodyLarge, modifier = Modifier
+                    Text(option, style = bodyLargeStyle, modifier = Modifier
                         .weight(1f))
 
-                    Text("+${data.currency}$formattedPrice", style = Typography.bodyLarge.copy(color = if(selected) colorScheme.primary else gray2))
+                    Text("+${data.currency}$formattedPrice", style = bodyLargeStyle.copy(color = if(selected) colorScheme.primary else gray2Color))
                 }
             }
 
@@ -83,6 +85,7 @@ fun RadioSelector(
 }
 
 data class RadioSelectorData(
+    val id: String,
     val title: String,
     val options: List<Option>,
     val currency: String,

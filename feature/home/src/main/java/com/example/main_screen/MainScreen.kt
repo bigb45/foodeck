@@ -87,6 +87,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.bumptech.glide.integration.compose.CrossFade
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.example.common.LoadingIndicator
 import com.example.compose.gray2
 import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.core.ui.theme.Typography
@@ -250,16 +251,7 @@ fun Home(
     }
 }
 
-@Composable
-fun LoadingIndicator() {
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        CircularProgressIndicator(
-            Modifier.align(Alignment.Center)
-        )
-    }
-}
+
 
 @Composable
 private fun BentoSection(modifier: Modifier = Modifier) {
