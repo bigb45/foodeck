@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.common.LoadingIndicator
 import com.example.compose.facebook_color
 import com.example.compose.google_color
 import com.example.compose.seed
@@ -106,92 +107,100 @@ fun LoginMethods(
             modifier = Modifier.fillMaxSize()
 
         ) {
-            Box {
-                Image(
-                    painter = painterResource(id = R.drawable.loginheader),
-                    contentDescription = null,
-                    Modifier
-                        .fillMaxWidth()
-                        .height(200.dp),
-                    contentScale = ContentScale.Crop
-                )
-                Row(
-                    Modifier.align(Alignment.Center), verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(painterResource(id = R.drawable.foodeck), contentDescription = null)
-                    Text(
-                        text = "Foodeck",
-                        style = TextStyle(
-                            fontSize = 34.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = MaterialTheme.colorScheme.primary,
-                        ),
-
-                        )
+            when(state){
+                AuthResult.Loading -> {
+                    LoadingIndicator()
                 }
-            }
-            Column(
-                verticalArrangement = Arrangement.SpaceEvenly,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(start = 24.dp, end = 24.dp, bottom = 16.dp)
-                    .verticalScroll(rememberScrollState(), true)
-            ) {
+                AuthResult.SignedOut -> {
+                    Box {
+                        Image(
+                            painter = painterResource(id = R.drawable.loginheader),
+                            contentDescription = null,
+                            Modifier
+                                .fillMaxWidth()
+                                .height(200.dp),
+                            contentScale = ContentScale.Crop
+                        )
+                        Row(
+                            Modifier.align(Alignment.Center), verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(painterResource(id = R.drawable.foodeck), contentDescription = null)
+                            Text(
+                                text = "Foodeck",
+                                style = TextStyle(
+                                    fontSize = 34.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = MaterialTheme.colorScheme.primary,
+                                ),
 
-                PrimaryButton(
-                    text = "Login with Google",
-                    onClick = {
-                        scope.launch {
-                            val signInIntentSender = googleAuthUiClient.signIn()
-                            launcher.launch(
-                                IntentSenderRequest.Builder(
-                                    signInIntentSender ?: return@launch
-                                ).build()
-                            )
+                                )
                         }
-                    },
-                    enabled = true,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = google_color
-                    ),
-                )
+                    }
+                    Column(
+                        verticalArrangement = Arrangement.SpaceEvenly,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(start = 24.dp, end = 24.dp, bottom = 16.dp)
+                            .verticalScroll(rememberScrollState(), true)
+                    ) {
 
-                PrimaryButton(
-                    text = stringResource(R.string.login_with_facebook),
-                    onClick = {
-                        navigateToFacebook()
-                    },
-                    enabled = true,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = facebook_color
-                    ),
-                )
-                PrimaryButton(
-                    text = stringResource(R.string.login_via_email),
-                    onClick = {
-                        navigateToEmail()
-                    },
-                    enabled = true,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = seed
-                    ),
-                )
+                        PrimaryButton(
+                            text = "Login with Google",
+                            onClick = {
+                                scope.launch {
+                                    val signInIntentSender = googleAuthUiClient.signIn()
+                                    launcher.launch(
+                                        IntentSenderRequest.Builder(
+                                            signInIntentSender ?: return@launch
+                                        ).build()
+                                    )
+                                }
+                            },
+                            enabled = true,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = google_color
+                            ),
+                        )
+
+                        PrimaryButton(
+                            text = stringResource(R.string.login_with_facebook),
+                            onClick = {
+                                navigateToFacebook()
+                            },
+                            enabled = true,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = facebook_color
+                            ),
+                        )
+                        PrimaryButton(
+                            text = stringResource(R.string.login_via_email),
+                            onClick = {
+                                navigateToEmail()
+                            },
+                            enabled = true,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = seed
+                            ),
+                        )
 
 
-                SecondaryButton(
-                    text = stringResource(R.string.create_an_account),
-                    enabled = true,
-                    onClick = {
-                        navigateToCreateAccount()
-                    })
+                        SecondaryButton(
+                            text = stringResource(R.string.create_an_account),
+                            enabled = true,
+                            onClick = {
+                                navigateToCreateAccount()
+                            })
 
-                Hyperlink(
-                    text = stringResource(R.string.terms_and_conditions),
-                    hyperLinkText = stringResource(R.string.terms_conditions_hyper_text),
-                )
-            }
+                        Hyperlink(
+                            text = stringResource(R.string.terms_and_conditions),
+                            hyperLinkText = stringResource(R.string.terms_conditions_hyper_text),
+                        )
+                    }
 
-        }
+
+                }
+                else -> {}
+            }}
     }
 }

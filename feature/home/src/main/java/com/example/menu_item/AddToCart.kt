@@ -41,7 +41,7 @@ fun CartBottomBar(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            "$${totalPrice}",
+            "$${String.format("%.2f", totalPrice)}",
             style = TextStyle(fontFamily = interBold, fontSize = 32.sp),
             modifier = Modifier.weight(1f)
         )

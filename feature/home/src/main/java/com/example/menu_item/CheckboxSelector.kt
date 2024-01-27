@@ -13,21 +13,20 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.compose.gray2
 import com.example.core.ui.theme.Typography
 import com.example.core.ui.theme.interBold
+import com.example.data.repositories.Option
 
 @Composable
 fun CheckBoxSelector(
     data: CheckBoxSelectorData,
-    selectedOptions: MutableState<Set<String>>,
-    onSelectionChange: (String, Boolean) -> Unit,
+    selectedOptions: Map<String, List<Option>>,
+    onSelectionChange: (String, Option, Boolean) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -50,16 +49,16 @@ fun CheckBoxSelector(
             modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             data.options.forEach {
-                val option = it.key
-                val formattedPrice = String.format("%.2f", it.value)
-                val checked = selectedOptions.value.contains(option)
+                val option = it.optionName
+                val formattedPrice = String.format("%.2f", it.price)
+                val isSelected = (selectedOptions[data.id] ?: emptyList()).contains(it)
 
                 Row(
                     modifier = Modifier
                         .clickable(
                             indication = null,
                             onClick = {
-                                onSelectionChange(option, !checked)
+                                onSelectionChange(data.id, it,  !isSelected)
                             },
                             interactionSource = interactionSource
                         )
@@ -67,8 +66,8 @@ fun CheckBoxSelector(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Checkbox(checked = checked, onCheckedChange = { isSelected ->
-                        onSelectionChange(option, isSelected)
+                    Checkbox(checked = isSelected, onCheckedChange = { isSelected ->
+                        onSelectionChange(data.id, it, isSelected)
                     })
 
                     Text(
@@ -78,7 +77,7 @@ fun CheckBoxSelector(
 
                     Text(
                         "+${data.currency}$formattedPrice",
-                        style = Typography.bodyLarge.copy(color = if (checked) colorScheme.primary else gray2)
+                        style = Typography.bodyLarge.copy(color = if (isSelected) colorScheme.primary else gray2)
                     )
                 }
             }
@@ -89,8 +88,9 @@ fun CheckBoxSelector(
 }
 
 data class CheckBoxSelectorData(
+    val id: String,
     val title: String,
-    val options: Map<String, Float>,
+    val options: List<Option>,
     val currency: String,
     val required: Boolean,
 )

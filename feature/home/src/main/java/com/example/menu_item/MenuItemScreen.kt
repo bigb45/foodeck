@@ -20,9 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -59,9 +57,6 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
 
     val screenState = viewModel.screenState.collectAsState()
 
-    val checkboxSelectedOptions = remember {
-        mutableStateOf(setOf<String>())
-    }
 
     when (screenState.value) {
 
@@ -75,17 +70,19 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
 
         is OptionsState.Success -> {
 
-            MenuItems(
-                nestedScrollConnection = nestedScrollConnection,
+            MenuItems(nestedScrollConnection = nestedScrollConnection,
                 toolbarState = toolbarState,
                 onNavigateUp = onNavigateUp,
                 lazyListState = lazyListState,
                 screenState = screenState.value as OptionsState.Success,
                 viewModel = viewModel,
-                checkboxSelectedOptions = checkboxSelectedOptions,
+                checkboxSelectedOptions = viewModel.checkboxListState.collectAsState().value,
                 radioSelectedOptions = viewModel.radioGroupListState.collectAsState().value,
                 onRadioSelectionChange = { key, newSelection ->
-                    viewModel.onRadioSelected(key, newSelection)
+                    viewModel.onRadioSelected(key = key, newSelection = newSelection)
+                },
+                onCheckboxSelectionChange = { key, newSelection, isSelected ->
+                    viewModel.onCheckBoxSelected(key = key, newSelection = newSelection, isSelected)
                 },
             )
         }
@@ -102,12 +99,12 @@ fun MenuItems(
     lazyListState: LazyListState,
     screenState: OptionsState.Success,
     viewModel: MenuItemViewModel,
-    checkboxSelectedOptions: MutableState<Set<String>>,
+    checkboxSelectedOptions: Map<String, List<Option>>,
     onRadioSelectionChange: (String, Option) -> Unit,
+    onCheckboxSelectionChange: (String, Option, Boolean) -> Unit,
     radioSelectedOptions: Map<String, Option?>,
 
     ) {
-    d("error", "total price: ${viewModel.totalPrice.collectAsState().value}")
     Box(
         modifier = Modifier
             .nestedScroll(nestedScrollConnection)
@@ -118,12 +115,14 @@ fun MenuItems(
             lazyListState = lazyListState,
             screenState = screenState,
             checkboxSelectedOptions = checkboxSelectedOptions,
-            onRadioSelectionChange = onRadioSelectionChange,
             radioSelectedOptions = radioSelectedOptions,
             count = viewModel.counter.collectAsState().value,
             totalPrice = viewModel.totalPrice.collectAsState().value,
-            increment = { viewModel.incrementCounter() }
-        ) { viewModel.decrementCounter() }
+            onRadioSelectionChange = onRadioSelectionChange,
+            onCheckboxSelectionChange = onCheckboxSelectionChange,
+            increment = { viewModel.incrementCounter() },
+            decrement = { viewModel.decrementCounter() }
+        )
 
         CollapsingToolbar(
             modifier = Modifier
@@ -146,11 +145,12 @@ fun MenuOptions(
     toolbarState: ToolbarState,
     lazyListState: LazyListState,
     screenState: OptionsState.Success,
-    checkboxSelectedOptions: MutableState<Set<String>>,
+    checkboxSelectedOptions: Map<String, List<Option>>,
     radioSelectedOptions: Map<String, Option?>,
     count: Int,
     totalPrice: Float,
     onRadioSelectionChange: (String, Option) -> Unit,
+    onCheckboxSelectionChange: (String, Option, Boolean) -> Unit,
     increment: () -> Unit,
     decrement: () -> Unit,
 ) {
@@ -161,8 +161,7 @@ fun MenuOptions(
             modifier = Modifier
                 .fillMaxWidth()
                 .graphicsLayer {
-                    translationY =
-                        toolbarState.height + toolbarState.offset
+                    translationY = toolbarState.height + toolbarState.offset
                 },
             contentPadding = PaddingValues(bottom = 108.dp),
             state = lazyListState,
@@ -174,27 +173,30 @@ fun MenuOptions(
 //                        TODO: change section and only pass options.data instead of creating data class here
                     val data = remember {
                         CheckBoxSelectorData(
+                            id = section.id,
                             title = section.sectionTitle,
-                            options = section.options.associate { option ->
-                                Pair(option.optionName, option.price)
-                            },
+                            options = section.options,
                             currency = section.currency,
                             required = section.required,
                         )
                     }
                     CheckBoxSelector(
                         data = data,
-                        selectedOptions = checkboxSelectedOptions
-                    ) { option, isSelected ->
-                        val currentSelected = checkboxSelectedOptions.value.toMutableSet()
-                        if (isSelected) {
-                            currentSelected.add(option)
-                        } else {
-                            currentSelected.remove(option)
-                        }
-                        checkboxSelectedOptions.value = currentSelected
-                        d("error", checkboxSelectedOptions.value.toString())
-                    }
+                        selectedOptions = checkboxSelectedOptions,
+                        onSelectionChange = {key, option, isSelected ->
+                            onCheckboxSelectionChange(key, option, isSelected)
+                                            },
+                    )
+//                    { option, isSelected ->
+//                        val currentSelected = checkboxSelectedOptions.value.toMutableSet()
+//                        if (isSelected) {
+//                            currentSelected.add(option)
+//                        } else {
+//                            currentSelected.remove(option)
+//                        }
+//                        checkboxSelectedOptions.value = currentSelected
+//                        d("error", checkboxSelectedOptions.value.toString())
+//                    }
 
                 } else if (section.sectionType == "radio") {
                     val data = remember {
