@@ -1,6 +1,6 @@
 package com.example.authentication
 
-import com.example.data.models.UserDetailsModel
+import com.example.data.models.UserDetails
 
 sealed interface AuthResult {
     object Loading : AuthResult
@@ -11,7 +11,7 @@ sealed interface AuthResult {
     ) : AuthResult
 
     data class Success(
-        val data: UserDetailsModel
+        val data: UserDetails
     ) : AuthResult
 
 }

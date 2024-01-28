@@ -6,15 +6,13 @@ import com.example.authentication.AuthResult
 import com.example.common.Result
 import com.example.common.asResult
 import com.example.data.models.TokenAuthResponseModel
-import com.example.data.models.UserDetailsModel
-import com.example.domain.use_cases.AddUserInformationUseCase
+import com.example.data.models.UserDetails
 import com.example.domain.use_cases.AuthenticateUserWithTokenUseCase
 import com.facebook.FacebookException
 import com.facebook.login.LoginResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -38,7 +36,7 @@ class FacebookLoginViewModel @Inject constructor(
 
                     }
                     is Result.Success -> {
-                        _authResult.value = AuthResult.Success(UserDetailsModel(userId = (result.data as TokenAuthResponseModel.SignInSuccess).tokens.userId))
+                        _authResult.value = AuthResult.Success(UserDetails(userId = (result.data as TokenAuthResponseModel.SignInSuccess).tokens.userId))
 
                     }
                 }

@@ -1,6 +1,5 @@
 package com.example.menu_item
 
-import android.util.Log.d
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -20,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.example.compose.gray2
 import com.example.core.ui.theme.Typography
 import com.example.core.ui.theme.interBold
-import com.example.data.repositories.Option
+import com.example.data.models.Option
 
 @Composable
 fun RadioSelector(

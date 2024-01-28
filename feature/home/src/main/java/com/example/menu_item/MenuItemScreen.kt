@@ -36,7 +36,7 @@ import com.example.common.CollapsingToolbar
 import com.example.common.LoadingIndicator
 import com.example.compose.gray6
 import com.example.custom_toolbar.ToolbarState
-import com.example.data.repositories.Option
+import com.example.data.models.Option
 import com.example.restaurant.MAX_TOOLBAR_HEIGHT
 import com.example.restaurant.MIN_TOOLBAR_HEIGHT
 import com.example.restaurant.rememberCustomNestedConnection
@@ -187,16 +187,6 @@ fun MenuOptions(
                             onCheckboxSelectionChange(key, option, isSelected)
                                             },
                     )
-//                    { option, isSelected ->
-//                        val currentSelected = checkboxSelectedOptions.value.toMutableSet()
-//                        if (isSelected) {
-//                            currentSelected.add(option)
-//                        } else {
-//                            currentSelected.remove(option)
-//                        }
-//                        checkboxSelectedOptions.value = currentSelected
-//                        d("error", checkboxSelectedOptions.value.toString())
-//                    }
 
                 } else if (section.sectionType == "radio") {
                     val data = remember {

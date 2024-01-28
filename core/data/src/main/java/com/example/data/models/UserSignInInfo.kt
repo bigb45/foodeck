@@ -1,8 +1,6 @@
 package com.example.data.models
 
-data class UserSignUpModel(
+data class UserSignInInfo(
     val email: String,
     val password: String,
-    val username: String,
-    val phoneNumber: String,
 )

@@ -4,9 +4,10 @@ import android.security.keystore.UserNotAuthenticatedException
 import android.util.Log.d
 import com.example.data.api_services.RestaurantsApiService
 import com.example.data.models.InternalServerException
-import com.example.data.models.OffersDto
-import com.example.data.models.RestaurantDto
-import com.google.gson.annotations.SerializedName
+import com.example.data.models.Meal
+import com.example.data.models.Offer
+import com.example.data.models.Restaurant
+import com.example.data.models.OptionsSectionDto
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.Response
@@ -15,25 +16,29 @@ import javax.inject.Inject
 
 class RestaurantsRepositoryImpl @Inject constructor(private val apiService: RestaurantsApiService) :
     RestaurantsRepository {
-    override suspend fun getRestaurants(): Flow<List<RestaurantDto>> {
+    override suspend fun getRestaurants(): Flow<List<Restaurant>> {
         return try {
             val res = handleRequest { apiService.getAllRestaurants() }
-            flow { emit(res.toDto { it.toDto() }) }
+            flow { emit(res) }
         } catch (e: Exception) {
             flow { throw (e) }
         }
     }
 
-    override suspend fun getOffers(): Flow<List<OffersDto>> {
+    override suspend fun getRestaurantMeals(): Flow<List<Meal>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getOffers(): Flow<List<Offer>> {
         return try {
             val res = handleRequest { apiService.getOffers() }
-            flow { emit(res.toDto { it.toDto() }) }
+            flow { emit(res) }
         } catch (e: Exception) {
             flow { throw ((e)) }
         }
     }
 
-    override suspend fun getMealOptions(): Flow<List<Section>> {
+    override suspend fun getMealOptions(): Flow<List<OptionsSectionDto>> {
         return try {
             val res = handleRequest { apiService.getMealSections() }
             flow { emit(res.sections) }
@@ -72,30 +77,5 @@ class RestaurantsRepositoryImpl @Inject constructor(private val apiService: Rest
     }
 }
 
-data class Menu(
-    val sections: List<Section>,
-)
-
-data class Section(
-    @SerializedName("id") val id: String,
-//    TODO: create a DTO and a MODEL and change the section type to the enum value
-    @SerializedName("type") val sectionType: String,
-    @SerializedName("title") val sectionTitle: String,
-    @SerializedName("options") val options: List<Option>,
-    @SerializedName("required") val required: Boolean,
-    @SerializedName("currency") val currency: String,
-
-    )
-
-data class Option(
-//    TODO: move this into the models folder
-    @SerializedName("id") val id: String,
-    @SerializedName("option") val optionName: String,
-    @SerializedName("price") val price: Float,
-)
-
-fun <T, R> List<T>.toDto(converter: (T) -> R): List<R> {
-    return map { converter(it) }
-}
 
 class NetworkError(message: String) : Exception(message)

@@ -4,7 +4,6 @@ import android.util.Log.d
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.data.models.UserDetailsModel
 import com.example.domain.use_cases.GetUserFromIdUseCase
 import com.example.welcome.navigation.userIdArgument
 import dagger.hilt.android.lifecycle.HiltViewModel

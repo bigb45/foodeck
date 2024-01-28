@@ -1,12 +1,11 @@
 package com.example.menu_item
 
-import android.util.Log.d
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.common.asResult
-import com.example.data.repositories.Option
-import com.example.data.repositories.Section
+import com.example.data.models.Option
+import com.example.data.models.OptionsSectionDto
 import com.example.domain.use_cases.GetMealOptionsUseCase
 import com.example.menu_item.navigation.menuItemIdArgument
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,7 +28,6 @@ class MenuItemViewModel @Inject constructor(
     private val _optionsState = MutableStateFlow<OptionsState>(OptionsState.Loading)
     private val _baseMealPrice = 21f
     private val _totalPrice = MutableStateFlow(_baseMealPrice)
-    //    a map of "sectionId" and the "Selection" of that section
     private val _radioGroupListState = MutableStateFlow<Map<String, Option?>>(emptyMap())
     private val _checkboxListState = MutableStateFlow<Map<String, List<Option>>>(emptyMap())
 //    TODO: create a list of floats that stores the additional price of each added component
@@ -73,7 +71,6 @@ class MenuItemViewModel @Inject constructor(
             total
         }.sum()
 
-        d("error", "${checkBoxTotal}")
          val total = (_baseMealPrice + radioTotal + checkBoxTotal) * _counter.value
          _totalPrice.value = total
         return total
@@ -130,7 +127,6 @@ class MenuItemViewModel @Inject constructor(
 
                     is com.example.common.Result.Success -> {
                         _optionsState.value = OptionsState.Success(result.data)
-                        generateRadioGroupState(result.data)
                     }
                 }
             }
@@ -145,18 +141,7 @@ class MenuItemViewModel @Inject constructor(
         }
     }
 
-    private fun generateRadioGroupState(data: List<Section>) {
-        val radioGroups = data.filter { it.sectionType == "radio" }
-        val mutableList = _radioGroupListState.value.toMutableMap()
-//        set the radio selection for each section to null
-        radioGroups.forEach { section ->
-            mutableList[section.id] = null
-
-        }
-        _radioGroupListState.value = mutableList
-    }
-
-    private fun getSectionFromId(data: OptionsState.Success, sectionId: String): Section {
+    private fun getSectionFromId(data: OptionsState.Success, sectionId: String): OptionsSectionDto {
         return data.sections.first { it.id == sectionId }
     }
 }

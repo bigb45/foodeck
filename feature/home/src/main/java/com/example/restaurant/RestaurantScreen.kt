@@ -26,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -51,7 +52,7 @@ import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.core.ui.theme.interBold
 import com.example.custom_toolbar.CustomTopAppBarState
 import com.example.custom_toolbar.ToolbarState
-import com.example.data.models.RestaurantDto
+import com.example.data.models.Restaurant
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
@@ -66,6 +67,10 @@ fun RestaurantScreen(
     onItemClick: (String) -> Unit,
 ) {
     val viewModel: RestaurantViewModel = hiltViewModel()
+
+    LaunchedEffect(Unit){
+        viewModel.fetchRestaurantDetails()
+    }
 
 //    make request using viewmodel
     val meals = listOf(
@@ -106,7 +111,7 @@ fun RestaurantScreen(
         ),
     )
 //   data coming from previous page
-    val restaurant = RestaurantDto(
+    val restaurant = Restaurant(
         "test",
         "The Foodeck Shop",
         "Ankara, Golbasi",
@@ -136,7 +141,7 @@ fun RestaurantScreen(
 
 @Composable
 internal fun Restaurant(
-    restaurant: RestaurantDto,
+    restaurant: Restaurant,
     categories: List<Category>,
     onNavigateUp: () -> Unit,
     onItemClick: (String) -> Unit,

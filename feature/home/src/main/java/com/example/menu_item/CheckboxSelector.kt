@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.example.compose.gray2
 import com.example.core.ui.theme.Typography
 import com.example.core.ui.theme.interBold
-import com.example.data.repositories.Option
+import com.example.data.models.Option
 
 @Composable
 fun CheckBoxSelector(

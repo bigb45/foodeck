@@ -4,9 +4,9 @@ package com.example.data.repositories
 import com.example.data.models.SignInAuthResponseModel
 import com.example.data.models.SignupAuthResponseModel
 import com.example.data.models.TokenAuthResponseModel
-import com.example.data.models.UserDetailsModel
-import com.example.data.models.UserSignInModel
-import com.example.data.models.UserSignUpModel
+import com.example.data.models.UserDetails
+import com.example.data.models.UserSignInInfo
+import com.example.data.models.UserSignUpInfo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -20,11 +20,11 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import kotlin.coroutines.resume
 
-
+@Deprecated("Use Custom API instead of Firebase")
 class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : AuthRepository {
     private val db = Firebase.database.reference
 
-    override suspend fun createUser(user: UserSignUpModel): Flow<SignupAuthResponseModel> {
+    override suspend fun createUser(user: UserSignUpInfo): Flow<SignupAuthResponseModel> {
 
         return flow {
             if (checkDuplicatePhoneNumber(user.phoneNumber)) {
@@ -32,8 +32,8 @@ class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : A
             }
             val result =
                 auth.createUserWithEmailAndPassword(user.email, user.password).await()
-            val userData = UserDetailsModel(
-                username = user.username,
+            val userData = UserDetails(
+                name = user.username,
                 userId = result.user?.uid ?: "test_id",
                 email = user.email,
                 phoneNumber = user.phoneNumber,
@@ -50,7 +50,7 @@ class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : A
         override val message: String = "The phone number is already in use."
     }
 
-    override suspend fun addUserInformation(userData: UserDetailsModel) {
+    override suspend fun addUserInformation(userData: UserDetails) {
         db.child("users").child(userData.userId ?: "error").setValue(userData)
     }
 
@@ -58,7 +58,7 @@ class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : A
         TODO("Not yet implemented")
     }
 
-    override suspend fun signUserIn(user: UserSignInModel): Flow<SignInAuthResponseModel> {
+    override suspend fun signUserIn(user: UserSignInInfo): Flow<SignInAuthResponseModel> {
         return flow {
             val result = auth.signInWithEmailAndPassword(user.email, user.password).await()
 
@@ -93,12 +93,12 @@ class AuthRepositoryImpl @Inject constructor(private val auth: FirebaseAuth) : A
         }
     }
 
-    override suspend fun getUserById(id: String): UserDetailsModel {
+    override suspend fun getUserById(id: String): UserDetails {
         val dbUser = db.child("users").child(id).get().await()
         val userData = with(dbUser) {
-            UserDetailsModel(
+            UserDetails(
                 userId = child("userId").value.toString(),
-                username = child("username").value.toString(),
+                name = child("username").value.toString(),
                 phoneNumber = child("phoneNumber").value.toString(),
                 email = child("email").value.toString(),
                 profilePictureUrl = child("profilePictureUrl").value.toString(),

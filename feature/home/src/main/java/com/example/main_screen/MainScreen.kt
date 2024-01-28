@@ -40,7 +40,6 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Badge
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -93,8 +92,8 @@ import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.core.ui.theme.Typography
 import com.example.core.ui.theme.inter
 import com.example.core.ui.theme.interBold
-import com.example.data.models.OffersDto
-import com.example.data.models.RestaurantDto
+import com.example.data.models.Offer
+import com.example.data.models.Restaurant
 import com.example.fooddeliver.home.R
 import kotlin.math.absoluteValue
 
@@ -190,8 +189,8 @@ fun MainScreen(
 
 @Composable
 fun Home(
-    restaurants: List<RestaurantDto>,
-    offers: List<OffersDto>,
+    restaurants: List<Restaurant>,
+    offers: List<Offer>,
     onRestaurantClick: (String) -> Unit,
 ) {
 
@@ -357,7 +356,7 @@ private fun BentoSection(modifier: Modifier = Modifier) {
 @Composable
 fun DealsSection(
     modifier: Modifier = Modifier,
-    restaurants: List<RestaurantDto>,
+    restaurants: List<Restaurant>,
     onRestaurantClick: (String) -> Unit,
 ) {
     Column(
@@ -559,7 +558,7 @@ private fun BadgedFab(number: Int, onClick: () -> Unit) {
 @OptIn(ExperimentalFoundationApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 // TODO: pass a callback to know which item was clicked
-fun CarrouselCards(modifier: Modifier = Modifier, items: List<OffersDto>) {
+fun CarrouselCards(modifier: Modifier = Modifier, items: List<Offer>) {
 
     val pagerState = rememberPagerState {
         items.size
@@ -679,7 +678,7 @@ private fun lerp(start: Float, stop: Float, fraction: Float): Float {
 fun RestaurantCard(
     modifier: Modifier = Modifier,
     boxModifier: Modifier = Modifier,
-    restaurant: RestaurantDto = RestaurantDto(),
+    restaurant: Restaurant = Restaurant(),
     onRestaurantClick: ((String) -> Unit)? = null,
 ) {
     Column(

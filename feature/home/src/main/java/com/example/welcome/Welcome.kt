@@ -45,7 +45,7 @@ fun Welcome(onContinueClick: () -> Unit, onSignOut: () -> Unit) {
 
                 )
                 Text(stringResource(R.string.signed_in_successfully), style = MaterialTheme.typography.titleLarge)
-                Text("Signed in as ${(uiState as WelcomeScreenUiState.Success).user.username}")
+                Text("Signed in as ${(uiState as WelcomeScreenUiState.Success).user.name}")
                 PrimaryButton(
                     text = "Continue to Foodeck", enabled = true, onClick = onContinueClick
                 )

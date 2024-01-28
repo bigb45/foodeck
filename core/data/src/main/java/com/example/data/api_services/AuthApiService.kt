@@ -1,7 +1,7 @@
 package com.example.data.api_services
 
 import com.example.data.models.TokenDto
-import com.example.data.models.RefreshTokenDto
+import com.example.data.models.RefreshToken
 import com.example.data.models.AuthenticationResponseDto
 import com.example.data.repositories.NewUserCredentials
 import com.example.data.repositories.UserCredentials
@@ -21,7 +21,7 @@ interface AuthApiService {
     suspend fun createUser(@Body createUserRequest: NewUserCredentials): Response<AuthenticationResponseDto>
 
     @POST("token")
-    suspend fun getAccessToken(@Body refreshToken: TokenDto): Response<RefreshTokenDto>
+    suspend fun getAccessToken(@Body refreshToken: TokenDto): Response<RefreshToken>
 
     @POST("login_with_token/{provider}")
     suspend fun authenticateWithGoogleToken(@Path("provider") provider: String, @Body providerTokenDto: TokenDto): Response<AuthenticationResponseDto>

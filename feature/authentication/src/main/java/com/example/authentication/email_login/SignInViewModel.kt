@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.authentication.AuthResult
 import com.example.common.Result
 import com.example.data.models.FieldError
-import com.example.data.models.UserSignInModel
+import com.example.data.models.UserSignInInfo
 import com.example.authentication.AuthEvent
 import com.example.common.asResult
 import com.example.data.util.TextFieldMessages
@@ -20,9 +20,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.example.data.models.InvalidCredentialsException
 import com.example.data.models.SignInAuthResponseModel
-import com.example.data.models.UserDetailsModel
+import com.example.data.models.UserDetails
 import com.example.data.models.UserNotFoundException
-import com.firebase.ui.auth.ui.idp.SingleSignInActivity
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
@@ -56,7 +55,7 @@ class SignInViewModel @Inject constructor(
                 if (validateFields()) {
                     _authResult.value = AuthResult.Loading
                     val userInfo = with(_uiState.value) {
-                        UserSignInModel(
+                        UserSignInInfo(
                             email = email, password = password
                         )
                     }
@@ -69,25 +68,10 @@ class SignInViewModel @Inject constructor(
         }
     }
 
-    private fun signIn(user: UserSignInModel) {
+    private fun signIn(user: UserSignInInfo) {
 //        TODO: use stateIn
         viewModelScope.launch {
             signUserInUseCase(user).asResult().collect { result ->
-//                    LoginAuthResponseModel.InternalServerError -> d("error", "server is down")
-//                    LoginAuthResponseModel.InvalidCredentials -> d("error", "wrong password")
-//                    LoginAuthResponseModel.Loading -> {
-//                        _authResult.value = AuthResult.Loading
-//                    }
-//                    is LoginAuthResponseModel.LoginFailure -> d("error", "user not found")
-//                    is LoginAuthResponseModel.LoginSuccess -> {
-//                        preferencesManager.writeToken(R.string.access_token, result.tokens.accessToken)
-////                        tokenRepository.getAccessToken()
-//                        _authResult.value = AuthResult.Success(UserData(userId = result.tokens.userId))
-//                    }
-//                    LoginAuthResponseModel.UnknownError -> d("error", "unknown error")
-//                    LoginAuthResponseModel.UserNotFound -> {
-//                        d("error", "user not found")
-//                    }
                 when (result) {
                     is Result.Error -> {
                         _authResult.value = AuthResult.Error(result.exception?.message ?: "Unknown error")
@@ -99,7 +83,7 @@ class SignInViewModel @Inject constructor(
                         d("error", "loading")
                     }
                     is Result.Success -> {
-                        _authResult.value = AuthResult.Success(UserDetailsModel(userId = (result.data as SignInAuthResponseModel.SignInSuccess).tokens.userId))
+                        _authResult.value = AuthResult.Success(UserDetails(userId = (result.data as SignInAuthResponseModel.SignInSuccess).tokens.userId))
                         d("error", "user data ${(result.data as SignInAuthResponseModel.SignInSuccess).tokens.userId}")
                     }
                 }

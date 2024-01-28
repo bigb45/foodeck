@@ -10,12 +10,11 @@ import com.example.data.models.SignupAuthResponseModel
 import com.example.data.models.TokenAuthResponseModel
 import com.example.data.models.TokenDto
 import com.example.data.models.UnknownException
-import com.example.data.models.UserDetailsModel
+import com.example.data.models.UserDetails
 import com.example.data.models.UserNotFoundException
-import com.example.data.models.UserSignInModel
-import com.example.data.models.UserSignUpModel
+import com.example.data.models.UserSignInInfo
+import com.example.data.models.UserSignUpInfo
 import com.example.data.util.AccessTokenLocalDataSource
-import com.example.data.util.PreferencesManager
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -23,7 +22,7 @@ import javax.inject.Inject
 
 class AuthRepositoryImplCustomApi @Inject constructor(private val authService: AuthApiService, private val tokenDataSource: AccessTokenLocalDataSource) :
     AuthRepository {
-    override suspend fun createUser(user: UserSignUpModel): Flow<SignupAuthResponseModel> {
+    override suspend fun createUser(user: UserSignUpInfo): Flow<SignupAuthResponseModel> {
         val credentials =
             NewUserCredentials(user.username, user.email, user.password)
         return try {
@@ -55,7 +54,7 @@ class AuthRepositoryImplCustomApi @Inject constructor(private val authService: A
 
 
 
-    override suspend fun signUserIn(user: UserSignInModel): Flow<SignInAuthResponseModel> {
+    override suspend fun signUserIn(user: UserSignInInfo): Flow<SignInAuthResponseModel> {
         val userCredentials = UserCredentials(email = user.email, password = user.password)
         return try {
             flow {
@@ -140,11 +139,11 @@ class AuthRepositoryImplCustomApi @Inject constructor(private val authService: A
         TODO("Not yet implemented")
     }
 
-    override suspend fun getUserById(id: String): UserDetailsModel {
+    override suspend fun getUserById(id: String): UserDetails {
         TODO("Not yet implemented")
     }
 
-    override suspend fun addUserInformation(userData: UserDetailsModel) {
+    override suspend fun addUserInformation(userData: UserDetails) {
 //        TODO: get validation token from google, send it to api and handle request in backend
         d("error", userData.toString())
     }

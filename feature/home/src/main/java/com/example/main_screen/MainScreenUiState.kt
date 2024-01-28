@@ -1,12 +1,12 @@
 package com.example.main_screen
 
-import com.example.data.models.OffersDto
-import com.example.data.models.RestaurantDto
+import com.example.data.models.Offer
+import com.example.data.models.Restaurant
 
 sealed class MainScreenUiState {
     data class Success(
-        val restaurants: List<RestaurantDto>,
-        val offers: List<OffersDto>,
+        val restaurants: List<Restaurant>,
+        val offers: List<Offer>,
 
         ): MainScreenUiState()
 
