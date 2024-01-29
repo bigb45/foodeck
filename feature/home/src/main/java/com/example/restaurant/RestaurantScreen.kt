@@ -27,6 +27,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -47,12 +48,14 @@ import com.ahmadhamwi.tabsync_compose.lazyListTabSync
 import com.example.common.AnimatedTabs
 import com.example.common.Category
 import com.example.common.CollapsingToolbar
+import com.example.common.LoadingIndicator
 import com.example.compose.gray6
 import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.core.ui.theme.interBold
 import com.example.custom_toolbar.CustomTopAppBarState
 import com.example.custom_toolbar.ToolbarState
 import com.example.data.models.Restaurant
+import com.example.data.models.RestaurantMenu
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
@@ -67,50 +70,24 @@ fun RestaurantScreen(
     onItemClick: (String) -> Unit,
 ) {
     val viewModel: RestaurantViewModel = hiltViewModel()
-
-    LaunchedEffect(Unit){
+    val items = viewModel.restaurantMenus.collectAsState()
+    LaunchedEffect(Unit) {
         viewModel.fetchRestaurantDetails()
     }
+    val placeHolder = listOf(Category(
+        categoryName = "placeHolder", items = listOf(
+            Meal(
+                id = "1",
+                name = "Meal1",
+                imageUrl = null,
+                contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
+                price = "99.99",
+                currency = "$"
+            )
+        )
+    ))
 
-//    make request using viewmodel
-    val meals = listOf(
-        Meal(
-            id = "1",
-            name = "Meal1",
-            imageUrl = null,
-            contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
-            price = "99.99",
-            currency = "$"
-        ),
-        Meal(
-            id = "2",
-            name = "Meal2",
-            imageUrl = null,
-            contents = "1 regular burger with croquette and hot cocoa",
-            price = "99.99",
-            currency = "$"
-        ),
-        Meal(
-            id = "3",
-            name = "Meal3",
-            imageUrl = null,
-            contents = "1 regular burger with croquette and hot cocoa",
-            price = "99.99",
-            currency = "$"
-        ),
-    )
-    val categories = listOf(
-        Category(categoryName = "Popular", items = meals),
-        Category(categoryName = "Wraps", items = meals),
-        Category(categoryName = "Shwarma", items = meals),
-        Category(categoryName = "Drinks", items = meals),
-        Category(categoryName = "Sweet", items = meals),
-        Category(categoryName = "Extra", items = meals),
-        Category(
-            categoryName = "Firindan lezzetler", items = meals
-        ),
-    )
-//   data coming from previous page
+// TODO: make this an api call
     val restaurant = Restaurant(
         "test",
         "The Foodeck Shop",
@@ -124,16 +101,47 @@ fun RestaurantScreen(
     FoodDeliveryTheme {
         Scaffold {
             it
-            Restaurant(
-                restaurant = restaurant,
-                categories = categories,
-                onNavigateUp = onNavigateUp,
-                onItemClick = onItemClick,
-                onShareClick = {},
-                onMoreClick = {},
-                onFavoriteClick = {},
-                onSearchClick = {}
-            )
+            when (items.value) {
+                is RestaurantState.Success -> {
+                    //    This is bad, don't do this in the UI
+                    var categories =
+                        (items.value as RestaurantState.Success<List<RestaurantMenu>>).data.map { section ->
+                            Category(categoryName = section.sectionTitle,
+                                items = section.storeItems.map { storeItem ->
+                                    Meal(
+                                        id = storeItem.itemId,
+                                        name = storeItem.itemName,
+                                        imageUrl = storeItem.coverImageUrl,
+                                        contents = storeItem.description,
+                                        price = storeItem.price.toString(),
+                                        currency = "$"
+                                    )
+                                })
+                        }
+//                    crash prevention measures
+                    if (categories.isEmpty()){
+                        categories = placeHolder
+                    }
+                    Restaurant(restaurant = restaurant,
+                            categories = categories,
+                            onNavigateUp = onNavigateUp,
+                            onItemClick = onItemClick,
+                            onShareClick = { viewModel.fetchRestaurantDetails() },
+                            onMoreClick = {},
+                            onFavoriteClick = {},
+                            onSearchClick = {})
+                    }
+
+
+                is RestaurantState.Loading -> {
+                    LoadingIndicator()
+                }
+
+                RestaurantState.Error -> {
+                    Text("error")
+                }
+            }
+
         }
     }
 }
@@ -162,22 +170,18 @@ internal fun Restaurant(
     val lazyListState = rememberLazyListState()
 
     val (selectedTabIndex, setSelectedTabIndex) = lazyListTabSync(
-        syncedIndices = categories.indices.toList(),
-        lazyListState = lazyListState
+        syncedIndices = categories.indices.toList(), lazyListState = lazyListState
     )
 
     val nestedScrollConnection = rememberCustomNestedConnection(
-        lazyListState = lazyListState,
-        toolbarState = toolbarState,
-        scope = scope
+        lazyListState = lazyListState, toolbarState = toolbarState, scope = scope
     )
     Box(
         modifier = Modifier.nestedScroll(nestedScrollConnection)
     ) {
 
         Meals(
-            modifier = Modifier
-                .graphicsLayer {
+            modifier = Modifier.graphicsLayer {
                     translationY =
                         toolbarState.height + toolbarState.offset + TAB_LAYOUT_HEIGHT.toPx() + (100.dp.toPx() * toolbarState.progress)
                 },
@@ -199,15 +203,13 @@ internal fun Restaurant(
             preContent = {
                 RestaurantInfo(modifier = Modifier
 
-                    .height(with(LocalDensity.current) { (toolbarState.progress * 100).dp })
-                    .graphicsLayer { translationY = toolbarState.offset }
-                    ,
-                    restaurant = restaurant)
+                    .height((toolbarState.progress * 100).dp)
+                    .graphicsLayer { translationY = toolbarState.offset },
+                    restaurant = restaurant
+                )
             },
             expandedActions = {
-                IconButton(onClick =
-                { onFavoriteClick(restaurant.restaurantId) }
-                ) {
+                IconButton(onClick = { onFavoriteClick(restaurant.restaurantId) }) {
                     Icon(
                         imageVector = Icons.Outlined.FavoriteBorder,
                         contentDescription = "Like restaurant",
@@ -236,16 +238,16 @@ internal fun Restaurant(
                 }
             },
         ) {
-            Column {
-                AnimatedTabs(
-                    modifier = Modifier
-                        .graphicsLayer { translationY = toolbarState.offset },
-                    categories = categories,
-                    selectedTabIndex = selectedTabIndex,
-                    setSelectedTabIndex = setSelectedTabIndex
-                )
-            }
+
+            AnimatedTabs(
+                modifier = Modifier.graphicsLayer { translationY = toolbarState.offset },
+
+                categories = categories,
+                selectedTabIndex = selectedTabIndex,
+                setSelectedTabIndex = setSelectedTabIndex
+            )
         }
+
     }
 }
 
@@ -260,7 +262,9 @@ fun Meals(
 ) {
     LazyColumn(
         contentPadding = contentPadding,
-        modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp), state = lazyListState
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        state = lazyListState
     ) {
         items(categories) { category ->
             CategorySection(category = category, onItemClick = onItemClick)
