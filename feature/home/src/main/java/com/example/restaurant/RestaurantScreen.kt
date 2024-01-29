@@ -20,14 +20,20 @@ import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -49,6 +55,7 @@ import com.example.common.AnimatedTabs
 import com.example.common.Category
 import com.example.common.CollapsingToolbar
 import com.example.common.LoadingIndicator
+import com.example.common.log
 import com.example.compose.gray6
 import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.core.ui.theme.interBold
@@ -58,34 +65,46 @@ import com.example.data.models.Restaurant
 import com.example.data.models.RestaurantMenu
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 val MIN_TOOLBAR_HEIGHT = 68.dp
 val MAX_TOOLBAR_HEIGHT = 176.dp
 val TAB_LAYOUT_HEIGHT = 40.dp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RestaurantScreen(
     onNavigateUp: () -> Unit,
     onItemClick: (String) -> Unit,
 ) {
+
+    val scope = rememberCoroutineScope()
+
+    val isDialogOpen = remember { mutableStateOf(false) }
+    val isSheetOpen = remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
     val viewModel: RestaurantViewModel = hiltViewModel()
     val items = viewModel.restaurantMenus.collectAsState()
     LaunchedEffect(Unit) {
         viewModel.fetchRestaurantDetails()
     }
-    val placeHolder = listOf(Category(
-        categoryName = "placeHolder", items = listOf(
-            Meal(
-                id = "1",
-                name = "Meal1",
-                imageUrl = null,
-                contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
-                price = "99.99",
-                currency = "$"
+
+    val placeHolder = listOf(
+        Category(
+            categoryName = "placeHolder", items = listOf(
+                Meal(
+                    id = "1",
+                    name = "Meal1",
+                    imageUrl = null,
+                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
+                    price = "99.99",
+                    currency = "$"
+                )
             )
         )
-    ))
+    )
+
 
 // TODO: make this an api call
     val restaurant = Restaurant(
@@ -119,18 +138,66 @@ fun RestaurantScreen(
                                 })
                         }
 //                    crash prevention measures
-                    if (categories.isEmpty()){
+                    if (categories.isEmpty()) {
                         categories = placeHolder
                     }
-                    Restaurant(restaurant = restaurant,
-                            categories = categories,
-                            onNavigateUp = onNavigateUp,
-                            onItemClick = onItemClick,
-                            onShareClick = { viewModel.fetchRestaurantDetails() },
-                            onMoreClick = {},
-                            onFavoriteClick = {},
-                            onSearchClick = {})
+                    when {
+                        isDialogOpen.value -> {
+                            AlertDialog(title = { Text("Delivery Time") },
+                                text = { Text("This restaurant will take approximately ${40} minutes to deliver.") },
+                                onDismissRequest = { isDialogOpen.value = false },
+                                confirmButton = {
+                                    TextButton(onClick = {
+                                        isDialogOpen.value = false
+                                        log("confirmed dialog")
+                                    }) {
+                                        Text("Ok")
+                                    }
+                                })
+                        }
+
+
+
                     }
+                        if(isSheetOpen.value){
+                            ModalBottomSheet(
+                                onDismissRequest = {
+                                    log("Sheet dismissed")
+                                    isSheetOpen.value = false
+                                },
+                                sheetState = sheetState
+                            ) {
+                                LazyColumn {
+                                    items(100) { index ->
+                                        Text(
+                                            modifier = Modifier.padding(
+                                                horizontal = 10.dp,
+                                                vertical = 8.dp
+                                            ),
+                                            text = "This is ${index}th modal bottom sheet item"
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                    Restaurant(restaurant = restaurant,
+                        categories = categories,
+                        onNavigateUp = onNavigateUp,
+                        onItemClick = onItemClick,
+                        onDeliveryTimeClick = {
+                            isDialogOpen.value = true
+                        },
+                        onRatingsClick = {
+                            isSheetOpen.value = true
+                            scope.launch{
+                                sheetState.expand()
+
+                            }
+                        }
+
+                    )
+                }
 
 
                 is RestaurantState.Loading -> {
@@ -151,14 +218,17 @@ fun RestaurantScreen(
 internal fun Restaurant(
     restaurant: Restaurant,
     categories: List<Category>,
-    onNavigateUp: () -> Unit,
-    onItemClick: (String) -> Unit,
-    onShareClick: () -> Unit,
-    onMoreClick: () -> Unit,
-    onFavoriteClick: (String) -> Unit,
-    onSearchClick: () -> Unit,
-) {
+    onNavigateUp: () -> Unit = {},
+    onItemClick: (String) -> Unit = {},
+    onShareClick: () -> Unit = {},
+    onMoreClick: () -> Unit = {},
+    onFavoriteClick: (String) -> Unit = {},
+    onSearchClick: () -> Unit = {},
+    onRestaurantLocationClick: () -> Unit = {},
+    onDeliveryTimeClick: () -> Unit = {},
+    onRatingsClick: () -> Unit = {},
 
+    ) {
 
     val toolbarRange = with(LocalDensity.current) {
         MIN_TOOLBAR_HEIGHT.roundToPx()..MAX_TOOLBAR_HEIGHT.roundToPx()
@@ -182,9 +252,9 @@ internal fun Restaurant(
 
         Meals(
             modifier = Modifier.graphicsLayer {
-                    translationY =
-                        toolbarState.height + toolbarState.offset + TAB_LAYOUT_HEIGHT.toPx() + (100.dp.toPx() * toolbarState.progress)
-                },
+                translationY =
+                    toolbarState.height + toolbarState.offset + TAB_LAYOUT_HEIGHT.toPx() + (100.dp.toPx() * toolbarState.progress)
+            },
             contentPadding = PaddingValues(bottom = TAB_LAYOUT_HEIGHT),
             categories = categories,
             lazyListState = lazyListState,
@@ -201,11 +271,15 @@ internal fun Restaurant(
             progress = toolbarState.progress,
             onNavigateUp = onNavigateUp,
             preContent = {
-                RestaurantInfo(modifier = Modifier
+                RestaurantInfo(
+                    modifier = Modifier
 
-                    .height((toolbarState.progress * 100).dp)
-                    .graphicsLayer { translationY = toolbarState.offset },
-                    restaurant = restaurant
+                        .height((toolbarState.progress * 100).dp)
+                        .graphicsLayer { translationY = toolbarState.offset },
+                    restaurant = restaurant,
+                    onRatingsClick = onRatingsClick,
+                    onDeliveryTimeClick = onDeliveryTimeClick,
+                    onRestaurantLocationClick = onRestaurantLocationClick
                 )
             },
             expandedActions = {

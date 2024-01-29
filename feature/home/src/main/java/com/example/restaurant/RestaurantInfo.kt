@@ -16,6 +16,7 @@ import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.rounded.StarBorder
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +31,9 @@ import com.example.data.models.Restaurant
 fun RestaurantInfo(
     modifier: Modifier = Modifier,
     restaurant: Restaurant,
+    onRatingsClick: () -> Unit,
+    onDeliveryTimeClick: () -> Unit,
+    onRestaurantLocationClick: () -> Unit
 ) {
     Box(
         modifier = modifier
@@ -49,29 +53,37 @@ fun RestaurantInfo(
 
         ) {
             InfoItem(Modifier
-                .weight(1f)) {
-                Icon(
-                    imageVector = Icons.Rounded.StarBorder,
-                    contentDescription = "Restaurant rating",
-                    modifier = Modifier
-                        .size(24.dp)
-                )
+                .weight(1f),
+                onClick = { onRatingsClick() }) {
+                    Icon(
+                        imageVector = Icons.Rounded.StarBorder,
+                        contentDescription = "Restaurant rating",
+                        modifier = Modifier
+                            .size(24.dp)
+                    )
                 Text(restaurant.restaurantRating)
             }
 
             InfoItem(Modifier
-                .weight(1f)){
-                Icon(
-                    imageVector = Icons.Outlined.AccessTime, contentDescription = "Time to deliver",
-                )
+                .weight(1f),
+                onClick = { onDeliveryTimeClick() }){
+
+                    Icon(
+                        imageVector = Icons.Outlined.AccessTime,
+                        contentDescription = "Time to deliver",
+                    )
+
                 Text(restaurant.timeToDeliver)
             }
 
             InfoItem(Modifier
-                .weight(1f)){
-                Icon(
-                    imageVector = Icons.Outlined.LocationOn, contentDescription = "Distance",
-                )
+                .weight(1f),
+                onClick = { onRestaurantLocationClick() }
+            ){
+                    Icon(
+                        imageVector = Icons.Outlined.LocationOn, contentDescription = "Distance",
+                    )
+
                 Text("1.4km")
             }
         }
@@ -82,12 +94,13 @@ fun RestaurantInfo(
 @Composable
 fun InfoItem(
     modifier: Modifier = Modifier,
+    onClick: () -> Unit,
     content: @Composable () -> Unit
 ) {
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
-            .clickable { }
+            .clickable{onClick()}
             .height(80.dp)
         ,
         horizontalAlignment = Alignment.CenterHorizontally,
