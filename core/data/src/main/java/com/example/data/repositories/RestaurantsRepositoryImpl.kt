@@ -4,10 +4,10 @@ import android.security.keystore.UserNotAuthenticatedException
 import android.util.Log.d
 import com.example.data.api_services.RestaurantsApiService
 import com.example.data.models.InternalServerException
-import com.example.data.models.Meal
 import com.example.data.models.Offer
-import com.example.data.models.Restaurant
 import com.example.data.models.OptionsSectionDto
+import com.example.data.models.Restaurant
+import com.example.data.models.RestaurantMenu
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.Response
@@ -25,9 +25,15 @@ class RestaurantsRepositoryImpl @Inject constructor(private val apiService: Rest
         }
     }
 
-    override suspend fun getRestaurantMeals(): Flow<List<Meal>> {
-        TODO("Not yet implemented")
+    override suspend fun getRestaurantMeals(restaurantId: String): Flow<List<RestaurantMenu>> {
+        return try {
+            val res = handleRequest { apiService.getMealsByRestaurantId(restaurantId) }
+            flow { emit(res) }
+        } catch (e: Exception) {
+            flow { throw (e) }
+        }
     }
+
 
     override suspend fun getOffers(): Flow<List<Offer>> {
         return try {
@@ -37,6 +43,7 @@ class RestaurantsRepositoryImpl @Inject constructor(private val apiService: Rest
             flow { throw ((e)) }
         }
     }
+
 
     override suspend fun getMealOptions(): Flow<List<OptionsSectionDto>> {
         return try {
@@ -55,7 +62,7 @@ class RestaurantsRepositoryImpl @Inject constructor(private val apiService: Rest
 
             return when {
                 res.isSuccessful -> {
-//                    d("error", "${res.body()}")
+                    d("error", "${res.body()}")
                     res.body()!!
                 }
 
