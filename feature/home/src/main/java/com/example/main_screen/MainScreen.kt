@@ -113,7 +113,7 @@ fun MainScreen(
 
     if (pullToRefreshState.isRefreshing) {
         LaunchedEffect(true) {
-            viewModel.load()
+            viewModel.reload()
             pullToRefreshState.endRefresh()
         }
     }
@@ -127,7 +127,7 @@ fun MainScreen(
                 scrollBehavior = scrollBehavior
             )
         }, floatingActionButton = {
-            BadgedFab(number) { onRestaurantClick("hello") }
+            BadgedFab(number) { onRestaurantClick("8") }
         }, bottomBar = {
             BottomNavBar()
         }

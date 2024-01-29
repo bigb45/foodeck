@@ -104,5 +104,6 @@ data class Meal(
     val imageUrl: String?,
     val contents: String,
     val price: String,
+//    TODO: make [currency] a global variable
     val currency: String,
 )

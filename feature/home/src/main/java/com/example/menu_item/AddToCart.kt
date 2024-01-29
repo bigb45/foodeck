@@ -30,7 +30,6 @@ fun CartBottomBar(
     onAddToCartClick: () -> Unit,
     totalPrice: Float,
 ) {
-    d("error", "${totalPrice}")
     Row(
         modifier = modifier
             .fillMaxWidth()

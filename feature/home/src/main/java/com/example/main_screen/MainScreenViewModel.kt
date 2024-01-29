@@ -1,12 +1,15 @@
 package com.example.main_screen
 
+import android.util.Log.d
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.common.listAsResult
 import com.example.common.Result
+import com.example.data.models.Restaurant
 import com.example.domain.use_cases.GetAllRestaurantsUseCase
 import com.example.domain.use_cases.GetOffersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -25,7 +28,7 @@ class MainScreenViewModel @Inject constructor(
     init {
         fetchRestaurantData()
     }
-    fun load(){
+    fun reload(){
 
         fetchRestaurantData()
     }
@@ -47,6 +50,8 @@ class MainScreenViewModel @Inject constructor(
                         _state.value = MainScreenUiState.Loading
                     }
                     restaurantsResult is Result.Success && offersResult is Result.Success -> {
+                        d("error", "${restaurantsResult.data}")
+
                         _state.value = MainScreenUiState.Success(
                             restaurants = restaurantsResult.data,
                             offers = offersResult.data

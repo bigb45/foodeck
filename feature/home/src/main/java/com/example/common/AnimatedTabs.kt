@@ -10,10 +10,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.compose.gray2
 import com.example.core.ui.theme.interBold
 import com.example.restaurant.Meal
 
+// TODO: remove this function, it is redundant
 @Composable
 fun AnimatedTabs(
     modifier: Modifier = Modifier,
@@ -23,9 +25,9 @@ fun AnimatedTabs(
 ) {
 
     TabSync(
-        modifier = modifier.fillMaxWidth(),
-        categories,
-        selectedTabIndex
+        modifier = modifier,
+        categories = categories,
+        selectedTabIndex = selectedTabIndex
     ) { index, _ -> setSelectedTabIndex(index) }
 
 }
@@ -47,6 +49,7 @@ internal fun TabSync(
                     Text(
                         text = category.categoryName,
                         style = TextStyle(
+//                            fontSize = 18.sp,
                             color = if(index == selectedTabIndex) colorScheme.primary else gray2,
                             fontFamily = interBold
                         )

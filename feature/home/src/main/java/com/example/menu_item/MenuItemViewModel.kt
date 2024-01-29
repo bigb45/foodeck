@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.common.asResult
+import com.example.common.Result
 import com.example.data.models.Option
 import com.example.data.models.OptionsSectionDto
 import com.example.domain.use_cases.GetMealOptionsUseCase
@@ -90,6 +91,7 @@ class MenuItemViewModel @Inject constructor(
     fun onCheckBoxSelected(key: String, newSelection: Option, isSelected: Boolean) {
         val mutableMap = _checkboxListState.value.toMutableMap()
         val mutableList =  (mutableMap[key] ?: emptyList()).toMutableSet()
+
         if(isSelected){
             mutableList.add(newSelection)
         }else{
@@ -117,17 +119,19 @@ class MenuItemViewModel @Inject constructor(
         viewModelScope.launch {
             getMealOptions().asResult().collect { result ->
                 when (result) {
-                    is com.example.common.Result.Error -> {
+                    is Result.Error -> {
                         _optionsState.value = OptionsState.Error(result.exception?.message)
                     }
 
-                    com.example.common.Result.Loading -> {
+                    Result.Loading -> {
                         _optionsState.value = OptionsState.Loading
                     }
 
-                    is com.example.common.Result.Success -> {
+                    is Result.Success -> {
                         _optionsState.value = OptionsState.Success(result.data)
                     }
+
+
                 }
             }
         }
