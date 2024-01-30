@@ -89,7 +89,6 @@ dependencies {
     kapt(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation)
 
-
     implementation(libs.androidx.compose.material)
 
     implementation("com.github.bumptech.glide:compose:1.0.0-beta01")

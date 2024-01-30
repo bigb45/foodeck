@@ -2,6 +2,7 @@ package com.example.data.di
 
 import com.example.common.Constants
 import com.example.data.api_services.RestaurantsApiService
+import com.example.data.local.database.Database
 import com.example.data.repositories.RestaurantsRepository
 import com.example.data.repositories.RestaurantsRepositoryImpl
 import com.google.gson.GsonBuilder
@@ -19,8 +20,8 @@ object RestaurantModule {
 
     @Provides
     @Singleton
-    fun provideRestaurantsRepository(apiService: RestaurantsApiService): RestaurantsRepository{
-        return RestaurantsRepositoryImpl(apiService)
+    fun provideRestaurantsRepository(apiService: RestaurantsApiService, database: Database): RestaurantsRepository{
+        return RestaurantsRepositoryImpl(apiService, database)
     }
 
     @Provides

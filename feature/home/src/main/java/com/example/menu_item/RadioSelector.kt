@@ -87,6 +87,6 @@ data class RadioSelectorData(
     val id: String,
     val title: String,
     val options: List<Option>,
-    val currency: String,
+    val currency: String? = "$",
     val required: Boolean,
 )

@@ -8,7 +8,10 @@ import com.example.common.Result
 import com.example.data.models.Restaurant
 import com.example.domain.use_cases.GetAllRestaurantsUseCase
 import com.example.domain.use_cases.GetOffersUseCase
+import com.example.domain.use_cases.TestUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +23,7 @@ import javax.inject.Inject
 class MainScreenViewModel @Inject constructor(
     private val getRestaurants: GetAllRestaurantsUseCase,
     private val getOffers: GetOffersUseCase,
+    private val test: TestUseCase,
 ) : ViewModel() {
     private val _state: MutableStateFlow<MainScreenUiState> =
         MutableStateFlow(MainScreenUiState.Loading)
@@ -27,10 +31,13 @@ class MainScreenViewModel @Inject constructor(
 
     init {
         fetchRestaurantData()
+
     }
     fun reload(){
-
-        fetchRestaurantData()
+//        fetchRestaurantData()
+        CoroutineScope(IO).launch {
+            test()
+        }
     }
     private fun fetchRestaurantData() {
         _state.value = MainScreenUiState.Loading

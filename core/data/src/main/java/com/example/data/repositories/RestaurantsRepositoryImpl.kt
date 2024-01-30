@@ -2,7 +2,11 @@ package com.example.data.repositories
 
 import android.security.keystore.UserNotAuthenticatedException
 import android.util.Log.d
+import androidx.room.RoomDatabase
+import com.example.common.log
 import com.example.data.api_services.RestaurantsApiService
+import com.example.data.entities.UserTest
+import com.example.data.local.database.Database
 import com.example.data.models.InternalServerException
 import com.example.data.models.Offer
 import com.example.data.models.OptionsSectionDto
@@ -14,8 +18,9 @@ import retrofit2.Response
 import java.io.IOException
 import javax.inject.Inject
 
-class RestaurantsRepositoryImpl @Inject constructor(private val apiService: RestaurantsApiService) :
+class RestaurantsRepositoryImpl @Inject constructor(private val apiService: RestaurantsApiService, roomDatabase: Database) :
     RestaurantsRepository {
+    private val userDao = roomDatabase.userDao()
     override suspend fun getRestaurants(): Flow<List<Restaurant>> {
         return try {
             val res = handleRequest { apiService.getAllRestaurants() }
@@ -44,10 +49,21 @@ class RestaurantsRepositoryImpl @Inject constructor(private val apiService: Rest
         }
     }
 
+    override suspend fun saveUserOrder(): Boolean {
+        val queryResult = userDao.getAll()
+        log(queryResult.toString())
+//        userDao.insertMohammed(UserTest("1", "Mohammed", "Natour"))
 
-    override suspend fun getMealOptions(): Flow<List<OptionsSectionDto>> {
+        return false
+    }
+
+
+    override suspend fun getMealOptions(restaurantId: String, menuId: String): Flow<List<OptionsSectionDto>> {
         return try {
-            val res = handleRequest { apiService.getMealSections() }
+            val res = handleRequest { apiService.getMealSections(
+                restaurantId = restaurantId,
+                menuId = menuId
+            ) }
             flow { emit(res.sections) }
         } catch (e: Exception) {
             d("error", "${e.message}")

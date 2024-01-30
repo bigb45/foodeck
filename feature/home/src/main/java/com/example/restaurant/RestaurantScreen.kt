@@ -94,7 +94,7 @@ fun RestaurantScreen(
         Category(
             categoryName = "placeHolder", items = listOf(
                 Meal(
-                    id = "1",
+                    id = "99",
                     name = "Meal1",
                     imageUrl = null,
                     contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
@@ -155,8 +155,6 @@ fun RestaurantScreen(
                                     }
                                 })
                         }
-
-
 
                     }
                         if(isSheetOpen.value){

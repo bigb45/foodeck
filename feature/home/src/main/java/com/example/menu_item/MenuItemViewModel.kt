@@ -5,10 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.common.asResult
 import com.example.common.Result
+import com.example.common.log
 import com.example.data.models.Option
 import com.example.data.models.OptionsSectionDto
 import com.example.domain.use_cases.GetMealOptionsUseCase
 import com.example.menu_item.navigation.menuItemIdArgument
+import com.example.restaurant.navigation.restaurantIdArgument
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -38,10 +40,13 @@ class MenuItemViewModel @Inject constructor(
     val checkboxListState: StateFlow<Map<String, List<Option>>> = _checkboxListState.asStateFlow()
     val totalPrice: StateFlow<Float> = _totalPrice.asStateFlow()
     val counter: StateFlow<Int> = _counter.asStateFlow()
-    val menuItemId: String =
+    private val menuItemId: String =
         URLDecoder.decode(savedStateHandle[menuItemIdArgument], Charsets.UTF_8.name())
+    private val restaurantId: String =
+            URLDecoder.decode(savedStateHandle[restaurantIdArgument], Charsets.UTF_8.name())
 
     init {
+        log(menuItemId)
         getOptions()
     }
 //    TODO: add form checking on add to cart click
@@ -117,9 +122,11 @@ class MenuItemViewModel @Inject constructor(
 
     private fun getOptions() {
         viewModelScope.launch {
-            getMealOptions().asResult().collect { result ->
+            getMealOptions(restaurantId = restaurantId, menuId = menuItemId).asResult().collect { result ->
                 when (result) {
                     is Result.Error -> {
+                        log(result.exception?.message.toString())
+
                         _optionsState.value = OptionsState.Error(result.exception?.message)
                     }
 
@@ -128,6 +135,7 @@ class MenuItemViewModel @Inject constructor(
                     }
 
                     is Result.Success -> {
+                        log(result.data.toString())
                         _optionsState.value = OptionsState.Success(result.data)
                     }
 

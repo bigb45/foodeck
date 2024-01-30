@@ -18,6 +18,6 @@ interface RestaurantsApiService {
     @GET("offers")
     suspend fun getOffers(): Response<List<Offer>>
 
-    @GET("custom_meal")
-    suspend fun getMealSections(): Response<Menu>
+    @GET("{restaurantId}/{menuId}/options")
+    suspend fun getMealSections(@Path("restaurantId") restaurantId: String, @Path("menuId") menuId: String): Response<Menu>
 }
