@@ -19,7 +19,8 @@
             android:name="com.example.fooddelivery.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.FoodDelivery"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustResize"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

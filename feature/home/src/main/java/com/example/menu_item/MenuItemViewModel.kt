@@ -3,28 +3,33 @@ package com.example.menu_item
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.common.asResult
 import com.example.common.Result
+import com.example.common.asResult
 import com.example.common.log
+import com.example.data.models.CartItemDto
 import com.example.data.models.Option
 import com.example.data.models.OptionsSectionDto
 import com.example.domain.use_cases.GetMealOptionsUseCase
+import com.example.domain.use_cases.SaveCartItem
 import com.example.menu_item.navigation.menuItemIdArgument
 import com.example.restaurant.navigation.restaurantIdArgument
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.net.URLDecoder
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class MenuItemViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getMealOptions: GetMealOptionsUseCase,
+    private val addToCart: SaveCartItem,
 ) : ViewModel() {
-    private val _order = MutableStateFlow("")
     private val _counter = MutableStateFlow(1)
 
     //    TODO: change this to List<BaseSectionData>
@@ -33,6 +38,7 @@ class MenuItemViewModel @Inject constructor(
     private val _totalPrice = MutableStateFlow(_baseMealPrice)
     private val _radioGroupListState = MutableStateFlow<Map<String, Option?>>(emptyMap())
     private val _checkboxListState = MutableStateFlow<Map<String, List<Option>>>(emptyMap())
+    private val _customInstructions = MutableStateFlow<String>("")
 //    TODO: create a list of floats that stores the additional price of each added component
 
     val screenState: StateFlow<OptionsState> = _optionsState.asStateFlow()
@@ -40,16 +46,18 @@ class MenuItemViewModel @Inject constructor(
     val checkboxListState: StateFlow<Map<String, List<Option>>> = _checkboxListState.asStateFlow()
     val totalPrice: StateFlow<Float> = _totalPrice.asStateFlow()
     val counter: StateFlow<Int> = _counter.asStateFlow()
+    val customInstructions: StateFlow<String> = _customInstructions.asStateFlow()
+
     private val menuItemId: String =
         URLDecoder.decode(savedStateHandle[menuItemIdArgument], Charsets.UTF_8.name())
     private val restaurantId: String =
-            URLDecoder.decode(savedStateHandle[restaurantIdArgument], Charsets.UTF_8.name())
+        URLDecoder.decode(savedStateHandle[restaurantIdArgument], Charsets.UTF_8.name())
 
     init {
-        log(menuItemId)
         getOptions()
     }
-//    TODO: add form checking on add to cart click
+
+    //    TODO: add form checking on add to cart click
     private fun calculateTotalPrice(): Float {
         val radioTotal = _radioGroupListState.value.map {
             var total = 0f
@@ -59,7 +67,7 @@ class MenuItemViewModel @Inject constructor(
                 data = _optionsState.value as OptionsState.Success,
                 sectionId = it.key
             )
-            if(it.value != null){
+            if (it.value != null) {
                 total += it.value!!.price
             }
 
@@ -77,14 +85,13 @@ class MenuItemViewModel @Inject constructor(
             total
         }.sum()
 
-         val total = (_baseMealPrice + radioTotal + checkBoxTotal) * _counter.value
-         _totalPrice.value = total
+        val total = (_baseMealPrice + radioTotal + checkBoxTotal) * _counter.value
+        _totalPrice.value = total
         return total
     }
 
 
-
-//    TODO: make the calculateTotalPrice function generic
+    //    TODO: make the calculateTotalPrice function generic
     fun onRadioSelected(key: String, newSelection: Option) {
         val mutableMap = _radioGroupListState.value.toMutableMap()
 
@@ -95,11 +102,11 @@ class MenuItemViewModel @Inject constructor(
 
     fun onCheckBoxSelected(key: String, newSelection: Option, isSelected: Boolean) {
         val mutableMap = _checkboxListState.value.toMutableMap()
-        val mutableList =  (mutableMap[key] ?: emptyList()).toMutableSet()
+        val mutableList = (mutableMap[key] ?: emptyList()).toMutableSet()
 
-        if(isSelected){
+        if (isSelected) {
             mutableList.add(newSelection)
-        }else{
+        } else {
             mutableList.remove(newSelection)
         }
 
@@ -122,30 +129,35 @@ class MenuItemViewModel @Inject constructor(
 
     private fun getOptions() {
         viewModelScope.launch {
-            getMealOptions(restaurantId = restaurantId, menuId = menuItemId).asResult().collect { result ->
-                when (result) {
-                    is Result.Error -> {
-                        log(result.exception?.message.toString())
+            getMealOptions(restaurantId = restaurantId, menuId = menuItemId).asResult()
+                .collect { result ->
+                    when (result) {
+                        is Result.Error -> {
+                            log(result.exception?.message.toString())
 
-                        _optionsState.value = OptionsState.Error(result.exception?.message)
+                            _optionsState.value = OptionsState.Error(result.exception?.message)
+                        }
+
+                        Result.Loading -> {
+                            _optionsState.value = OptionsState.Loading
+                        }
+
+                        is Result.Success -> {
+                            log(result.data.toString())
+                            _optionsState.value = OptionsState.Success(result.data)
+                        }
+
+
                     }
-
-                    Result.Loading -> {
-                        _optionsState.value = OptionsState.Loading
-                    }
-
-                    is Result.Success -> {
-                        log(result.data.toString())
-                        _optionsState.value = OptionsState.Success(result.data)
-                    }
-
-
                 }
-            }
         }
     }
 
-    private fun getMenuDetails(menuId: String){
+    fun setCustomInstructions(newInstructions: String){
+        _customInstructions.value = newInstructions
+    }
+
+    private fun getMenuDetails(menuId: String) {
         viewModelScope.launch {
 //            TODO: get menu details from api request
 //            TODO: set initial price to price from menu details
@@ -156,4 +168,20 @@ class MenuItemViewModel @Inject constructor(
     private fun getSectionFromId(data: OptionsState.Success, sectionId: String): OptionsSectionDto {
         return data.sections.first { it.id == sectionId }
     }
+
+    fun onAddToCartClick() {
+        CoroutineScope(IO).launch {
+            val cartItemDto = CartItemDto(
+                id = UUID.randomUUID().toString(),
+                menuId = menuItemId,
+                orderQuantity = _counter.value,
+                customInstructions = _customInstructions.value
+
+            )
+            log("adding $cartItemDto to the database")
+            addToCart(cartItemDto)
+
+        }
+    }
+
 }

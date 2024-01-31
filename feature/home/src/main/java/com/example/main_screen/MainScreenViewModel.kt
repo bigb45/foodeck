@@ -34,10 +34,10 @@ class MainScreenViewModel @Inject constructor(
 
     }
     fun reload(){
-//        fetchRestaurantData()
-        CoroutineScope(IO).launch {
-            test()
-        }
+        fetchRestaurantData()
+//        CoroutineScope(IO).launch {
+//            test()
+//        }
     }
     private fun fetchRestaurantData() {
         _state.value = MainScreenUiState.Loading

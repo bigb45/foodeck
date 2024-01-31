@@ -1,7 +1,12 @@
 package com.example.menu_item
 
 import android.util.Log.d
+import android.view.ViewTreeObserver
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,7 +26,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -31,7 +40,10 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.common.CollapsingToolbar
 import com.example.common.LoadingIndicator
@@ -71,7 +83,8 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
 
         is OptionsState.Success -> {
 
-            MenuItems(nestedScrollConnection = nestedScrollConnection,
+            MenuItems(
+                nestedScrollConnection = nestedScrollConnection,
                 toolbarState = toolbarState,
                 onNavigateUp = onNavigateUp,
                 lazyListState = lazyListState,
@@ -85,7 +98,8 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
                 onCheckboxSelectionChange = { key, newSelection, isSelected ->
                     viewModel.onCheckBoxSelected(key = key, newSelection = newSelection, isSelected)
                 },
-            )
+
+                )
         }
 
     }
@@ -96,10 +110,10 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
 fun MenuItems(
     nestedScrollConnection: NestedScrollConnection,
     toolbarState: ToolbarState,
-    onNavigateUp: () -> Unit,
     lazyListState: LazyListState,
     screenState: OptionsState.Success,
     viewModel: MenuItemViewModel,
+    onNavigateUp: () -> Unit,
     checkboxSelectedOptions: Map<String, List<Option>>,
     onRadioSelectionChange: (String, Option) -> Unit,
     onCheckboxSelectionChange: (String, Option, Boolean) -> Unit,
@@ -117,12 +131,19 @@ fun MenuItems(
             screenState = screenState,
             checkboxSelectedOptions = checkboxSelectedOptions,
             radioSelectedOptions = radioSelectedOptions,
+//            TODO: fix this collectasstate.value mess
             count = viewModel.counter.collectAsState().value,
+            instructions = viewModel.customInstructions.collectAsState().value,
             totalPrice = viewModel.totalPrice.collectAsState().value,
             onRadioSelectionChange = onRadioSelectionChange,
             onCheckboxSelectionChange = onCheckboxSelectionChange,
             increment = { viewModel.incrementCounter() },
-            decrement = { viewModel.decrementCounter() }
+            decrement = { viewModel.decrementCounter() },
+            onInstructionsChange = { newText -> viewModel.setCustomInstructions(newText) },
+            onAddToCartClick = {
+                viewModel.onAddToCartClick()
+                onNavigateUp()
+            }
         )
 
         CollapsingToolbar(
@@ -137,7 +158,6 @@ fun MenuItems(
             title = "Meal name",
             subTitle = "Restaurant name, address",
         )
-
     }
 }
 
@@ -149,12 +169,24 @@ fun MenuOptions(
     checkboxSelectedOptions: Map<String, List<Option>>,
     radioSelectedOptions: Map<String, Option?>,
     count: Int,
+    instructions: String,
     totalPrice: Float,
     onRadioSelectionChange: (String, Option) -> Unit,
     onCheckboxSelectionChange: (String, Option, Boolean) -> Unit,
     increment: () -> Unit,
     decrement: () -> Unit,
-) {
+    onInstructionsChange: (String) -> Unit,
+    onAddToCartClick: () -> Unit,
+
+    ) {
+    val imeState = rememberImeState()
+
+    LaunchedEffect(key1 = imeState.value){
+//        this is to fix the instructions text field hiding behind the soft keyboard
+        if(imeState.value){
+            lazyListState.scrollToItem(lazyListState.layoutInfo.totalItemsCount)
+        }
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -185,9 +217,9 @@ fun MenuOptions(
                     CheckBoxSelector(
                         data = data,
                         selectedOptions = checkboxSelectedOptions,
-                        onSelectionChange = {key, option, isSelected ->
+                        onSelectionChange = { key, option, isSelected ->
                             onCheckboxSelectionChange(key, option, isSelected)
-                                            },
+                        },
                     )
 
                 } else if (section.sectionType == "radio") {
@@ -222,17 +254,20 @@ fun MenuOptions(
             }
 
             item {
-                Instructions(onTextChange = { /*TODO*/ }, text = "")
+                Instructions(
+                    onTextChange = { onInstructionsChange(it) },
+                    text = instructions,
+                    scrollState = lazyListState
+                )
             }
-        }
 
+
+        }
         CartBottomBar(
             modifier = Modifier.align(Alignment.BottomCenter),
-            onAddToCartClick = { },
+            onAddToCartClick = onAddToCartClick,
             totalPrice = totalPrice
-
         )
-
     }
 }
 
@@ -269,4 +304,26 @@ fun MealActions() {
             tint = Color.White,
         )
     }
+}
+
+@Composable
+fun rememberImeState(): State<Boolean> {
+    val imeState = remember {
+        mutableStateOf(false)
+    }
+
+    val view = LocalView.current
+    DisposableEffect(view) {
+        val listener = ViewTreeObserver.OnGlobalLayoutListener {
+            val isKeyboardOpen = ViewCompat.getRootWindowInsets(view)
+                ?.isVisible(WindowInsetsCompat.Type.ime()) ?: true
+            imeState.value = isKeyboardOpen
+        }
+
+        view.viewTreeObserver.addOnGlobalLayoutListener(listener)
+        onDispose {
+            view.viewTreeObserver.removeOnGlobalLayoutListener(listener)
+        }
+    }
+    return imeState
 }

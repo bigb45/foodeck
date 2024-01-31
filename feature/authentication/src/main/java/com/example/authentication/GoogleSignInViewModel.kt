@@ -20,7 +20,7 @@ import javax.inject.Inject
 class GoogleSignInViewModel @Inject constructor(
     private val authenticateWithToken: AuthenticateUserWithTokenUseCase,
 ) : ViewModel() {
-    private val _authResult = MutableStateFlow<AuthResult>(AuthResult.Loading)
+    private val _authResult = MutableStateFlow<AuthResult>(AuthResult.SignedOut)
     private val _uiState = MutableStateFlow<LoginMethodsScreenState>(LoginMethodsScreenState.SignedOut)
 
     val authResult: StateFlow<AuthResult> = _authResult
