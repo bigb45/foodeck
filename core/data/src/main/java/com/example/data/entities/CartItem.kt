@@ -2,18 +2,15 @@ package com.example.data.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.example.data.models.CustomizationList
-import com.example.data.models.MenuCustomization
-import com.example.data.models.Offer
 
-@Entity
+
+@Entity(tableName = "CartItem", primaryKeys = ["cartItemId"])
 data class CartItem(
-    @PrimaryKey val id: String,
-    val orderId: String,
-    val orderQuantity: Int,
-    val menuId: String,
-    val customInstructions: String?,
-    val customizations: CustomizationList
-
+    @ColumnInfo(name = "cartItemId") val id: String,
+    @ColumnInfo(name = "menuId") val menuId: String,
+    @ColumnInfo(name = "quantity") val quantity: Int,
+    @ColumnInfo(name = "customInstructions") val customInstructions: String?,
 )

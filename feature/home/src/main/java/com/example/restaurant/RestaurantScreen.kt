@@ -87,7 +87,9 @@ fun RestaurantScreen(
     val viewModel: RestaurantViewModel = hiltViewModel()
     val items = viewModel.restaurantMenus.collectAsState()
     LaunchedEffect(Unit) {
-        viewModel.fetchRestaurantDetails()
+        if(items.value !is RestaurantState.Success){
+            viewModel.fetchRestaurantDetails()
+        }
     }
 
     val placeHolder = listOf(

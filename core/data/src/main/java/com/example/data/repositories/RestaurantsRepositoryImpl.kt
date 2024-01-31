@@ -2,16 +2,17 @@ package com.example.data.repositories
 
 import android.security.keystore.UserNotAuthenticatedException
 import android.util.Log.d
-import androidx.room.RoomDatabase
-import com.example.common.log
 import com.example.data.api_services.RestaurantsApiService
-import com.example.data.entities.UserTest
+import com.example.data.entities.CartItem
+import com.example.data.entities.OrderSelection
 import com.example.data.local.database.Database
+import com.example.data.models.CartItemDto
 import com.example.data.models.InternalServerException
 import com.example.data.models.Offer
 import com.example.data.models.OptionsSectionDto
 import com.example.data.models.Restaurant
 import com.example.data.models.RestaurantMenu
+import com.example.data.models.toEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.Response
@@ -21,6 +22,7 @@ import javax.inject.Inject
 class RestaurantsRepositoryImpl @Inject constructor(private val apiService: RestaurantsApiService, roomDatabase: Database) :
     RestaurantsRepository {
     private val userDao = roomDatabase.userDao()
+    private val orderDao = roomDatabase.orderDao()
     override suspend fun getRestaurants(): Flow<List<Restaurant>> {
         return try {
             val res = handleRequest { apiService.getAllRestaurants() }
@@ -49,14 +51,18 @@ class RestaurantsRepositoryImpl @Inject constructor(private val apiService: Rest
         }
     }
 
-    override suspend fun saveUserOrder(): Boolean {
-        val queryResult = userDao.getAll()
-        log(queryResult.toString())
-//        userDao.insertMohammed(UserTest("1", "Mohammed", "Natour"))
 
+    override suspend fun saveUserMenuSelections(selection: OrderSelection): Boolean {
+//        val queryResult = userDao.getAll()
+//        log(queryResult.toString())
+//        userDao.insertMohammed(UserTest("1", "Mohammed", "Natour"))
+        orderDao.insertOrderSelection(selection)
         return false
     }
 
+    override suspend fun saveCartItem(cartItem: CartItemDto) {
+        orderDao.insertCartItem(cartItem.toEntity())
+    }
 
     override suspend fun getMealOptions(restaurantId: String, menuId: String): Flow<List<OptionsSectionDto>> {
         return try {
