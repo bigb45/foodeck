@@ -28,6 +28,8 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -50,8 +52,10 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -75,9 +79,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -118,7 +126,6 @@ fun MainScreen(
         }
     }
 
-
     FoodDeliveryTheme {
         Scaffold(modifier = Modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
@@ -127,7 +134,7 @@ fun MainScreen(
                 scrollBehavior = scrollBehavior
             )
         }, floatingActionButton = {
-            BadgedFab(number) { onRestaurantClick("8") }
+            BadgedFab(number) { onRestaurantClick("2") }
         }, bottomBar = {
             BottomNavBar()
         }
@@ -153,6 +160,7 @@ fun MainScreen(
                             offers = offers,
                             onRestaurantClick = onRestaurantClick,
                         )
+
 
                     }
 
@@ -460,13 +468,23 @@ private fun CustomSearchBox(
     query: String,
     onValueChange: (String) -> Unit,
 ) {
+    val focusManager = LocalFocusManager.current
+
     Box(
         modifier = modifier
             .fillMaxWidth()
             .background(colorScheme.primaryContainer)
     ) {
         OutlinedTextField(
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Search
+            ),
+            keyboardActions = KeyboardActions(
+                onSearch = {
 
+                    focusManager.clearFocus()
+                }
+            ),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = colorScheme.onPrimary,
                 unfocusedContainerColor = colorScheme.onPrimary,
