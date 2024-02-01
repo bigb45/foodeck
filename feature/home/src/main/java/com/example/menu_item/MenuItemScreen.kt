@@ -10,10 +10,13 @@ import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -181,14 +184,22 @@ fun MenuOptions(
 
     ) {
     val imeState = rememberImeState()
-
-    LaunchedEffect(key1 = imeState.value){
-//        this is to fix the instructions text field hiding behind the soft keyboard
+//  key1 scrolls the text field into view
+//  key2 scrolls the text field into view when the user starts typing
+    LaunchedEffect(key1 = imeState.value, key2 = instructions){
+        /*
+        * This block prevents unwanted behavior, the unwanted behavior is as follows:
+        * 1. when the user clicks on the text field, it doesn't come up into view
+        * 2. when the text field has focus and the user scrolls away, typing does not bring the text field back into view
+        * 3. when the top bar is expanded and the text field is clicked, the top bar does not collapse
+        * */
         if(imeState.value){
-            delay(200)
-            lazyListState.scrollToItem(lazyListState.layoutInfo.totalItemsCount)
+            toolbarState.collapse()
+            lazyListState.animateScrollToItem(lazyListState.layoutInfo.totalItemsCount)
         }
     }
+
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -199,7 +210,7 @@ fun MenuOptions(
                 .graphicsLayer {
                     translationY = toolbarState.height + toolbarState.offset
                 },
-            contentPadding = PaddingValues(bottom = 108.dp),
+            contentPadding = PaddingValues(bottom = 160.dp),
             state = lazyListState,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -259,7 +270,6 @@ fun MenuOptions(
                 Instructions(
                     onTextChange = { onInstructionsChange(it) },
                     text = instructions,
-                    scrollState = lazyListState
                 )
             }
 
