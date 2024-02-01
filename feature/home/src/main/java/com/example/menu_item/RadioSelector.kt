@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.compose.gray2
 import com.example.core.ui.theme.Typography
@@ -25,6 +26,7 @@ import com.example.data.models.Option
 fun RadioSelector(
     data: RadioSelectorData,
     selectedOption: Option?,
+    sectionSelected: Boolean,
     onSelectionChange: (String, Option) -> Unit,
     ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -38,6 +40,9 @@ fun RadioSelector(
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        if(!sectionSelected){
+            Text("Please make a selection")
+        }
         Row(
             modifier = Modifier
                 .fillMaxWidth(),

@@ -581,7 +581,6 @@ fun rememberCustomNestedConnection(
             toolbarState.scrollTopLimitReached =
                 lazyListState.firstVisibleItemIndex == 0 && lazyListState.firstVisibleItemScrollOffset == 0
             toolbarState.scrollOffset = toolbarState.scrollOffset - available.y
-            log("${lazyListState.firstVisibleItemScrollOffset}")
             return Offset(0f, toolbarState.consumed)
         }
 

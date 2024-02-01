@@ -7,13 +7,6 @@ import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.mapSaver
-import androidx.compose.runtime.structuralEqualityPolicy
-import androidx.compose.ui.unit.dp
-import com.example.common.log
 
 class CustomTopAppBarState(
     heightRange: IntRange,

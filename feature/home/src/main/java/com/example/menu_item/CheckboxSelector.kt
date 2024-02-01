@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.compose.gray2
 import com.example.core.ui.theme.Typography
@@ -26,6 +27,7 @@ import com.example.data.models.Option
 fun CheckBoxSelector(
     data: CheckBoxSelectorData,
     selectedOptions: Map<String, List<Option>>,
+    selected: Boolean,
     onSelectionChange: (String, Option, Boolean) -> Unit,
 ) {
     Column(
@@ -37,7 +39,8 @@ fun CheckBoxSelector(
         val interactionSource = remember { MutableInteractionSource() }
         Row(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                ,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(data.title, style = Typography.titleLarge.copy(fontFamily = interBold))

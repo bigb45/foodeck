@@ -1,26 +1,21 @@
 package com.example.menu_item
 
-import android.util.Log.d
 import android.view.ViewTreeObserver
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.animateScrollBy
-import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.MoreVert
@@ -33,9 +28,11 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -50,6 +47,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.common.CollapsingToolbar
 import com.example.common.LoadingIndicator
+import com.example.common.log
 import com.example.compose.gray6
 import com.example.custom_toolbar.ToolbarState
 import com.example.data.models.Option
@@ -57,7 +55,6 @@ import com.example.restaurant.MAX_TOOLBAR_HEIGHT
 import com.example.restaurant.MIN_TOOLBAR_HEIGHT
 import com.example.restaurant.rememberCustomNestedConnection
 import com.example.restaurant.rememberToolbarState
-import kotlinx.coroutines.delay
 
 @Composable
 fun MenuItemScreen(onNavigateUp: () -> Unit) {
@@ -74,6 +71,7 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
 
     val screenState = viewModel.screenState.collectAsState()
 
+    val unselected = viewModel.unselectedRequiredSections.collectAsState()
 
     when (screenState.value) {
 
@@ -139,6 +137,10 @@ fun MenuItems(
             count = viewModel.counter.collectAsState().value,
             instructions = viewModel.customInstructions.collectAsState().value,
             totalPrice = viewModel.totalPrice.collectAsState().value,
+            unselectedSections = viewModel.unselectedRequiredSections.collectAsState().value,
+            unselectedIndex = viewModel.unselectedIndex.collectAsState().value,
+            trigger = viewModel.launchedEffectTrigger.collectAsState().value,
+
             onRadioSelectionChange = onRadioSelectionChange,
             onCheckboxSelectionChange = onCheckboxSelectionChange,
             increment = { viewModel.incrementCounter() },
@@ -146,7 +148,7 @@ fun MenuItems(
             onInstructionsChange = { newText -> viewModel.setCustomInstructions(newText) },
             onAddToCartClick = {
                 viewModel.onAddToCartClick()
-                onNavigateUp()
+//                onNavigateUp()
             }
         )
 
@@ -175,6 +177,9 @@ fun MenuOptions(
     count: Int,
     instructions: String,
     totalPrice: Float,
+    unselectedSections: String,
+    unselectedIndex: Int?,
+    trigger: Boolean,
     onRadioSelectionChange: (String, Option) -> Unit,
     onCheckboxSelectionChange: (String, Option, Boolean) -> Unit,
     increment: () -> Unit,
@@ -183,22 +188,31 @@ fun MenuOptions(
     onAddToCartClick: () -> Unit,
 
     ) {
+
+    LaunchedEffect(key1 = trigger) {
+        if (unselectedIndex != null) {
+            lazyListState.animateScrollToItem(unselectedIndex)
+        }
+        if (lazyListState.firstVisibleItemIndex != 0) {
+            toolbarState.collapse()
+        }
+    }
+
     val imeState = rememberImeState()
 //  key1 scrolls the text field into view
 //  key2 scrolls the text field into view when the user starts typing
-    LaunchedEffect(key1 = imeState.value, key2 = instructions){
+    LaunchedEffect(key1 = imeState.value, key2 = instructions) {
         /*
         * This block prevents unwanted behavior, the unwanted behavior is as follows:
         * 1. when the user clicks on the text field, it doesn't come up into view
         * 2. when the text field has focus and the user scrolls away, typing does not bring the text field back into view
         * 3. when the top bar is expanded and the text field is clicked, the top bar does not collapse
         * */
-        if(imeState.value){
+        if (imeState.value) {
             toolbarState.collapse()
             lazyListState.animateScrollToItem(lazyListState.layoutInfo.totalItemsCount)
         }
     }
-
 
     Box(
         modifier = Modifier
@@ -210,11 +224,13 @@ fun MenuOptions(
                 .graphicsLayer {
                     translationY = toolbarState.height + toolbarState.offset
                 },
+
             contentPadding = PaddingValues(bottom = 160.dp),
             state = lazyListState,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(screenState.sections) { section ->
+                val isSectionSelected = unselectedSections != section.id
 
                 if (section.sectionType == "checkbox") {
 //                        TODO: change section and only pass options.data instead of creating data class here
@@ -227,9 +243,12 @@ fun MenuOptions(
                             required = section.required,
                         )
                     }
+
+
                     CheckBoxSelector(
                         data = data,
                         selectedOptions = checkboxSelectedOptions,
+                        selected = isSectionSelected,
                         onSelectionChange = { key, option, isSelected ->
                             onCheckboxSelectionChange(key, option, isSelected)
                         },
@@ -249,6 +268,7 @@ fun MenuOptions(
                     RadioSelector(
                         data = data,
                         selectedOption = radioSelectedOptions[section.id],
+                        sectionSelected = isSectionSelected,
                         onSelectionChange = onRadioSelectionChange,
 
                         )
@@ -268,7 +288,9 @@ fun MenuOptions(
 
             item {
                 Instructions(
-                    onTextChange = { onInstructionsChange(it) },
+                    onTextChange = {
+                        onInstructionsChange(it)
+                    },
                     text = instructions,
                 )
             }
@@ -287,7 +309,7 @@ fun MenuOptions(
 @Composable
 fun MealActions() {
     IconButton(onClick = {
-        d("error", "add meal to favorites")
+        log("add meal to favorites")
     }) {
         Icon(
             imageVector = Icons.Outlined.FavoriteBorder,
@@ -296,7 +318,7 @@ fun MealActions() {
         )
     }
     IconButton(onClick = {
-        d("error", "share meal")
+        log("share meal")
 
     }) {
         Icon(
@@ -306,9 +328,7 @@ fun MealActions() {
         )
     }
     IconButton(onClick = {
-        d("error", "more options")
-
-
+        log("more options")
     }) {
         Icon(
             imageVector = Icons.Outlined.MoreVert,
