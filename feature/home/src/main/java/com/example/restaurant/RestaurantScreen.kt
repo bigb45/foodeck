@@ -1,5 +1,6 @@
 package com.example.restaurant
 
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.animation.core.animateDecay
 import androidx.compose.foundation.background
@@ -94,7 +95,7 @@ fun RestaurantScreen(
 
     val placeHolder = listOf(
         Category(
-            categoryName = "placeHolder", items = listOf(
+            categoryName = "1", items = listOf(
                 Meal(
                     id = "99",
                     name = "Meal1",
@@ -102,11 +103,185 @@ fun RestaurantScreen(
                     contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
                     price = "99.99",
                     currency = "$"
-                )
-            )
-        )
-    )
+                ),
+                Meal(
+                    id = "98",
+                    name = "Meal1",
+                    imageUrl = null,
+                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
+                    price = "99.99",
+                    currency = "$"
+                ),
+                Meal(
+                    id = "97",
+                    name = "Meal1",
+                    imageUrl = null,
+                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
+                    price = "99.99",
+                    currency = "$"
+                ),
+                Meal(
+                    id = "96",
+                    name = "Meal1",
+                    imageUrl = null,
+                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
+                    price = "99.99",
+                    currency = "$"
+                ),
 
+            )
+        ),
+        Category(
+            categoryName = "2", items = listOf(
+                Meal(
+                    id = "89",
+                    name = "Meal1",
+                    imageUrl = null,
+                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
+                    price = "99.99",
+                    currency = "$"
+                ),
+                Meal(
+                    id = "88",
+                    name = "Meal1",
+                    imageUrl = null,
+                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
+                    price = "99.99",
+                    currency = "$"
+                ),
+                Meal(
+                    id = "87",
+                    name = "Meal1",
+                    imageUrl = null,
+                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
+                    price = "99.99",
+                    currency = "$"
+                ),
+                Meal(
+                    id = "86",
+                    name = "Meal1",
+                    imageUrl = null,
+                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
+                    price = "99.99",
+                    currency = "$"
+                ),
+
+            )
+        ),
+        Category(
+            categoryName = "3", items = listOf(
+                Meal(
+                    id = "79",
+                    name = "Meal1",
+                    imageUrl = null,
+                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
+                    price = "99.99",
+                    currency = "$"
+                ),
+                Meal(
+                    id = "78",
+                    name = "Meal1",
+                    imageUrl = null,
+                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
+                    price = "99.99",
+                    currency = "$"
+                ),
+                Meal(
+                    id = "77",
+                    name = "Meal1",
+                    imageUrl = null,
+                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
+                    price = "99.99",
+                    currency = "$"
+                ),
+                Meal(
+                    id = "76",
+                    name = "Meal1",
+                    imageUrl = null,
+                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
+                    price = "99.99",
+                    currency = "$"
+                ),
+
+            )
+        ),
+        Category(
+            categoryName = "4", items = listOf(
+                Meal(
+                    id = "69",
+                    name = "Meal1",
+                    imageUrl = null,
+                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
+                    price = "99.99",
+                    currency = "$"
+                ),
+                Meal(
+                    id = "68",
+                    name = "Meal1",
+                    imageUrl = null,
+                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
+                    price = "99.99",
+                    currency = "$"
+                ),
+                Meal(
+                    id = "67",
+                    name = "Meal1",
+                    imageUrl = null,
+                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
+                    price = "99.99",
+                    currency = "$"
+                ),
+                Meal(
+                    id = "66",
+                    name = "Meal1",
+                    imageUrl = null,
+                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
+                    price = "99.99",
+                    currency = "$"
+                ),
+
+            )
+        ),
+        Category(
+            categoryName = "5", items = listOf(
+                Meal(
+                    id = "59",
+                    name = "Meal1",
+                    imageUrl = null,
+                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
+                    price = "99.99",
+                    currency = "$"
+                ),
+                Meal(
+                    id = "58",
+                    name = "Meal1",
+                    imageUrl = null,
+                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
+                    price = "99.99",
+                    currency = "$"
+                ),
+                Meal(
+                    id = "57",
+                    name = "Meal1",
+                    imageUrl = null,
+                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
+                    price = "99.99",
+                    currency = "$"
+                ),
+                Meal(
+                    id = "56",
+                    name = "Meal1",
+                    imageUrl = null,
+                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
+                    price = "99.99",
+                    currency = "$"
+                ),
+
+            )
+        ),
+
+    )
+//
 
 // TODO: make this an api call
     val restaurant = Restaurant(
@@ -235,6 +410,7 @@ internal fun Restaurant(
     }
 
     val toolbarState = rememberToolbarState(toolbarRange)
+
     val scope = rememberCoroutineScope()
 
     val lazyListState = rememberLazyListState()
@@ -260,13 +436,14 @@ internal fun Restaurant(
             lazyListState = lazyListState,
             onItemClick = onItemClick,
         )
+
         CollapsingToolbar(
-            title = restaurant.restaurantName,
-            subTitle = restaurant.restaurantAddress,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(with(LocalDensity.current) { toolbarState.height.toDp() })
                 .graphicsLayer { translationY = toolbarState.offset },
+            title = restaurant.restaurantName,
+            subTitle = restaurant.restaurantAddress,
             coverImageUrl = restaurant.coverImageUrl,
             progress = toolbarState.progress,
             onNavigateUp = onNavigateUp,
@@ -315,10 +492,13 @@ internal fun Restaurant(
 
             AnimatedTabs(
                 modifier = Modifier.graphicsLayer { translationY = toolbarState.offset },
-
                 categories = categories,
                 selectedTabIndex = selectedTabIndex,
-                setSelectedTabIndex = setSelectedTabIndex
+                setSelectedTabIndex = {
+                    newIndex ->
+                    setSelectedTabIndex(newIndex)
+                    toolbarState.collapse()
+                }
             )
         }
 
@@ -401,6 +581,7 @@ fun rememberCustomNestedConnection(
             toolbarState.scrollTopLimitReached =
                 lazyListState.firstVisibleItemIndex == 0 && lazyListState.firstVisibleItemScrollOffset == 0
             toolbarState.scrollOffset = toolbarState.scrollOffset - available.y
+            log("${lazyListState.firstVisibleItemScrollOffset}")
             return Offset(0f, toolbarState.consumed)
         }
 

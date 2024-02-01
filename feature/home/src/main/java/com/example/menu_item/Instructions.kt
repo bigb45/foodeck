@@ -64,6 +64,7 @@ fun Instructions(
     text: String,
     scrollState: LazyListState
 ) {
+    val scope = rememberCoroutineScope()
     Column(
         modifier = modifier
             .background(MaterialTheme.colorScheme.surface)
@@ -87,15 +88,7 @@ fun Instructions(
                     .fillMaxWidth()
                     .border(width = 1.dp, shape = RoundedCornerShape(16.dp), color = gray6)
                     .height(54.dp)
-//                    .onFocusEvent {
-//                        if (it.isFocused ) {
-//                            coroutineScope.launch {
-////                                wait for the keyboard to show up
-//                                delay(300)
-//                                scrollState.animateScrollToItem(scrollState.layoutInfo.totalItemsCount)
-//                            }
-//                        }
-//                    }
+
                 ,
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
                 onValueChange = onTextChange,

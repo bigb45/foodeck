@@ -7,4 +7,5 @@ interface ToolbarState {
     val consumed: Float // how much of ? has been consumed
     var scrollTopLimitReached: Boolean // has the toolbar 'bottomed-out'
     var scrollOffset: Float
+    fun collapse()
 }

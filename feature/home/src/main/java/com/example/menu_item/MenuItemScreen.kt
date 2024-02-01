@@ -54,6 +54,7 @@ import com.example.restaurant.MAX_TOOLBAR_HEIGHT
 import com.example.restaurant.MIN_TOOLBAR_HEIGHT
 import com.example.restaurant.rememberCustomNestedConnection
 import com.example.restaurant.rememberToolbarState
+import kotlinx.coroutines.delay
 
 @Composable
 fun MenuItemScreen(onNavigateUp: () -> Unit) {
@@ -184,6 +185,7 @@ fun MenuOptions(
     LaunchedEffect(key1 = imeState.value){
 //        this is to fix the instructions text field hiding behind the soft keyboard
         if(imeState.value){
+            delay(200)
             lazyListState.scrollToItem(lazyListState.layoutInfo.totalItemsCount)
         }
     }
