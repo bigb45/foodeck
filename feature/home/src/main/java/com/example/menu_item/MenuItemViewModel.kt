@@ -9,6 +9,7 @@ import com.example.common.log
 import com.example.data.models.CartItemDto
 import com.example.data.models.Option
 import com.example.data.models.OptionsSectionDto
+import com.example.data.models.SectionType
 import com.example.domain.use_cases.GetMealOptionsUseCase
 import com.example.domain.use_cases.SaveCartItem
 import com.example.menu_item.navigation.menuItemIdArgument
@@ -60,11 +61,11 @@ class MenuItemViewModel @Inject constructor(
         val selectionsTotal = (radioButtonList + checkboxList).map { (key, value) ->
             val section = getSectionFromId(key)
             when (section.sectionType) {
-                "checkbox" -> {
+                SectionType.CHECKBOX.value -> {
                     (value as List<Option>).map { option -> option.price }.sum()
                 }
 
-                "radio" -> {
+                SectionType.RADIO.value -> {
                     (value as Option).price
                 }
 

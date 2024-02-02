@@ -1,5 +1,6 @@
 package com.example.menu_item
 
+import android.widget.CheckBox
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,6 +45,7 @@ import com.example.common.log
 import com.example.common.util.rememberImeState
 import com.example.compose.gray6
 import com.example.custom_toolbar.ToolbarState
+import com.example.data.models.SectionType
 import com.example.data.models.toSectionData
 import com.example.restaurant.MAX_TOOLBAR_HEIGHT
 import com.example.restaurant.MIN_TOOLBAR_HEIGHT
@@ -222,7 +224,10 @@ fun MenuOptions(
             items(screenState.sections) { section ->
                 val isSectionSelected = screenState.unselectedSection != section.sectionTitle
                 val data = remember { section.toSectionData() }
-                if (section.sectionType == "checkbox") {
+//                TODO: remove the .toString() call
+                log(section.sectionType)
+                log(SectionType.CHECKBOX.value)
+                if (section.sectionType == SectionType.CHECKBOX.value) {
                     CheckBoxSelector(
                         data = data,
                         selectedOptions = screenState.selectedCheckboxOptions,
@@ -232,7 +237,7 @@ fun MenuOptions(
                         },
                     )
 
-                } else if (section.sectionType == "radio") {
+                } else if (section.sectionType == SectionType.RADIO.value) {
 
                     RadioSelector(
                         data = data,
