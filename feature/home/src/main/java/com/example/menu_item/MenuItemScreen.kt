@@ -4,35 +4,35 @@ import android.view.ViewTreeObserver
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -55,6 +55,7 @@ import com.example.restaurant.MAX_TOOLBAR_HEIGHT
 import com.example.restaurant.MIN_TOOLBAR_HEIGHT
 import com.example.restaurant.rememberCustomNestedConnection
 import com.example.restaurant.rememberToolbarState
+import kotlinx.coroutines.async
 
 @Composable
 fun MenuItemScreen(onNavigateUp: () -> Unit) {
@@ -71,50 +72,64 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
 
     val screenState = viewModel.screenState.collectAsState()
 
-    val unselected = viewModel.unselectedRequiredSections.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    when (screenState.value) {
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+    ) {
 
-        is OptionsState.Loading -> {
-            LoadingIndicator()
+        when (screenState.value) {
+
+            is OptionsState.Loading -> {
+                LoadingIndicator()
+            }
+
+            is OptionsState.Error -> {
+                Text("error")
+            }
+
+            is OptionsState.Success -> {
+
+                MenuItems(
+                    modifier = Modifier
+                        .padding(it),
+                    nestedScrollConnection = nestedScrollConnection,
+                    toolbarState = toolbarState,
+                    onNavigateUp = onNavigateUp,
+                    lazyListState = lazyListState,
+                    screenState = screenState.value as OptionsState.Success,
+                    viewModel = viewModel,
+                    checkboxSelectedOptions = viewModel.checkboxListState.collectAsState().value,
+                    radioSelectedOptions = viewModel.radioGroupListState.collectAsState().value,
+                    snackbarHost = snackbarHostState,
+                    onRadioSelectionChange = { key, newSelection ->
+                        viewModel.onRadioSelected(key = key, newSelection = newSelection)
+                    },
+                    onCheckboxSelectionChange = { key, newSelection, isSelected ->
+                        viewModel.onCheckBoxSelected(
+                            key = key,
+                            newSelection = newSelection,
+                            isSelected
+                        )
+                    },
+
+                    )
+            }
+
         }
-
-        is OptionsState.Error -> {
-            Text("error")
-        }
-
-        is OptionsState.Success -> {
-
-            MenuItems(
-                nestedScrollConnection = nestedScrollConnection,
-                toolbarState = toolbarState,
-                onNavigateUp = onNavigateUp,
-                lazyListState = lazyListState,
-                screenState = screenState.value as OptionsState.Success,
-                viewModel = viewModel,
-                checkboxSelectedOptions = viewModel.checkboxListState.collectAsState().value,
-                radioSelectedOptions = viewModel.radioGroupListState.collectAsState().value,
-                onRadioSelectionChange = { key, newSelection ->
-                    viewModel.onRadioSelected(key = key, newSelection = newSelection)
-                },
-                onCheckboxSelectionChange = { key, newSelection, isSelected ->
-                    viewModel.onCheckBoxSelected(key = key, newSelection = newSelection, isSelected)
-                },
-
-                )
-        }
-
     }
 }
 
 
 @Composable
 fun MenuItems(
+    modifier: Modifier = Modifier,
     nestedScrollConnection: NestedScrollConnection,
     toolbarState: ToolbarState,
     lazyListState: LazyListState,
     screenState: OptionsState.Success,
     viewModel: MenuItemViewModel,
+    snackbarHost: SnackbarHostState,
     onNavigateUp: () -> Unit,
     checkboxSelectedOptions: Map<String, List<Option>>,
     onRadioSelectionChange: (String, Option) -> Unit,
@@ -123,7 +138,7 @@ fun MenuItems(
 
     ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .nestedScroll(nestedScrollConnection)
             .background(gray6)
     ) {
@@ -133,22 +148,24 @@ fun MenuItems(
             screenState = screenState,
             checkboxSelectedOptions = checkboxSelectedOptions,
             radioSelectedOptions = radioSelectedOptions,
-//            TODO: fix this collectasstate.value mess
+//            TODO: fix this collect as state.value mess
             count = viewModel.counter.collectAsState().value,
             instructions = viewModel.customInstructions.collectAsState().value,
             totalPrice = viewModel.totalPrice.collectAsState().value,
-            unselectedSections = viewModel.unselectedRequiredSections.collectAsState().value,
+            unselectedSection = viewModel.unselectedRequiredSections.collectAsState().value,
             unselectedIndex = viewModel.unselectedIndex.collectAsState().value,
             trigger = viewModel.launchedEffectTrigger.collectAsState().value,
-
+            snackbarHost = snackbarHost,
             onRadioSelectionChange = onRadioSelectionChange,
             onCheckboxSelectionChange = onCheckboxSelectionChange,
             increment = { viewModel.incrementCounter() },
             decrement = { viewModel.decrementCounter() },
             onInstructionsChange = { newText -> viewModel.setCustomInstructions(newText) },
             onAddToCartClick = {
-                viewModel.onAddToCartClick()
-//                onNavigateUp()
+                if (viewModel.onAddToCartClick()) {
+                    onNavigateUp()
+                }
+
             }
         )
 
@@ -177,9 +194,11 @@ fun MenuOptions(
     count: Int,
     instructions: String,
     totalPrice: Float,
-    unselectedSections: String,
+    unselectedSection: String,
     unselectedIndex: Int?,
     trigger: Boolean,
+    snackbarHost: SnackbarHostState,
+
     onRadioSelectionChange: (String, Option) -> Unit,
     onCheckboxSelectionChange: (String, Option, Boolean) -> Unit,
     increment: () -> Unit,
@@ -188,14 +207,32 @@ fun MenuOptions(
     onAddToCartClick: () -> Unit,
 
     ) {
-
     LaunchedEffect(key1 = trigger) {
-        if (unselectedIndex != null) {
-            lazyListState.animateScrollToItem(unselectedIndex)
+        val scrollToItemDeferred = async {
+            if (unselectedIndex != null) {
+                lazyListState.animateScrollToItem(unselectedIndex)
+            }
         }
-        if (lazyListState.firstVisibleItemIndex != 0) {
-            toolbarState.collapse()
+
+        val showSnackbarDeferred = async {
+            if (unselectedIndex != null) {
+                snackbarHost.showSnackbar(
+                    "Please make a selection on $unselectedSection",
+                    duration = SnackbarDuration.Short,
+                    withDismissAction = true
+                )
+            }
         }
+
+        val collapseToolbarDeferred = async {
+            if (lazyListState.firstVisibleItemIndex != 0) {
+                toolbarState.collapse()
+            }
+        }
+
+        scrollToItemDeferred.await()
+        showSnackbarDeferred.await()
+        collapseToolbarDeferred.await()
     }
 
     val imeState = rememberImeState()
@@ -230,7 +267,7 @@ fun MenuOptions(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(screenState.sections) { section ->
-                val isSectionSelected = unselectedSections != section.id
+                val isSectionSelected = unselectedSection != section.id
 
                 if (section.sectionType == "checkbox") {
 //                        TODO: change section and only pass options.data instead of creating data class here

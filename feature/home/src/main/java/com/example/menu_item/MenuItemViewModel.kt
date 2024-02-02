@@ -182,7 +182,7 @@ class MenuItemViewModel @Inject constructor(
         return (_optionsState.value as OptionsState.Success).sections.first { it.id == sectionId }
     }
 
-    fun onAddToCartClick() {
+    fun onAddToCartClick(): Boolean {
         if(validateSelections()) {
             CoroutineScope(IO).launch {
                 val cartItemDto = CartItemDto(
@@ -196,7 +196,9 @@ class MenuItemViewModel @Inject constructor(
                 addToCart(cartItemDto)
 
             }
+            return true
         }
+        return false
     }
 
     private fun validateSelections(): Boolean {
@@ -208,7 +210,7 @@ class MenuItemViewModel @Inject constructor(
         requiredSections.forEachIndexed {
             index, section ->
             if(!(_radioGroupListState.value.keys + _checkboxListState.value.keys).contains(section.id)){
-                _unselectedRequiredSections.value = section.id
+                _unselectedRequiredSections.value = section.sectionTitle
                 _unselectedIndex.value = index
                 _launchedEffectTrigger.value = !_launchedEffectTrigger.value
                 return false
