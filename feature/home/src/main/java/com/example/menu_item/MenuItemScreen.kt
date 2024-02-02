@@ -51,6 +51,8 @@ import com.example.common.log
 import com.example.compose.gray6
 import com.example.custom_toolbar.ToolbarState
 import com.example.data.models.Option
+import com.example.data.models.OptionsSectionDto
+import com.example.data.models.toSectionData
 import com.example.restaurant.MAX_TOOLBAR_HEIGHT
 import com.example.restaurant.MIN_TOOLBAR_HEIGHT
 import com.example.restaurant.rememberCustomNestedConnection
@@ -63,22 +65,21 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
         MIN_TOOLBAR_HEIGHT.roundToPx()..MAX_TOOLBAR_HEIGHT.roundToPx()
     }
 
+    val viewModel: MenuItemViewModel = hiltViewModel()
+
     val toolbarState = rememberToolbarState(toolbarRange)
     val scope = rememberCoroutineScope()
     val lazyListState = rememberLazyListState()
 
     val nestedScrollConnection = rememberCustomNestedConnection(toolbarState, lazyListState, scope)
-    val viewModel: MenuItemViewModel = hiltViewModel()
-
-    val screenState = viewModel.screenState.collectAsState()
-
+    val screenState = viewModel.menuItemScreenState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) {
 
-        when (screenState.value) {
+        when (screenState.value.optionsState) {
 
             is OptionsState.Loading -> {
                 LoadingIndicator()
@@ -89,30 +90,16 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
             }
 
             is OptionsState.Success -> {
-
                 MenuItems(
                     modifier = Modifier
                         .padding(it),
                     nestedScrollConnection = nestedScrollConnection,
                     toolbarState = toolbarState,
-                    onNavigateUp = onNavigateUp,
                     lazyListState = lazyListState,
-                    screenState = screenState.value as OptionsState.Success,
+                    screenState = screenState.value,
                     viewModel = viewModel,
-                    checkboxSelectedOptions = viewModel.checkboxListState.collectAsState().value,
-                    radioSelectedOptions = viewModel.radioGroupListState.collectAsState().value,
                     snackbarHost = snackbarHostState,
-                    onRadioSelectionChange = { key, newSelection ->
-                        viewModel.onRadioSelected(key = key, newSelection = newSelection)
-                    },
-                    onCheckboxSelectionChange = { key, newSelection, isSelected ->
-                        viewModel.onCheckBoxSelected(
-                            key = key,
-                            newSelection = newSelection,
-                            isSelected
-                        )
-                    },
-
+                    onNavigateUp = onNavigateUp,
                     )
             }
 
@@ -127,16 +114,12 @@ fun MenuItems(
     nestedScrollConnection: NestedScrollConnection,
     toolbarState: ToolbarState,
     lazyListState: LazyListState,
-    screenState: OptionsState.Success,
+    screenState: MenuItemScreenState,
     viewModel: MenuItemViewModel,
     snackbarHost: SnackbarHostState,
     onNavigateUp: () -> Unit,
-    checkboxSelectedOptions: Map<String, List<Option>>,
-    onRadioSelectionChange: (String, Option) -> Unit,
-    onCheckboxSelectionChange: (String, Option, Boolean) -> Unit,
-    radioSelectedOptions: Map<String, Option?>,
-
     ) {
+
     Box(
         modifier = modifier
             .nestedScroll(nestedScrollConnection)
@@ -146,18 +129,17 @@ fun MenuItems(
             toolbarState = toolbarState,
             lazyListState = lazyListState,
             screenState = screenState,
-            checkboxSelectedOptions = checkboxSelectedOptions,
-            radioSelectedOptions = radioSelectedOptions,
-//            TODO: fix this collect as state.value mess
-            count = viewModel.counter.collectAsState().value,
-            instructions = viewModel.customInstructions.collectAsState().value,
-            totalPrice = viewModel.totalPrice.collectAsState().value,
-            unselectedSection = viewModel.unselectedRequiredSections.collectAsState().value,
-            unselectedIndex = viewModel.unselectedIndex.collectAsState().value,
-            trigger = viewModel.launchedEffectTrigger.collectAsState().value,
             snackbarHost = snackbarHost,
-            onRadioSelectionChange = onRadioSelectionChange,
-            onCheckboxSelectionChange = onCheckboxSelectionChange,
+            { key, newSelection ->
+                viewModel.onRadioSelected(key = key, newSelection = newSelection)
+            },
+            onCheckboxSelectionChange = { key, newSelection, isSelected ->
+                viewModel.onCheckBoxSelected(
+                    key = key,
+                    newSelection = newSelection,
+                    isSelected
+                )
+            },
             increment = { viewModel.incrementCounter() },
             decrement = { viewModel.decrementCounter() },
             onInstructionsChange = { newText -> viewModel.setCustomInstructions(newText) },
@@ -165,7 +147,6 @@ fun MenuItems(
                 if (viewModel.onAddToCartClick()) {
                     onNavigateUp()
                 }
-
             }
         )
 
@@ -188,17 +169,8 @@ fun MenuItems(
 fun MenuOptions(
     toolbarState: ToolbarState,
     lazyListState: LazyListState,
-    screenState: OptionsState.Success,
-    checkboxSelectedOptions: Map<String, List<Option>>,
-    radioSelectedOptions: Map<String, Option?>,
-    count: Int,
-    instructions: String,
-    totalPrice: Float,
-    unselectedSection: String,
-    unselectedIndex: Int?,
-    trigger: Boolean,
+    screenState: MenuItemScreenState,
     snackbarHost: SnackbarHostState,
-
     onRadioSelectionChange: (String, Option) -> Unit,
     onCheckboxSelectionChange: (String, Option, Boolean) -> Unit,
     increment: () -> Unit,
@@ -207,17 +179,35 @@ fun MenuOptions(
     onAddToCartClick: () -> Unit,
 
     ) {
-    LaunchedEffect(key1 = trigger) {
+
+
+    val imeState = rememberImeState()
+//  key1 scrolls the text field into view
+//  key2 scrolls the text field into view when the user starts typing
+    LaunchedEffect(key1 = imeState.value, key2 = screenState.instructions) {
+        /*
+        * This block prevents unwanted behavior, the unwanted behavior is as follows:
+        * 1. when the user clicks on the text field, it doesn't come up into view
+        * 2. when the text field has focus and the user scrolls away, typing does not bring the text field back into view
+        * 3. when the top bar is expanded and the text field is clicked, the top bar does not collapse
+        * */
+        if (imeState.value) {
+            toolbarState.collapse()
+            lazyListState.animateScrollToItem(lazyListState.layoutInfo.totalItemsCount)
+        }
+    }
+
+    LaunchedEffect(key1 = screenState.trigger) {
         val scrollToItemDeferred = async {
-            if (unselectedIndex != null) {
-                lazyListState.animateScrollToItem(unselectedIndex)
+            if (screenState.unselectedSectionIndex != null) {
+                lazyListState.animateScrollToItem(screenState.unselectedSectionIndex)
             }
         }
 
         val showSnackbarDeferred = async {
-            if (unselectedIndex != null) {
+            if (screenState.unselectedSectionIndex != null) {
                 snackbarHost.showSnackbar(
-                    "Please make a selection on $unselectedSection",
+                    "Please make a selection on ${screenState.unselectedSection}",
                     duration = SnackbarDuration.Short,
                     withDismissAction = true
                 )
@@ -235,22 +225,6 @@ fun MenuOptions(
         collapseToolbarDeferred.await()
     }
 
-    val imeState = rememberImeState()
-//  key1 scrolls the text field into view
-//  key2 scrolls the text field into view when the user starts typing
-    LaunchedEffect(key1 = imeState.value, key2 = instructions) {
-        /*
-        * This block prevents unwanted behavior, the unwanted behavior is as follows:
-        * 1. when the user clicks on the text field, it doesn't come up into view
-        * 2. when the text field has focus and the user scrolls away, typing does not bring the text field back into view
-        * 3. when the top bar is expanded and the text field is clicked, the top bar does not collapse
-        * */
-        if (imeState.value) {
-            toolbarState.collapse()
-            lazyListState.animateScrollToItem(lazyListState.layoutInfo.totalItemsCount)
-        }
-    }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -266,25 +240,14 @@ fun MenuOptions(
             state = lazyListState,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+
             items(screenState.sections) { section ->
-                val isSectionSelected = unselectedSection != section.id
-
+                val isSectionSelected = screenState.unselectedSection != section.sectionTitle
+                val data = remember { section.toSectionData() }
                 if (section.sectionType == "checkbox") {
-//                        TODO: change section and only pass options.data instead of creating data class here
-                    val data = remember {
-                        CheckBoxSelectorData(
-                            id = section.id,
-                            title = section.sectionTitle,
-                            options = section.options,
-                            currency = section.currency,
-                            required = section.required,
-                        )
-                    }
-
-
                     CheckBoxSelector(
                         data = data,
-                        selectedOptions = checkboxSelectedOptions,
+                        selectedOptions = screenState.selectedCheckboxOptions,
                         selected = isSectionSelected,
                         onSelectionChange = { key, option, isSelected ->
                             onCheckboxSelectionChange(key, option, isSelected)
@@ -292,32 +255,20 @@ fun MenuOptions(
                     )
 
                 } else if (section.sectionType == "radio") {
-//                    TODO: move this to viewModel
-                    val data = remember {
-                        RadioSelectorData(
-                            id = section.id,
-                            title = section.sectionTitle,
-                            options = section.options,
-                            currency = section.currency,
-                            required = section.required,
-                        )
-                    }
+
                     RadioSelector(
                         data = data,
-                        selectedOption = radioSelectedOptions[section.id],
+                        selectedOption = screenState.selectedRadioOption[section.id],
                         sectionSelected = isSectionSelected,
                         onSelectionChange = onRadioSelectionChange,
-
                         )
-
                 }
-
             }
 
             item {
                 Counter(
                     modifier = Modifier.fillMaxHeight(),
-                    counter = count,
+                    counter = screenState.quantity,
                     increment = increment,
                     decrement = decrement
                 )
@@ -328,7 +279,7 @@ fun MenuOptions(
                     onTextChange = {
                         onInstructionsChange(it)
                     },
-                    text = instructions,
+                    text = screenState.instructions,
                 )
             }
 
@@ -337,7 +288,7 @@ fun MenuOptions(
         CartBottomBar(
             modifier = Modifier.align(Alignment.BottomCenter),
             onAddToCartClick = onAddToCartClick,
-            totalPrice = totalPrice
+            totalPrice = screenState.totalPrice
         )
     }
 }

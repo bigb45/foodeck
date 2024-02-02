@@ -1,6 +1,7 @@
 package com.example.menu_item
 
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -13,6 +14,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,17 +24,22 @@ import com.example.compose.gray2
 import com.example.core.ui.theme.Typography
 import com.example.core.ui.theme.interBold
 import com.example.data.models.Option
+import com.example.data.models.SectionData
 
 @Composable
 fun CheckBoxSelector(
-    data: CheckBoxSelectorData,
+    data: SectionData,
     selectedOptions: Map<String, List<Option>>,
     selected: Boolean,
     onSelectionChange: (String, Option, Boolean) -> Unit,
 ) {
+    val color: Color by animateColorAsState(targetValue = if (selected) colorScheme.surface else colorScheme.primaryContainer,
+        label = ""
+    )
     Column(
         modifier = Modifier
-            .background(colorScheme.surface)
+
+            .background(color)
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -90,10 +97,3 @@ fun CheckBoxSelector(
 
 }
 
-data class CheckBoxSelectorData(
-    val id: String,
-    val title: String,
-    val options: List<Option>,
-    val currency: String? ="$",
-    val required: Boolean,
-)

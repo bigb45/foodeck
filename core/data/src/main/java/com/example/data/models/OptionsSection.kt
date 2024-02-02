@@ -13,6 +13,17 @@ data class OptionsSectionDto(
 
     )
 
+fun OptionsSectionDto.toSectionData(): SectionData{
+    return SectionData(
+        id = this.id,
+        title = this.sectionTitle,
+        options = this.options,
+        currency = this.currency,
+        required = this.required,
+    )
+}
+
+
 data class Menu(
     val sections: List<OptionsSectionDto>,
 )

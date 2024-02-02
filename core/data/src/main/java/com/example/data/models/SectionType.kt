@@ -1,6 +1,6 @@
 package com.example.data.models
 
-enum class OptionSelectorType {
+enum class SectionType {
     RADIO,
     CHECKBOX
 }

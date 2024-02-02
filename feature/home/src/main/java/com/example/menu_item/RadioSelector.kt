@@ -21,10 +21,11 @@ import com.example.compose.gray2
 import com.example.core.ui.theme.Typography
 import com.example.core.ui.theme.interBold
 import com.example.data.models.Option
+import com.example.data.models.SectionData
 
 @Composable
 fun RadioSelector(
-    data: RadioSelectorData,
+    data: SectionData,
     selectedOption: Option?,
     sectionSelected: Boolean,
     onSelectionChange: (String, Option) -> Unit,
@@ -87,11 +88,3 @@ fun RadioSelector(
     }
 
 }
-
-data class RadioSelectorData(
-    val id: String,
-    val title: String,
-    val options: List<Option>,
-    val currency: String? = "$",
-    val required: Boolean,
-)
