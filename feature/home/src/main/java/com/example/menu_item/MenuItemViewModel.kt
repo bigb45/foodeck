@@ -33,10 +33,15 @@ class MenuItemViewModel @Inject constructor(
 
     private val _counter = MutableStateFlow(1)
     private val _optionsState = MutableStateFlow<OptionsState>(OptionsState.Loading)
-    private val _baseMealPrice = 21f
+    private val _baseMenuPrice = MutableStateFlow<Float>(21f)
     private val _launchedEffectTrigger = MutableStateFlow<Boolean>(true)
+    private val _state = MutableStateFlow<MenuItemScreenState>(MenuItemScreenState(
+        quantity = _counter.value,
+        optionsState = _optionsState.value,
+        trigger = _launchedEffectTrigger.value,
+        initialMenuPrice = _baseMenuPrice.value
+    ))
 
-    private val _state = MutableStateFlow<MenuItemScreenState>(MenuItemScreenState())
     val menuItemScreenState: StateFlow<MenuItemScreenState> = _state.asStateFlow()
 
 
@@ -68,7 +73,7 @@ class MenuItemViewModel @Inject constructor(
         }.sum()
 
 
-        val total = (_baseMealPrice + selectionsTotal) * _counter.value
+        val total = (_baseMenuPrice.value + selectionsTotal) * _counter.value
         _state.value = _state.value.copy(
             totalPrice = total
         )

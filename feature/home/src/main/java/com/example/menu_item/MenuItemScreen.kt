@@ -1,6 +1,5 @@
 package com.example.menu_item
 
-import android.view.ViewTreeObserver
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,11 +25,8 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -40,18 +36,14 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.common.CollapsingToolbar
 import com.example.common.LoadingIndicator
 import com.example.common.log
+import com.example.common.util.rememberImeState
 import com.example.compose.gray6
 import com.example.custom_toolbar.ToolbarState
-import com.example.data.models.Option
-import com.example.data.models.OptionsSectionDto
 import com.example.data.models.toSectionData
 import com.example.restaurant.MAX_TOOLBAR_HEIGHT
 import com.example.restaurant.MIN_TOOLBAR_HEIGHT
@@ -86,7 +78,7 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
             }
 
             is OptionsState.Error -> {
-                Text("error")
+                Text("Error: " + (screenState.value.optionsState as OptionsState.Error).message)
             }
 
             is OptionsState.Success -> {
@@ -100,7 +92,7 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
                     viewModel = viewModel,
                     snackbarHost = snackbarHostState,
                     onNavigateUp = onNavigateUp,
-                    )
+                )
             }
 
         }
@@ -118,7 +110,7 @@ fun MenuItems(
     viewModel: MenuItemViewModel,
     snackbarHost: SnackbarHostState,
     onNavigateUp: () -> Unit,
-    ) {
+) {
 
     Box(
         modifier = modifier
@@ -130,24 +122,17 @@ fun MenuItems(
             lazyListState = lazyListState,
             screenState = screenState,
             snackbarHost = snackbarHost,
-            { key, newSelection ->
-                viewModel.onRadioSelected(key = key, newSelection = newSelection)
-            },
-            onCheckboxSelectionChange = { key, newSelection, isSelected ->
-                viewModel.onCheckBoxSelected(
-                    key = key,
-                    newSelection = newSelection,
-                    isSelected
-                )
-            },
-            increment = { viewModel.incrementCounter() },
-            decrement = { viewModel.decrementCounter() },
-            onInstructionsChange = { newText -> viewModel.setCustomInstructions(newText) },
-            onAddToCartClick = {
-                if (viewModel.onAddToCartClick()) {
-                    onNavigateUp()
-                }
-            }
+            actions = MenuOptionsActions(
+                onRadioSelectionChange = viewModel::onRadioSelected,
+                onCheckboxSelectionChange = viewModel::onCheckBoxSelected,
+                increment = viewModel::incrementCounter,
+                decrement = viewModel::decrementCounter,
+                onInstructionsChange = viewModel::setCustomInstructions,
+                onAddToCartClick = {
+                    if (viewModel.onAddToCartClick()) {
+                        onNavigateUp()
+                    }
+                })
         )
 
         CollapsingToolbar(
@@ -171,16 +156,9 @@ fun MenuOptions(
     lazyListState: LazyListState,
     screenState: MenuItemScreenState,
     snackbarHost: SnackbarHostState,
-    onRadioSelectionChange: (String, Option) -> Unit,
-    onCheckboxSelectionChange: (String, Option, Boolean) -> Unit,
-    increment: () -> Unit,
-    decrement: () -> Unit,
-    onInstructionsChange: (String) -> Unit,
-    onAddToCartClick: () -> Unit,
+    actions: MenuOptionsActions,
 
     ) {
-
-
     val imeState = rememberImeState()
 //  key1 scrolls the text field into view
 //  key2 scrolls the text field into view when the user starts typing
@@ -250,7 +228,7 @@ fun MenuOptions(
                         selectedOptions = screenState.selectedCheckboxOptions,
                         selected = isSectionSelected,
                         onSelectionChange = { key, option, isSelected ->
-                            onCheckboxSelectionChange(key, option, isSelected)
+                            actions.onCheckboxSelectionChange(key, option, isSelected)
                         },
                     )
 
@@ -260,8 +238,8 @@ fun MenuOptions(
                         data = data,
                         selectedOption = screenState.selectedRadioOption[section.id],
                         sectionSelected = isSectionSelected,
-                        onSelectionChange = onRadioSelectionChange,
-                        )
+                        onSelectionChange = actions.onRadioSelectionChange,
+                    )
                 }
             }
 
@@ -269,25 +247,24 @@ fun MenuOptions(
                 Counter(
                     modifier = Modifier.fillMaxHeight(),
                     counter = screenState.quantity,
-                    increment = increment,
-                    decrement = decrement
+                    increment = actions.increment,
+                    decrement = actions.decrement
                 )
             }
 
             item {
                 Instructions(
                     onTextChange = {
-                        onInstructionsChange(it)
+                        actions.onInstructionsChange(it)
                     },
                     text = screenState.instructions,
                 )
             }
-
-
         }
+
         CartBottomBar(
             modifier = Modifier.align(Alignment.BottomCenter),
-            onAddToCartClick = onAddToCartClick,
+            onAddToCartClick = actions.onAddToCartClick,
             totalPrice = screenState.totalPrice
         )
     }
@@ -324,26 +301,4 @@ fun MealActions() {
             tint = Color.White,
         )
     }
-}
-
-@Composable
-fun rememberImeState(): State<Boolean> {
-    val imeState = remember {
-        mutableStateOf(false)
-    }
-
-    val view = LocalView.current
-    DisposableEffect(view) {
-        val listener = ViewTreeObserver.OnGlobalLayoutListener {
-            val isKeyboardOpen = ViewCompat.getRootWindowInsets(view)
-                ?.isVisible(WindowInsetsCompat.Type.ime()) ?: true
-            imeState.value = isKeyboardOpen
-        }
-
-        view.viewTreeObserver.addOnGlobalLayoutListener(listener)
-        onDispose {
-            view.viewTreeObserver.removeOnGlobalLayoutListener(listener)
-        }
-    }
-    return imeState
 }
