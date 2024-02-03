@@ -1,7 +1,7 @@
 package com.example.data.repositories
 
-import com.example.data.models.UserDetailsModel
+import com.example.data.models.UserDetails
 
 interface UsersRepository {
-    suspend fun getUser(userId: String): UserDetailsModel
+    suspend fun getUser(userId: String): UserDetails
 }

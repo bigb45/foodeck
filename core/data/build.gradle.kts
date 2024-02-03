@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
 
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
@@ -62,7 +61,8 @@ dependencies {
     implementation(libs.ui)
     implementation(libs.ui.graphics)
     implementation(libs.ui.tooling.preview)
-    implementation(libs.material3)
+//    implementation(libs.material3)
+    implementation(libs.androidx.material3.android)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.play.services.auth)
     implementation(libs.firebase.auth.ktx)
@@ -70,6 +70,10 @@ dependencies {
     implementation(libs.retrofit2)
     implementation(libs.gson.converter)
     implementation(project(":core:common"))
+    implementation(libs.androidx.room.common)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.runtime)
+    kapt(libs.androidx.room.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

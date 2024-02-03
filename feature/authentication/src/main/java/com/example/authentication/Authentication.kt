@@ -13,8 +13,9 @@ import com.example.authentication.email_login.navigation.emailLoginScreen
 import com.example.authentication.email_login.navigation.navigateToEmail
 import com.example.authentication.facebook_login.navigation.facebookLoginScreen
 import com.example.authentication.navigation.loginMethods
+import com.example.authentication.navigation.authRoute
 import com.example.authentication.navigation.loginMethodsRoute
-import com.example.authentication.navigation.navigateToLoginMethods
+import com.example.authentication.navigation.navigateToAuthentication
 
 
 @Composable
@@ -49,7 +50,7 @@ fun Authentication(onAuthenticationSuccess: (String) -> Unit) {
             facebookLoginScreen(
                 onNavigationIconClick = navController::navigateUp,
                 onAuthenticationSuccess = onAuthenticationSuccess,
-                onContinueClick = navController::navigateToLoginMethods
+                onContinueClick = navController::navigateToAuthentication
             )
 
             loginMethods(navController, onAuthenticationSuccess)

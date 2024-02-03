@@ -64,9 +64,9 @@ dependencies {
     implementation(libs.ui)
     implementation(libs.ui.graphics)
     implementation(libs.ui.tooling.preview)
-    implementation(libs.material3)
+//    implementation(libs.material3)
+    implementation(libs.androidx.material3.android)
     implementation(libs.androidx.navigation.runtime.ktx)
-    implementation(platform(libs.compose.bom))
     implementation(libs.androidx.tools.core)
     implementation(project(":core"))
     implementation(project(":core:domain"))
@@ -88,7 +88,6 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation)
-
 
     implementation(libs.androidx.compose.material)
 

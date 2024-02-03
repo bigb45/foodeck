@@ -9,8 +9,8 @@ import com.example.common.Result
 import com.example.common.asResult
 import com.example.data.models.FieldError
 import com.example.data.models.SignupAuthResponseModel
-import com.example.data.models.UserDetailsModel
-import com.example.data.models.UserSignUpModel
+import com.example.data.models.UserDetails
+import com.example.data.models.UserSignUpInfo
 import com.example.data.repositories.AuthRepositoryImpl
 import com.example.data.util.TextFieldMessages
 import com.example.domain.use_cases.CreateUserUseCase
@@ -74,7 +74,7 @@ class SignupViewModel @Inject constructor(
                 if (validateFields()) {
                     _authResult.value = AuthResult.Loading
                     val newUser = with(_uiState.value) {
-                        UserSignUpModel(
+                        UserSignUpInfo(
                             username = username,
                             email = email,
                             password = password,
@@ -94,7 +94,7 @@ class SignupViewModel @Inject constructor(
         return _isFormValid.value
     }
 
-    private fun signUp(user: UserSignUpModel) {
+    private fun signUp(user: UserSignUpInfo) {
         viewModelScope.launch {
 
             signupUpUseCase(user).asResult().collect { result ->
@@ -129,7 +129,7 @@ class SignupViewModel @Inject constructor(
 
                     is Result.Success -> {
                         _authResult.value =
-                            AuthResult.Success(UserDetailsModel(userId = (result.data as SignupAuthResponseModel.SignupSuccess).tokens.userId))
+                            AuthResult.Success(UserDetails(userId = (result.data as SignupAuthResponseModel.SignupSuccess).tokens.userId))
                         d(
                             "error",
                             "user data ${(result.data as SignupAuthResponseModel.SignupSuccess).tokens.userId}"

@@ -4,9 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import android.util.Log.d
-import com.example.data.api_services.AuthApiService
-import com.example.data.models.UserDetailsModel
-import com.example.domain.use_cases.AuthenticateUserWithTokenUseCase
+import com.example.data.models.UserDetails
 import com.example.fooddelivery.authentication.R
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.BeginSignInRequest.GoogleIdTokenRequestOptions
@@ -16,7 +14,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 import java.util.concurrent.CancellationException
-import javax.inject.Inject
 
 class GoogleAuthUiClient (
     private val context: Context,
@@ -89,10 +86,10 @@ class GoogleAuthUiClient (
         }
     }
 
-    fun getSignedInUser(): UserDetailsModel? = auth.currentUser?.run {
-        UserDetailsModel(
+    fun getSignedInUser(): UserDetails? = auth.currentUser?.run {
+        UserDetails(
             userId = uid,
-            username = displayName ?: "default user",
+            name = displayName ?: "default user",
             profilePictureUrl = photoUrl?.toString()
         )
     }

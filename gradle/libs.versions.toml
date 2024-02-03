@@ -9,11 +9,11 @@ androidx-test-ext-junit = "1.1.5"
 espresso-core = "3.5.1"
 kotlin-gradle-plugin = "1.5.21"
 lifecycle-runtime-ktx = "2.6.2"
-activity-compose = "1.8.0"
-compose-bom = "2023.10.01"
+activity-compose = "1.8.2"
+compose-bom = "2024.01.00"
 navigation-runtime-ktx = "2.7.4"
 appcompat = "1.6.1"
-material = "1.10.0"
+material = "1.11.0"
 foundation-android = "1.5.4"
 ui-text-android = "1.5.4"
 play-services-auth = "20.7.0"
@@ -31,6 +31,12 @@ navigation-compose = "2.7.4"
 hilt-android = "2.48"
 retrofit2 = "2.1.0"
 gson-converter = "2.9.0"
+material3-android = "1.2.0-beta02"
+room-version = "2.6.1"
+room-common = "2.6.1"
+room-compiler = "2.6.1"
+room-ktx = "2.6.1"
+
 [libraries]
 androidx-compose-material = { module = "androidx.compose.material:material-icons-extended" }
 androidx-hilt-navigation = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt-navigation"}
@@ -71,6 +77,12 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3",
 firebase-database-ktx = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebase-database-ktx" }
 retrofit2 = {group = 'com.squareup.retrofit2', name = 'retrofit', version.ref = 'retrofit2'}
 gson-converter = {group = 'com.squareup.retrofit2', name = 'converter-gson', version.ref = 'gson-converter'}
+androidx-material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3-android" }
+androidx-room-common = { group = "androidx.room", name = "room-common", version.ref = "room-common" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room-compiler" }
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room-compiler" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room-ktx" }
+
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

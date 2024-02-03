@@ -8,7 +8,7 @@ import com.example.common.asResult
 import com.example.data.models.InternalServerException
 import com.example.data.models.TokenAuthResponseModel
 import com.example.data.models.UnknownException
-import com.example.data.models.UserDetailsModel
+import com.example.data.models.UserDetails
 import com.example.domain.use_cases.AuthenticateUserWithTokenUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +20,7 @@ import javax.inject.Inject
 class GoogleSignInViewModel @Inject constructor(
     private val authenticateWithToken: AuthenticateUserWithTokenUseCase,
 ) : ViewModel() {
-    private val _authResult = MutableStateFlow<AuthResult>(AuthResult.Loading)
+    private val _authResult = MutableStateFlow<AuthResult>(AuthResult.SignedOut)
     private val _uiState = MutableStateFlow<LoginMethodsScreenState>(LoginMethodsScreenState.SignedOut)
 
     val authResult: StateFlow<AuthResult> = _authResult
@@ -41,7 +41,7 @@ class GoogleSignInViewModel @Inject constructor(
                         Log.d("error", "loading")
                     }
                     is Result.Success -> {
-                        _authResult.value = AuthResult.Success(UserDetailsModel(userId = (result.data as TokenAuthResponseModel.SignInSuccess).tokens.userId))
+                        _authResult.value = AuthResult.Success(UserDetails(userId = (result.data as TokenAuthResponseModel.SignInSuccess).tokens.userId))
                         Log.d(
                             "error",
                             "user data ${(result.data as TokenAuthResponseModel.SignInSuccess).tokens.userId}"

@@ -24,7 +24,7 @@ fun <T> Flow<T>.asResult(): Flow<Result<T>> {
 }
 
 
-fun <T> Flow<List<T>>.ListAsResult(): Flow<Result<List<T>>> {
+fun <T> Flow<List<T>>.listAsResult(): Flow<Result<List<T>>> {
      return this
         .map<List<T>, Result<List<T>>> {
             Result.Success(it)
