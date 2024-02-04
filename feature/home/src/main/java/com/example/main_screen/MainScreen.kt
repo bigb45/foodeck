@@ -103,6 +103,7 @@ import com.example.core.ui.theme.interBold
 import com.example.data.models.Offer
 import com.example.data.models.Restaurant
 import com.example.fooddeliver.home.R
+import com.example.restaurant.RestaurantState
 import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -112,12 +113,18 @@ fun MainScreen(
 ) {
     val viewModel: MainScreenViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        if(uiState !is MainScreenUiState.Success){
+            viewModel.fetchRestaurantData()
+        }
+    }
+
     val pullToRefreshState = rememberPullToRefreshState()
-    val number = 5
+    val number = 2
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val scaleFraction = if (pullToRefreshState.isRefreshing) 1f else
         LinearOutSlowInEasing.transform(pullToRefreshState.progress).coerceIn(0f, 1f)
-
 
     if (pullToRefreshState.isRefreshing) {
         LaunchedEffect(true) {
@@ -139,8 +146,8 @@ fun MainScreen(
             BottomNavBar()
         }
 
-        ) { padding ->
-
+        ) {
+            padding ->
             Box(
                 modifier = Modifier
                     .padding(
@@ -543,7 +550,6 @@ private fun BottomNavBar() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun BadgedFab(number: Int, onClick: () -> Unit) {
     Box {
@@ -557,7 +563,6 @@ private fun BadgedFab(number: Int, onClick: () -> Unit) {
                 contentDescription = null,
                 tint = colorScheme.onPrimaryContainer,
                 modifier = Modifier
-
                     .size(24.dp)
 
             )

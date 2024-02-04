@@ -61,6 +61,10 @@ fun MenuItemScreen(onNavigateUp: () -> Unit) {
 
     val viewModel: MenuItemViewModel = hiltViewModel()
 
+    LaunchedEffect(key1 = Unit){
+        viewModel.getOptions()
+    }
+
     val toolbarState = rememberToolbarState(toolbarRange)
     val scope = rememberCoroutineScope()
     val lazyListState = rememberLazyListState()

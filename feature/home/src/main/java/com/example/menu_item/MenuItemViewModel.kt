@@ -51,10 +51,6 @@ class MenuItemViewModel @Inject constructor(
     private val restaurantId: String =
         URLDecoder.decode(savedStateHandle[restaurantIdArgument], Charsets.UTF_8.name())
 
-    init {
-        getOptions()
-    }
-
     private fun calculateTotalPrice(): Float {
         val radioButtonList = _state.value.selectedRadioOption
         val checkboxList = _state.value.selectedCheckboxOptions
@@ -133,7 +129,7 @@ class MenuItemViewModel @Inject constructor(
         }
     }
 
-    private fun getOptions() {
+    fun getOptions() {
         viewModelScope.launch {
             getMealOptions(restaurantId = restaurantId, menuId = menuItemId).asResult()
                 .collect { result ->
