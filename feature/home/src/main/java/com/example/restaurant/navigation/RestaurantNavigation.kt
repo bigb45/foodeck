@@ -19,7 +19,7 @@ fun NavController.navigateToRestaurant(navOptions: NavOptions? = null, restauran
     this.navigate(route = "$restaurantRoute/$encodedRestaurantId", navOptions = navOptions)
 }
 
-fun NavGraphBuilder.restaurant(onNavigateUp: () -> Unit, onItemClick: (String) -> Unit){
+fun NavGraphBuilder.restaurant(onNavigateUp: () -> Unit, onItemClick: (String, String) -> Unit){
 
     composable(
         route = "$restaurantRoute/{$restaurantIdArgument}",
@@ -27,7 +27,8 @@ fun NavGraphBuilder.restaurant(onNavigateUp: () -> Unit, onItemClick: (String) -
             navArgument(restaurantIdArgument) { type = NavType.StringType },
         ),
     ) {
-            RestaurantScreen(onNavigateUp = onNavigateUp, onItemClick = onItemClick)
+            RestaurantScreen(onNavigateUp = onNavigateUp, onItemClick = {menuId, restaurantId ->
+                onItemClick(menuId, restaurantId) })
     }
 
 }

@@ -2,11 +2,9 @@ package com.example
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.main_screen.navigation.mainScreen
-import com.example.menu_item.MenuItemScreen
 import com.example.menu_item.navigation.menuItemScreen
 import com.example.menu_item.navigation.navigateToMenuItem
 import com.example.navigation.mainScreenRoute
@@ -17,7 +15,7 @@ import com.example.restaurant.navigation.restaurant
 fun Home() {
     val navController = rememberNavController()
 
-    FoodDeliveryTheme{
+    FoodDeliveryTheme {
         NavHost(navController = navController, startDestination = mainScreenRoute) {
             mainScreen(
                 onRestaurantClick = { restaurantId ->
@@ -30,8 +28,8 @@ fun Home() {
 
             restaurant(
                 onNavigateUp = navController::navigateUp
-            ) {
-                navController.navigateToMenuItem(menuItemId = it)
+            ) { menuId, restaurantId ->
+                navController.navigateToMenuItem(menuItemId = menuId, restaurantId = restaurantId)
             }
 
             menuItemScreen(

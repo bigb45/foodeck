@@ -16,23 +16,27 @@ const val menuItemRoute = "menu_item_route"
 const val menuItemIdArgument = "menuItemId"
 private val URL_CHARACTER_ENCODING = Charsets.UTF_8.name()
 
-fun NavController.navigateToMenuItem(navOptions: NavOptions? = null, menuItemId: String) {
+fun NavController.navigateToMenuItem(navOptions: NavOptions? = null, menuItemId: String, restaurantId: String) {
     val encodedMenuItemId = URLEncoder.encode(
         menuItemId, URL_CHARACTER_ENCODING
+    )
+    val encodedRestaurantId = URLEncoder.encode(
+        restaurantId, URL_CHARACTER_ENCODING
     )
 
     d("error", menuItemId)
     this.navigate(
-        route = "$restaurantRoute/$menuItemRoute/$encodedMenuItemId",
+        route = "$restaurantRoute/$menuItemRoute/$encodedRestaurantId/$encodedMenuItemId",
         navOptions = navOptions
     )
 }
 
 fun NavGraphBuilder.menuItemScreen(onNavigateUp: () -> Unit) {
     composable(
-        route = "$restaurantRoute/{$restaurantIdArgument}/{$menuItemIdArgument}",
+        route = "$restaurantRoute/$menuItemRoute/{$restaurantIdArgument}/{$menuItemIdArgument}",
         arguments = listOf(
             navArgument(menuItemIdArgument) { type = NavType.StringType },
+            navArgument(restaurantIdArgument) { type = NavType.StringType },
         ),
     ) {
         MenuItemScreen(onNavigateUp = onNavigateUp)
