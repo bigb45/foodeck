@@ -1,6 +1,5 @@
 package com.example.common
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.PrimaryScrollableTabRow
@@ -10,16 +9,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.compose.gray2
 import com.example.core.ui.theme.interBold
-import com.example.restaurant.Meal
 
 // TODO: remove this function, it is redundant
 @Composable
 fun AnimatedTabs(
     modifier: Modifier = Modifier,
-    categories: List<Category>,
+    categories: List<String>,
     selectedTabIndex: Int,
     setSelectedTabIndex: (Int) -> Unit,
 ) {
@@ -28,7 +25,7 @@ fun AnimatedTabs(
         modifier = modifier,
         categories = categories,
         selectedTabIndex = selectedTabIndex
-    ) { index, _ -> setSelectedTabIndex(index) }
+    ) { index -> setSelectedTabIndex(index) }
 
 }
 
@@ -36,18 +33,18 @@ fun AnimatedTabs(
 @Composable
 internal fun TabSync(
     modifier: Modifier = Modifier,
-    categories: List<Category>,
+    categories: List<String>,
     selectedTabIndex: Int,
-    onTabSelect: (Int, Category) -> Unit,
+    onTabSelect: (Int) -> Unit,
 ) {
     PrimaryScrollableTabRow(modifier = modifier, selectedTabIndex = selectedTabIndex, edgePadding = 0.dp) {
         categories.forEachIndexed { index, category ->
             Tab(
                 selected = index == selectedTabIndex,
-                onClick = { onTabSelect(index, category) },
+                onClick = { onTabSelect(index) },
                 text = {
                     Text(
-                        text = category.categoryName,
+                        text = category,
                         style = TextStyle(
 //                            fontSize = 18.sp,
                             color = if(index == selectedTabIndex) colorScheme.primary else gray2,
@@ -59,5 +56,4 @@ internal fun TabSync(
     }
 }
 
-data class Category(val categoryName: String, val items: List<Meal>)
 

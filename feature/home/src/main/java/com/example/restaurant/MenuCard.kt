@@ -1,32 +1,25 @@
 package com.example.restaurant
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -35,12 +28,13 @@ import com.example.compose.gray1
 import com.example.core.ui.theme.Typography
 import com.example.core.ui.theme.interBold
 import com.example.fooddeliver.home.R
+import com.example.model.Menu
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun MealCard(
+fun MenuCard(
     modifier: Modifier = Modifier,
-    meal: Meal,
+    menu: Menu,
 //    state: MealState
 ) {
 
@@ -58,7 +52,7 @@ fun MealCard(
                     .clip(RoundedCornerShape(16.dp))
                     .size(64.dp)
             ) {
-                GlideImage(model = meal.imageUrl ?: R.drawable.cover, contentDescription = "Food")
+                GlideImage(model = menu.imageUrl ?: R.drawable.cover, contentDescription = "Food")
             }
 
 
@@ -70,10 +64,10 @@ fun MealCard(
                     space = 4.dp, alignment = Alignment.CenterVertically
                 )
             ) {
-                Text(meal.name, style = Typography.titleMedium)
-                Text(meal.contents, style = Typography.bodyLarge.copy(color = gray1), maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(menu.name, style = Typography.titleMedium)
+                Text(menu.contents, style = Typography.bodyLarge.copy(color = gray1), maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Text(
-                    "${meal.currency}${meal.price}",
+                    "${menu.currency}${menu.price}",
                     style = Typography.titleMedium.copy(fontFamily = interBold),
                     modifier = Modifier.padding(top = 8.dp)
                 )
@@ -98,12 +92,3 @@ fun MealCard(
     }
 }
 
-data class Meal(
-    val id: String? = "0",
-    val name: String,
-    val imageUrl: String?,
-    val contents: String,
-    val price: String,
-//    TODO: make [currency] a global variable
-    val currency: String,
-)
