@@ -1,16 +1,13 @@
 package com.example.restaurant
 
-import android.util.Log.d
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.common.asResult
 import com.example.common.log
-import com.example.data.models.RestaurantMenu
-import com.example.domain.use_cases.GetAllRestaurantMealsUseCase
-import com.example.menu_item.OptionsState
+import com.example.data.models.RestaurantSection
+import com.example.domain.use_cases.GetAllRestaurantMenusUseCase
 import com.example.restaurant.navigation.restaurantIdArgument
-import com.example.welcome.navigation.userIdArgument
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,13 +19,13 @@ import javax.inject.Inject
 @HiltViewModel
 class RestaurantViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val getAllMeals: GetAllRestaurantMealsUseCase
+    private val getAllMeals: GetAllRestaurantMenusUseCase
 ): ViewModel() {
-    private val restaurantId: String =
+    val restaurantId: String =
         URLDecoder.decode(savedStateHandle[restaurantIdArgument], Charsets.UTF_8.name())
 
-    private val _restaurantState = MutableStateFlow<RestaurantState<List<RestaurantMenu>>>(RestaurantState.Loading)
-    val restaurantMenus: StateFlow<RestaurantState<List<RestaurantMenu>>> = _restaurantState.asStateFlow()
+    private val _restaurantState = MutableStateFlow<RestaurantState<List<RestaurantSection>>>(RestaurantState.Loading)
+    val restaurantMenus: StateFlow<RestaurantState<List<RestaurantSection>>> = _restaurantState.asStateFlow()
     fun fetchRestaurantDetails(){
         _restaurantState.value = RestaurantState.Loading
         viewModelScope.launch {

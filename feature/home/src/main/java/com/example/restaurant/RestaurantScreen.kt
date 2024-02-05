@@ -1,6 +1,5 @@
 package com.example.restaurant
 
-import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.animation.core.animateDecay
 import androidx.compose.foundation.background
@@ -51,9 +50,10 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ahmadhamwi.tabsync_compose.lazyListTabSync
 import com.example.common.AnimatedTabs
-import com.example.common.Category
+import com.example.model.Category
 import com.example.common.CollapsingToolbar
 import com.example.common.LoadingIndicator
 import com.example.common.log
@@ -63,21 +63,22 @@ import com.example.core.ui.theme.interBold
 import com.example.custom_toolbar.CustomTopAppBarState
 import com.example.custom_toolbar.ToolbarState
 import com.example.data.models.Restaurant
-import com.example.data.models.RestaurantMenu
+import com.example.data.models.RestaurantSection
+import com.example.model.Menu
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancelChildren
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 val MIN_TOOLBAR_HEIGHT = 68.dp
 val MAX_TOOLBAR_HEIGHT = 176.dp
 val TAB_LAYOUT_HEIGHT = 40.dp
 
+lateinit var  restaurantId: String
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RestaurantScreen(
     onNavigateUp: () -> Unit,
-    onItemClick: (String) -> Unit,
+    onItemClick: (String, String) -> Unit,
 ) {
 
     val scope = rememberCoroutineScope()
@@ -86,6 +87,7 @@ fun RestaurantScreen(
     val isSheetOpen = remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     val viewModel: RestaurantViewModel = hiltViewModel()
+    restaurantId = viewModel.restaurantId
     val items = viewModel.restaurantMenus.collectAsState()
     LaunchedEffect(Unit) {
         if(items.value !is RestaurantState.Success){
@@ -96,7 +98,7 @@ fun RestaurantScreen(
     val placeHolder = listOf(
         Category(
             categoryName = "1", items = listOf(
-                Meal(
+                Menu(
                     id = "99",
                     name = "Meal1",
                     imageUrl = null,
@@ -104,7 +106,7 @@ fun RestaurantScreen(
                     price = "99.99",
                     currency = "$"
                 ),
-                Meal(
+                Menu(
                     id = "98",
                     name = "Meal1",
                     imageUrl = null,
@@ -112,7 +114,7 @@ fun RestaurantScreen(
                     price = "99.99",
                     currency = "$"
                 ),
-                Meal(
+                Menu(
                     id = "97",
                     name = "Meal1",
                     imageUrl = null,
@@ -120,7 +122,7 @@ fun RestaurantScreen(
                     price = "99.99",
                     currency = "$"
                 ),
-                Meal(
+                Menu(
                     id = "96",
                     name = "Meal1",
                     imageUrl = null,
@@ -133,7 +135,7 @@ fun RestaurantScreen(
         ),
         Category(
             categoryName = "2", items = listOf(
-                Meal(
+                Menu(
                     id = "89",
                     name = "Meal1",
                     imageUrl = null,
@@ -141,7 +143,7 @@ fun RestaurantScreen(
                     price = "99.99",
                     currency = "$"
                 ),
-                Meal(
+                Menu(
                     id = "88",
                     name = "Meal1",
                     imageUrl = null,
@@ -149,7 +151,7 @@ fun RestaurantScreen(
                     price = "99.99",
                     currency = "$"
                 ),
-                Meal(
+                Menu(
                     id = "87",
                     name = "Meal1",
                     imageUrl = null,
@@ -157,7 +159,7 @@ fun RestaurantScreen(
                     price = "99.99",
                     currency = "$"
                 ),
-                Meal(
+                Menu(
                     id = "86",
                     name = "Meal1",
                     imageUrl = null,
@@ -170,7 +172,7 @@ fun RestaurantScreen(
         ),
         Category(
             categoryName = "3", items = listOf(
-                Meal(
+                Menu(
                     id = "79",
                     name = "Meal1",
                     imageUrl = null,
@@ -178,7 +180,7 @@ fun RestaurantScreen(
                     price = "99.99",
                     currency = "$"
                 ),
-                Meal(
+                Menu(
                     id = "78",
                     name = "Meal1",
                     imageUrl = null,
@@ -186,7 +188,7 @@ fun RestaurantScreen(
                     price = "99.99",
                     currency = "$"
                 ),
-                Meal(
+                Menu(
                     id = "77",
                     name = "Meal1",
                     imageUrl = null,
@@ -194,7 +196,7 @@ fun RestaurantScreen(
                     price = "99.99",
                     currency = "$"
                 ),
-                Meal(
+                Menu(
                     id = "76",
                     name = "Meal1",
                     imageUrl = null,
@@ -207,7 +209,7 @@ fun RestaurantScreen(
         ),
         Category(
             categoryName = "4", items = listOf(
-                Meal(
+                Menu(
                     id = "69",
                     name = "Meal1",
                     imageUrl = null,
@@ -215,7 +217,7 @@ fun RestaurantScreen(
                     price = "99.99",
                     currency = "$"
                 ),
-                Meal(
+                Menu(
                     id = "68",
                     name = "Meal1",
                     imageUrl = null,
@@ -223,7 +225,7 @@ fun RestaurantScreen(
                     price = "99.99",
                     currency = "$"
                 ),
-                Meal(
+                Menu(
                     id = "67",
                     name = "Meal1",
                     imageUrl = null,
@@ -231,7 +233,7 @@ fun RestaurantScreen(
                     price = "99.99",
                     currency = "$"
                 ),
-                Meal(
+                Menu(
                     id = "66",
                     name = "Meal1",
                     imageUrl = null,
@@ -244,7 +246,7 @@ fun RestaurantScreen(
         ),
         Category(
             categoryName = "5", items = listOf(
-                Meal(
+                Menu(
                     id = "59",
                     name = "Meal1",
                     imageUrl = null,
@@ -252,7 +254,7 @@ fun RestaurantScreen(
                     price = "99.99",
                     currency = "$"
                 ),
-                Meal(
+                Menu(
                     id = "58",
                     name = "Meal1",
                     imageUrl = null,
@@ -260,7 +262,7 @@ fun RestaurantScreen(
                     price = "99.99",
                     currency = "$"
                 ),
-                Meal(
+                Menu(
                     id = "57",
                     name = "Meal1",
                     imageUrl = null,
@@ -268,7 +270,7 @@ fun RestaurantScreen(
                     price = "99.99",
                     currency = "$"
                 ),
-                Meal(
+                Menu(
                     id = "56",
                     name = "Meal1",
                     imageUrl = null,
@@ -301,10 +303,10 @@ fun RestaurantScreen(
                 is RestaurantState.Success -> {
                     //    This is bad, don't do this in the UI
                     var categories =
-                        (items.value as RestaurantState.Success<List<RestaurantMenu>>).data.map { section ->
+                        (items.value as RestaurantState.Success<List<RestaurantSection>>).data.map { section ->
                             Category(categoryName = section.sectionTitle,
-                                items = section.storeItems.map { storeItem ->
-                                    Meal(
+                                items = section.menuItems.map { storeItem ->
+                                    Menu(
                                         id = storeItem.itemId,
                                         name = storeItem.itemName,
                                         imageUrl = storeItem.coverImageUrl,
@@ -359,7 +361,10 @@ fun RestaurantScreen(
                     Restaurant(restaurant = restaurant,
                         categories = categories,
                         onNavigateUp = onNavigateUp,
-                        onItemClick = onItemClick,
+                        onItemClick = {
+                                      restaurantId, menuId ->
+                            onItemClick(restaurantId, menuId)
+                        },
                         onDeliveryTimeClick = {
                             isDialogOpen.value = true
                         },
@@ -373,7 +378,6 @@ fun RestaurantScreen(
 
                     )
                 }
-
 
                 is RestaurantState.Loading -> {
                     LoadingIndicator()
@@ -394,7 +398,7 @@ internal fun Restaurant(
     restaurant: Restaurant,
     categories: List<Category>,
     onNavigateUp: () -> Unit = {},
-    onItemClick: (String) -> Unit = {},
+    onItemClick: (String, String) -> Unit = {_, _ -> },
     onShareClick: () -> Unit = {},
     onMoreClick: () -> Unit = {},
     onFavoriteClick: (String) -> Unit = {},
@@ -426,7 +430,7 @@ internal fun Restaurant(
         modifier = Modifier.nestedScroll(nestedScrollConnection)
     ) {
 
-        Meals(
+        Menus(
             modifier = Modifier.graphicsLayer {
                 translationY =
                     toolbarState.height + toolbarState.offset + TAB_LAYOUT_HEIGHT.toPx() + (100.dp.toPx() * toolbarState.progress)
@@ -434,7 +438,9 @@ internal fun Restaurant(
             contentPadding = PaddingValues(bottom = TAB_LAYOUT_HEIGHT),
             categories = categories,
             lazyListState = lazyListState,
-            onItemClick = onItemClick,
+            onItemClick = {restaurantId, menuId ->
+                onItemClick(restaurantId, menuId)
+            },
         )
 
         CollapsingToolbar(
@@ -492,7 +498,7 @@ internal fun Restaurant(
 
             AnimatedTabs(
                 modifier = Modifier.graphicsLayer { translationY = toolbarState.offset },
-                categories = categories,
+                categories = categories.map{it.categoryName},
                 selectedTabIndex = selectedTabIndex,
                 setSelectedTabIndex = {
                     newIndex ->
@@ -507,12 +513,12 @@ internal fun Restaurant(
 
 
 @Composable
-fun Meals(
+fun Menus(
     modifier: Modifier = Modifier,
     categories: List<Category>,
     contentPadding: PaddingValues,
     lazyListState: LazyListState,
-    onItemClick: (String) -> Unit,
+    onItemClick: (String, String) -> Unit,
 ) {
     LazyColumn(
         contentPadding = contentPadding,
@@ -521,7 +527,10 @@ fun Meals(
         state = lazyListState
     ) {
         items(categories) { category ->
-            CategorySection(category = category, onItemClick = onItemClick)
+            CategorySection(category = category, onItemClick = {
+                    restaurantId, menuId ->
+                onItemClick(restaurantId, menuId)
+            },)
             HorizontalDivider()
 
         }
@@ -529,7 +538,7 @@ fun Meals(
 }
 
 @Composable
-fun CategorySection(category: Category, onItemClick: (String) -> Unit) {
+fun CategorySection(category: Category, onItemClick: (String, String) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -547,10 +556,10 @@ fun CategorySection(category: Category, onItemClick: (String) -> Unit) {
             )
             repeat(category.items.size) {
 
-                MealCard(
+                MenuCard(
                     modifier = Modifier.clickable {
-                        onItemClick(category.items[it].id!!)
-                    }, meal = category.items[it]
+                        onItemClick(category.items[it].id!!, restaurantId)
+                    }, menu = category.items[it]
                 )
 
                 HorizontalDivider(

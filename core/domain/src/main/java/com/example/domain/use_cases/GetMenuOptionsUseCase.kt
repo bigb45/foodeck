@@ -5,8 +5,8 @@ import com.example.data.models.OptionsSectionDto
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetMealOptionsUseCase @Inject constructor(private val repository: RestaurantsRepository) {
+class GetMenuOptionsUseCase @Inject constructor(private val repository: RestaurantsRepository) {
     suspend operator fun invoke(restaurantId: String, menuId: String): Flow<List<OptionsSectionDto>>{
-        return repository.getMealOptions(restaurantId = restaurantId, menuId = menuId)
+        return repository.getMenuOptions(restaurantId = restaurantId, menuId = menuId)
     }
 }
