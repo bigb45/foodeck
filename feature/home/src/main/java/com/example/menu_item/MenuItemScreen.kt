@@ -140,18 +140,18 @@ fun MenuItems(
                     }
                 })
         )
-
+        val menuInfo = remember { screenState.menuInfo }
         CollapsingToolbar(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(with(LocalDensity.current) { toolbarState.height.toDp() })
                 .graphicsLayer { translationY = toolbarState.offset },
-            coverImageUrl = null,
+            coverImageUrl = menuInfo!!.coverImageUrl,
             progress = toolbarState.progress,
             onNavigateUp = onNavigateUp,
             expandedActions = { MealActions() },
-            title = "Meal name",
-            subTitle = "Restaurant name, address",
+            title = menuInfo.itemName,
+            subTitle = "${menuInfo.storeName}, ${menuInfo.address}",
         )
     }
 }
@@ -228,9 +228,6 @@ fun MenuOptions(
             items(screenState.sections) { section ->
                 val isSectionSelected = screenState.unselectedSection != section.sectionTitle
                 val data = remember { section.toSectionData() }
-//                TODO: remove the .toString() call
-                log(section.sectionType)
-                log(SectionType.CHECKBOX.value)
                 if (section.sectionType == SectionType.CHECKBOX.value) {
                     CheckBoxSelector(
                         data = data,

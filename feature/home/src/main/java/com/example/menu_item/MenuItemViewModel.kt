@@ -10,7 +10,8 @@ import com.example.data.models.CartItemDto
 import com.example.data.models.Option
 import com.example.data.models.OptionsSectionDto
 import com.example.data.models.SectionType
-import com.example.domain.use_cases.GetMealOptionsUseCase
+import com.example.domain.use_cases.GetMenuInfoUseCase
+import com.example.domain.use_cases.GetMenuOptionsUseCase
 import com.example.domain.use_cases.SaveCartItem
 import com.example.menu_item.navigation.menuItemIdArgument
 import com.example.restaurant.navigation.restaurantIdArgument
@@ -20,6 +21,7 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import java.net.URLDecoder
 import java.util.UUID
@@ -28,7 +30,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MenuItemViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val getMealOptions: GetMealOptionsUseCase,
+    private val getMenuInfo: GetMenuInfoUseCase,
+    private val getMenuOptions: GetMenuOptionsUseCase,
     private val addToCart: SaveCartItem,
 ) : ViewModel() {
 
@@ -36,12 +39,14 @@ class MenuItemViewModel @Inject constructor(
     private val _optionsState = MutableStateFlow<OptionsState>(OptionsState.Loading)
     private val _baseMenuPrice = MutableStateFlow<Float>(21f)
     private val _launchedEffectTrigger = MutableStateFlow<Boolean>(true)
-    private val _state = MutableStateFlow<MenuItemScreenState>(MenuItemScreenState(
-        quantity = _counter.value,
-        optionsState = _optionsState.value,
-        trigger = _launchedEffectTrigger.value,
-        initialMenuPrice = _baseMenuPrice.value
-    ))
+    private val _state = MutableStateFlow<MenuItemScreenState>(
+        MenuItemScreenState(
+            quantity = _counter.value,
+            optionsState = _optionsState.value,
+            trigger = _launchedEffectTrigger.value,
+            initialMenuPrice = _baseMenuPrice.value
+        )
+    )
 
     val menuItemScreenState: StateFlow<MenuItemScreenState> = _state.asStateFlow()
 
@@ -131,32 +136,48 @@ class MenuItemViewModel @Inject constructor(
 
     fun getOptions() {
         viewModelScope.launch {
-            getMealOptions(restaurantId = restaurantId, menuId = menuItemId).asResult()
-                .collect { result ->
-                    when (result) {
-                        is Result.Error -> {
-                            _state.value = _state.value.copy(
-                                optionsState = OptionsState.Error(result.exception?.message)
-                            )
-                        }
-
-                        Result.Loading -> {
-                            _state.value = _state.value.copy(
-                                optionsState = OptionsState.Loading
-                            )
-                        }
-
-                        is Result.Success -> {
-                            _optionsState.value = OptionsState.Success(result.data)
-                            _state.value = _state.value.copy(
-                                optionsState = OptionsState.Success(result.data),
-                                sections = result.data
-                            )
-                        }
-
-
+            val menuInfo = getMenuInfo(
+                restaurantId = restaurantId,
+                menuId = menuItemId
+            ).asResult()
+            val menuOptions =
+                getMenuOptions(
+                    restaurantId = restaurantId,
+                    menuId = menuItemId).asResult()
+            combine(menuInfo, menuOptions) { infoResult, optionsResult ->
+                when {
+                    infoResult is Result.Error -> {
+                        _state.value = _state.value.copy(
+                            optionsState = OptionsState.Error(infoResult.exception?.message)
+                        )
                     }
+
+                    optionsResult is Result.Error-> {
+                        _state.value = _state.value.copy(
+                            optionsState = OptionsState.Error(optionsResult.exception?.message)
+                        )
+                    }
+
+                    infoResult is Result.Loading || optionsResult is Result.Loading  -> {
+                        _state.value = _state.value.copy(
+                            optionsState = OptionsState.Loading
+                        )
+                    }
+
+                    infoResult is Result.Success && optionsResult is Result.Success -> {
+                        _optionsState.value = OptionsState.Success(optionsResult.data)
+                        _state.value = _state.value.copy(
+                            optionsState = OptionsState.Success(optionsResult.data),
+                            sections = optionsResult.data,
+                            menuInfo = infoResult.data
+                        )
+                    }
+
+
                 }
+
+
+            }.collect {}
         }
     }
 
