@@ -1,5 +1,6 @@
 package com.example.data.api_services
 
+import com.example.data.models.BentoSection
 import com.example.data.models.Offer
 import com.example.data.models.Menu
 import com.example.data.models.Restaurant
@@ -20,4 +21,7 @@ interface RestaurantsApiService {
 
     @GET("{restaurantId}/{menuId}/options")
     suspend fun getMealSections(@Path("restaurantId") restaurantId: String, @Path("menuId") menuId: String): Response<Menu>
+
+    @GET("bento_categories")
+    suspend fun getBentoSections(): Response<List<BentoSection>>
 }

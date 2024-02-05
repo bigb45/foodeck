@@ -6,6 +6,7 @@ import com.example.data.api_services.RestaurantsApiService
 import com.example.data.entities.CartItem
 import com.example.data.entities.OrderSelection
 import com.example.data.local.database.Database
+import com.example.data.models.BentoSection
 import com.example.data.models.CartItemDto
 import com.example.data.models.InternalServerException
 import com.example.data.models.Offer
@@ -64,6 +65,15 @@ class RestaurantsRepositoryImpl @Inject constructor(private val apiService: Rest
         orderDao.insertCartItem(cartItem.toEntity())
     }
 
+    override suspend fun getBentoSection(): Flow<List<BentoSection>> {
+        return try{
+            val res = handleRequest { apiService.getBentoSections() }
+            flow{ emit(res) }
+        } catch (e: Exception) {
+            flow { throw ((e)) }
+        }
+    }
+
     override suspend fun getMealOptions(restaurantId: String, menuId: String): Flow<List<OptionsSectionDto>> {
         return try {
             val res = handleRequest { apiService.getMealSections(
@@ -100,8 +110,8 @@ class RestaurantsRepositoryImpl @Inject constructor(private val apiService: Rest
         } catch (e: IOException) {
             throw (NetworkError("Error while fetching data."))
         } catch (e: Exception) {
-            d("error", "Unknown error ${e.message}")
-            throw (Exception("An unknown exception has occur    red"))
+            d("error", "Exception: ${e.message}")
+            throw (Exception("An unknown exception has occurred"))
         }
     }
 }

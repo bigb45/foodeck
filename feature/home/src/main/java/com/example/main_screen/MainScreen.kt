@@ -42,6 +42,7 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Badge
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -52,10 +53,8 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -80,12 +79,10 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -100,10 +97,10 @@ import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.core.ui.theme.Typography
 import com.example.core.ui.theme.inter
 import com.example.core.ui.theme.interBold
+import com.example.data.models.BentoSection
 import com.example.data.models.Offer
 import com.example.data.models.Restaurant
 import com.example.fooddeliver.home.R
-import com.example.restaurant.RestaurantState
 import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -115,7 +112,7 @@ fun MainScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(Unit) {
-        if(uiState !is MainScreenUiState.Success){
+        if (uiState !is MainScreenUiState.Success) {
             viewModel.fetchRestaurantData()
         }
     }
@@ -146,8 +143,7 @@ fun MainScreen(
             BottomNavBar()
         }
 
-        ) {
-            padding ->
+        ) { padding ->
             Box(
                 modifier = Modifier
                     .padding(
@@ -155,16 +151,18 @@ fun MainScreen(
                     )
                     .fillMaxSize()
                     .nestedScroll(pullToRefreshState.nestedScrollConnection)
-            ){
+            ) {
                 when (uiState) {
 
                     is MainScreenUiState.Success -> {
                         val restaurants = (uiState as MainScreenUiState.Success).restaurants
                         val offers = (uiState as MainScreenUiState.Success).offers
+                        val bentoSections = (uiState as MainScreenUiState.Success).bentoSections
 
                         Home(
                             restaurants = restaurants,
                             offers = offers,
+                            bentoSections = bentoSections,
                             onRestaurantClick = onRestaurantClick,
                         )
 
@@ -173,6 +171,7 @@ fun MainScreen(
 
                     MainScreenUiState.Loading -> {
                         LoadingIndicator()
+
                     }
 
 //            TODO: Error state
@@ -180,8 +179,8 @@ fun MainScreen(
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxSize()
-                        ){
-                           item {
+                        ) {
+                            item {
                                 Text(
                                     "${(uiState as MainScreenUiState.Error).message}",
                                     modifier = Modifier.fillMaxSize()
@@ -206,69 +205,70 @@ fun MainScreen(
 fun Home(
     restaurants: List<Restaurant>,
     offers: List<Offer>,
+    bentoSections: List<BentoSection>,
     onRestaurantClick: (String) -> Unit,
 ) {
 
 
     var query by remember { mutableStateOf("") }
 
-        LazyColumn(
-            Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 56.dp)
+    LazyColumn(
+        Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 56.dp)
 
-        ) {
-            item {
-                CustomSearchBox(query = query, onValueChange = { query = it })
-            }
+    ) {
+        item {
+            CustomSearchBox(query = query, onValueChange = { query = it })
+        }
 
-            item {
-                BentoSection(modifier = Modifier.padding(16.dp))
-            }
-            item {
-                CarrouselCards(
-                    modifier = Modifier.padding(vertical = 16.dp), offers
-                )
-            }
+        item {
+            BentoSection(modifier = Modifier.padding(16.dp), sections = bentoSections)
+        }
+        item {
+            CarrouselCards(
+                modifier = Modifier.padding(vertical = 16.dp), offers
+            )
+        }
 
-            item {
-                DealsSection(
-                    modifier = Modifier.padding(vertical = 16.dp),
-                    restaurants = restaurants,
-                    onRestaurantClick = onRestaurantClick
-                )
-            }
+        item {
+            DealsSection(
+                modifier = Modifier.padding(vertical = 16.dp),
+                restaurants = restaurants,
+                onRestaurantClick = onRestaurantClick
+            )
+        }
 
-            item {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth()
-                ) {
-                    Text(
-                        "Explore More", style = TextStyle(
-                            fontWeight = FontWeight.W900,
-                            fontSize = 20.sp,
-                            fontFamily = interBold
-                        )
+        item {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    "Explore More", style = TextStyle(
+                        fontWeight = FontWeight.W900,
+                        fontSize = 20.sp,
+                        fontFamily = interBold
                     )
-                }
-            }
-            items(restaurants) {
-                RestaurantCard(
-                    modifier = Modifier.padding(16.dp),
-                    boxModifier = Modifier.height(240.dp),
-                    restaurant = it,
-                    onRestaurantClick
                 )
             }
+        }
+        items(restaurants) {
+            RestaurantCard(
+                modifier = Modifier.padding(16.dp),
+                boxModifier = Modifier.height(240.dp),
+                restaurant = it,
+                onRestaurantClick
+            )
+        }
 
     }
 }
 
 
-
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-private fun BentoSection(modifier: Modifier = Modifier) {
+private fun BentoSection(modifier: Modifier = Modifier, sections: List<BentoSection>) {
     val gradientBrush = Brush.verticalGradient(
         0.5f to Color.Transparent, 1F to Color.Black.copy(alpha = 0.5f)
     )
@@ -280,9 +280,7 @@ private fun BentoSection(modifier: Modifier = Modifier) {
             verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier
         ) {
             Box {
-                Image(
-                    painter = painterResource(id = R.drawable.wallpaperflare_com_wallpaper),
-                    contentDescription = "Food image",
+                GlideImage(
                     modifier = Modifier
                         .clip(shape = RoundedCornerShape(16.dp))
                         .drawWithCache {
@@ -291,14 +289,18 @@ private fun BentoSection(modifier: Modifier = Modifier) {
                                 drawRect(gradientBrush)
                             }
                         },
+                    model = sections[0].imageUrl,
+                    contentScale = ContentScale.Crop,
+                    contentDescription = "bento section"
                 )
+
                 Column(
                     Modifier
                         .align(Alignment.BottomStart)
                         .padding(10.dp)
                 ) {
-                    Text(text = "Candy", style = TextStyle(color = Color.White, fontSize = 20.sp))
-                    Text("Sweet tooth!", style = TextStyle(color = Color.White, fontSize = 16.sp))
+                    Text(text = sections[0].title, style = TextStyle(color = Color.White, fontSize = 20.sp))
+                    Text(sections[0].subtitle, style = TextStyle(color = Color.White, fontSize = 16.sp))
 
                 }
             }
@@ -307,10 +309,8 @@ private fun BentoSection(modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Box(Modifier.weight(1f)) {
-                    Image(
-                        painter = painterResource(id = R.drawable.wallpaperflare_com_wallpaper),
-                        contentDescription = "Food image",
-                        Modifier
+                    GlideImage(
+                        modifier =  Modifier
                             .height(160.dp)
                             .clip(shape = RoundedCornerShape(16.dp))
                             .drawWithCache {
@@ -319,26 +319,24 @@ private fun BentoSection(modifier: Modifier = Modifier) {
                                     drawRect(gradientBrush)
                                 }
                             },
-                        contentScale = ContentScale.Crop
+                        model = sections[1].imageUrl,
+                        contentScale = ContentScale.Crop,
+                        contentDescription = "bento section"
                     )
                     Column(
                         Modifier
                             .align(Alignment.BottomStart)
                             .padding(10.dp)
                     ) {
-                        Text("Salty", style = TextStyle(color = Color.White, fontSize = 20.sp))
-                        Text(
-                            "Fill up on Sodium!",
-                            style = TextStyle(color = Color.White, fontSize = 16.sp)
-                        )
+                        Text(text = sections[1].title, style = TextStyle(color = Color.White, fontSize = 20.sp))
+                        Text(sections[1].subtitle, style = TextStyle(color = Color.White, fontSize = 16.sp))
+
 
                     }
                 }
                 Box(Modifier.weight(1f)) {
-                    Image(
-                        painter = painterResource(id = R.drawable.wallpaperflare_com_wallpaper),
-                        contentDescription = "Food image",
-                        Modifier
+                    GlideImage(
+                        modifier =  Modifier
                             .height(160.dp)
                             .clip(shape = RoundedCornerShape(16.dp))
                             .drawWithCache {
@@ -347,18 +345,18 @@ private fun BentoSection(modifier: Modifier = Modifier) {
                                     drawRect(gradientBrush)
                                 }
                             },
-                        contentScale = ContentScale.Crop
+                        model = sections[2].imageUrl,
+                        contentScale = ContentScale.Crop,
+                        contentDescription = "bento section"
                     )
                     Column(
                         Modifier
                             .align(Alignment.BottomStart)
                             .padding(10.dp)
                     ) {
-                        Text("Salty", style = TextStyle(color = Color.White, fontSize = 20.sp))
-                        Text(
-                            "Fill up on Sodium!",
-                            style = TextStyle(color = Color.White, fontSize = 16.sp)
-                        )
+                        Text(text = sections[2].title, style = TextStyle(color = Color.White, fontSize = 20.sp))
+                        Text(sections[2].subtitle, style = TextStyle(color = Color.White, fontSize = 16.sp))
+
 
                     }
                 }
