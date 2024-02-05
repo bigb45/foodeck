@@ -2,17 +2,18 @@ package com.example.data.repositories
 
 import android.security.keystore.UserNotAuthenticatedException
 import android.util.Log.d
+import com.example.common.log
 import com.example.data.api_services.RestaurantsApiService
-import com.example.data.entities.CartItem
 import com.example.data.entities.OrderSelection
 import com.example.data.local.database.Database
 import com.example.data.models.BentoSection
 import com.example.data.models.CartItemDto
 import com.example.data.models.InternalServerException
+import com.example.data.models.MenuItem
 import com.example.data.models.Offer
 import com.example.data.models.OptionsSectionDto
 import com.example.data.models.Restaurant
-import com.example.data.models.RestaurantMenu
+import com.example.data.models.RestaurantSection
 import com.example.data.models.toEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -33,9 +34,9 @@ class RestaurantsRepositoryImpl @Inject constructor(private val apiService: Rest
         }
     }
 
-    override suspend fun getRestaurantMeals(restaurantId: String): Flow<List<RestaurantMenu>> {
+    override suspend fun getRestaurantMenus(restaurantId: String): Flow<List<RestaurantSection>> {
         return try {
-            val res = handleRequest { apiService.getMealsByRestaurantId(restaurantId) }
+            val res = handleRequest { apiService.getAllMenusByRestaurantId(restaurantId) }
             flow { emit(res) }
         } catch (e: Exception) {
             flow { throw (e) }
@@ -74,15 +75,27 @@ class RestaurantsRepositoryImpl @Inject constructor(private val apiService: Rest
         }
     }
 
-    override suspend fun getMealOptions(restaurantId: String, menuId: String): Flow<List<OptionsSectionDto>> {
+    override suspend fun getMenuInfo(restaurantId: String, menuId: String): Flow<MenuItem> {
+        return try{
+            val res = handleRequest { apiService.getMenuInfo(
+                restaurantId = restaurantId,
+                menuId = menuId
+            ) }
+            flow{ emit(res) }
+        } catch (e: Exception) {
+            flow { throw ((e)) }
+        }
+    }
+
+    override suspend fun getMenuOptions(restaurantId: String, menuId: String): Flow<List<OptionsSectionDto>> {
         return try {
-            val res = handleRequest { apiService.getMealSections(
+            val res = handleRequest { apiService.getMenuOptions(
                 restaurantId = restaurantId,
                 menuId = menuId
             ) }
             flow { emit(res.sections) }
         } catch (e: Exception) {
-            d("error", "${e.message}")
+            log("${e.message}")
             flow { throw (e) }
         }
     }
