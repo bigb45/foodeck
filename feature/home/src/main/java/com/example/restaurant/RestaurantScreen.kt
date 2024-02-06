@@ -130,177 +130,18 @@ fun RestaurantScreen(
                     price = "99.99",
                     currency = "$"
                 ),
-
             )
         ),
-        Category(
-            categoryName = "2", items = listOf(
-                Menu(
-                    id = "89",
-                    name = "Meal1",
-                    imageUrl = null,
-                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
-                    price = "99.99",
-                    currency = "$"
-                ),
-                Menu(
-                    id = "88",
-                    name = "Meal1",
-                    imageUrl = null,
-                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
-                    price = "99.99",
-                    currency = "$"
-                ),
-                Menu(
-                    id = "87",
-                    name = "Meal1",
-                    imageUrl = null,
-                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
-                    price = "99.99",
-                    currency = "$"
-                ),
-                Menu(
-                    id = "86",
-                    name = "Meal1",
-                    imageUrl = null,
-                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
-                    price = "99.99",
-                    currency = "$"
-                ),
-
-            )
-        ),
-        Category(
-            categoryName = "3", items = listOf(
-                Menu(
-                    id = "79",
-                    name = "Meal1",
-                    imageUrl = null,
-                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
-                    price = "99.99",
-                    currency = "$"
-                ),
-                Menu(
-                    id = "78",
-                    name = "Meal1",
-                    imageUrl = null,
-                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
-                    price = "99.99",
-                    currency = "$"
-                ),
-                Menu(
-                    id = "77",
-                    name = "Meal1",
-                    imageUrl = null,
-                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
-                    price = "99.99",
-                    currency = "$"
-                ),
-                Menu(
-                    id = "76",
-                    name = "Meal1",
-                    imageUrl = null,
-                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
-                    price = "99.99",
-                    currency = "$"
-                ),
-
-            )
-        ),
-        Category(
-            categoryName = "4", items = listOf(
-                Menu(
-                    id = "69",
-                    name = "Meal1",
-                    imageUrl = null,
-                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
-                    price = "99.99",
-                    currency = "$"
-                ),
-                Menu(
-                    id = "68",
-                    name = "Meal1",
-                    imageUrl = null,
-                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
-                    price = "99.99",
-                    currency = "$"
-                ),
-                Menu(
-                    id = "67",
-                    name = "Meal1",
-                    imageUrl = null,
-                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
-                    price = "99.99",
-                    currency = "$"
-                ),
-                Menu(
-                    id = "66",
-                    name = "Meal1",
-                    imageUrl = null,
-                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
-                    price = "99.99",
-                    currency = "$"
-                ),
-
-            )
-        ),
-        Category(
-            categoryName = "5", items = listOf(
-                Menu(
-                    id = "59",
-                    name = "Meal1",
-                    imageUrl = null,
-                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
-                    price = "99.99",
-                    currency = "$"
-                ),
-                Menu(
-                    id = "58",
-                    name = "Meal1",
-                    imageUrl = null,
-                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
-                    price = "99.99",
-                    currency = "$"
-                ),
-                Menu(
-                    id = "57",
-                    name = "Meal1",
-                    imageUrl = null,
-                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
-                    price = "99.99",
-                    currency = "$"
-                ),
-                Menu(
-                    id = "56",
-                    name = "Meal1",
-                    imageUrl = null,
-                    contents = "1 regular burger with croquette and hot cocoa1 regular burger with croquette and hot cocoa",
-                    price = "99.99",
-                    currency = "$"
-                ),
-
-            )
-        ),
-
     )
 //
 
-// TODO: make this an api call
-    val restaurant = Restaurant(
-        "test",
-        "The Foodeck Shop",
-        "Ankara, Golbasi",
-        "40 min",
-        "test",
-        null,
-        "4.4",
-    )
 
     FoodDeliveryTheme {
         Scaffold {
             it
             when (items.value) {
                 is RestaurantState.Success -> {
+                    val restaurant = remember {(items.value as RestaurantState.Success<List<RestaurantSection>>).restaurantInfo!!}
                     //    This is bad, don't do this in the UI
                     var categories =
                         (items.value as RestaurantState.Success<List<RestaurantSection>>).data.map { section ->
@@ -323,12 +164,11 @@ fun RestaurantScreen(
                     when {
                         isDialogOpen.value -> {
                             AlertDialog(title = { Text("Delivery Time") },
-                                text = { Text("This restaurant will take approximately ${40} minutes to deliver.") },
+                                text = { Text("This restaurant will take approximately ${restaurant.timeToDeliver} minutes to deliver.") },
                                 onDismissRequest = { isDialogOpen.value = false },
                                 confirmButton = {
                                     TextButton(onClick = {
                                         isDialogOpen.value = false
-                                        log("confirmed dialog")
                                     }) {
                                         Text("Ok")
                                     }
