@@ -151,7 +151,7 @@ fun MenuItems(
             onNavigateUp = onNavigateUp,
             expandedActions = { MealActions() },
             title = menuInfo.itemName,
-            subTitle = "${menuInfo.storeName}, ${menuInfo.address}",
+            subTitle = "${menuInfo.storeName} - ${menuInfo.address}",
         )
     }
 }
