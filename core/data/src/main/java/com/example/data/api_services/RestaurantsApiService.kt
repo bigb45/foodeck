@@ -28,4 +28,6 @@ interface RestaurantsApiService {
     @GET("{restaurantId}/menu/{menuId}")
     suspend fun getMenuInfo(@Path("restaurantId") restaurantId: String, @Path("menuId") menuId: String): Response<MenuItem>
 
+    @GET("{restaurantId}")
+    suspend fun getRestaurantById(@Path("restaurantId") restaurantId: String): Response<Restaurant>
 }

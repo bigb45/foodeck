@@ -25,10 +25,16 @@ class RestaurantsRepositoryImpl @Inject constructor(private val apiService: Rest
     RestaurantsRepository {
     private val userDao = roomDatabase.userDao()
     private val orderDao = roomDatabase.orderDao()
+//    simple cache mechanism
+    private var restaurantCache: List<Restaurant> = emptyList()
     override suspend fun getRestaurants(): Flow<List<Restaurant>> {
         return try {
-            val res = handleRequest { apiService.getAllRestaurants() }
-            flow { emit(res) }
+            if(restaurantCache.isEmpty()){
+                log("making request")
+                val res = handleRequest { apiService.getAllRestaurants() }
+                restaurantCache = res
+            }
+            flow { emit(restaurantCache) }
         } catch (e: Exception) {
             flow { throw (e) }
         }
@@ -53,11 +59,7 @@ class RestaurantsRepositoryImpl @Inject constructor(private val apiService: Rest
         }
     }
 
-
     override suspend fun saveUserMenuSelections(selection: OrderSelection): Boolean {
-//        val queryResult = userDao.getAll()
-//        log(queryResult.toString())
-//        userDao.insertMohammed(UserTest("1", "Mohammed", "Natour"))
         orderDao.insertOrderSelection(selection)
         return false
     }
@@ -85,6 +87,20 @@ class RestaurantsRepositoryImpl @Inject constructor(private val apiService: Rest
         } catch (e: Exception) {
             flow { throw ((e)) }
         }
+    }
+
+    override suspend fun getRestaurantInfo(restaurantId: String): Flow<Restaurant> {
+       return if (restaurantCache.isNotEmpty()) {
+               flow { emit(restaurantCache.first { it.restaurantId == restaurantId }) }
+           }else{
+           try{
+               val res = handleRequest { apiService.getRestaurantById(restaurantId) }
+               flow{ emit(res) }
+           } catch (e: Exception) {
+               flow { throw ((e)) }
+           }
+           }
+
     }
 
     override suspend fun getMenuOptions(restaurantId: String, menuId: String): Flow<List<OptionsSectionDto>> {

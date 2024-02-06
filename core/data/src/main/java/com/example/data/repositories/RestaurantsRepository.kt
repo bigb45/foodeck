@@ -19,4 +19,5 @@ interface RestaurantsRepository {
     suspend fun getBentoSection(): Flow<List<BentoSection>>
     suspend fun getMenuOptions(restaurantId: String, menuId: String): Flow<List<OptionsSectionDto>>
     suspend fun getMenuInfo(restaurantId: String, menuId: String): Flow<MenuItem>
+    suspend fun getRestaurantInfo(restaurantId: String): Flow<Restaurant>
 }
