@@ -6,6 +6,7 @@ import com.example.data.api_services.RestaurantsApiService
 import com.example.data.entities.CartItem
 import com.example.data.entities.OrderSelection
 import com.example.data.local.database.Database
+import com.example.data.models.BentoSectionData
 import com.example.data.models.CartItemDto
 import com.example.data.models.InternalServerException
 import com.example.data.models.Offer
@@ -62,6 +63,18 @@ class RestaurantsRepositoryImpl @Inject constructor(private val apiService: Rest
 
     override suspend fun saveCartItem(cartItem: CartItemDto) {
         orderDao.insertCartItem(cartItem.toEntity())
+    }
+
+    override suspend fun getBentoSections(): Flow<List<BentoSectionData>> {
+        return try {
+            val res = handleRequest {
+                apiService.getBentoSections()
+            }
+            flow { emit(res) }
+        } catch (e: Exception) {
+            d("error", "${e.message}")
+            flow { throw (e) }
+        }
     }
 
     override suspend fun getMealOptions(restaurantId: String, menuId: String): Flow<List<OptionsSectionDto>> {

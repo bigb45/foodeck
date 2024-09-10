@@ -100,6 +100,7 @@ import com.example.core.ui.theme.FoodDeliveryTheme
 import com.example.core.ui.theme.Typography
 import com.example.core.ui.theme.inter
 import com.example.core.ui.theme.interBold
+import com.example.data.models.BentoSectionData
 import com.example.data.models.Offer
 import com.example.data.models.Restaurant
 import com.example.fooddeliver.home.R
@@ -154,11 +155,12 @@ fun MainScreen(
                     is MainScreenUiState.Success -> {
                         val restaurants = (uiState as MainScreenUiState.Success).restaurants
                         val offers = (uiState as MainScreenUiState.Success).offers
-
+                        val bentoSection = (uiState as MainScreenUiState.Success).bentoSection
                         Home(
                             restaurants = restaurants,
                             offers = offers,
                             onRestaurantClick = onRestaurantClick,
+                            bentoSection = bentoSection
                         )
 
 
@@ -199,6 +201,7 @@ fun MainScreen(
 fun Home(
     restaurants: List<Restaurant>,
     offers: List<Offer>,
+    bentoSection: List<BentoSectionData>,
     onRestaurantClick: (String) -> Unit,
 ) {
 
@@ -214,7 +217,7 @@ fun Home(
             }
 
             item {
-                BentoSection(modifier = Modifier.padding(16.dp))
+                BentoSection(modifier = Modifier.padding(16.dp), bentoSection)
             }
             item {
                 CarrouselCards(
@@ -261,7 +264,7 @@ fun Home(
 
 
 @Composable
-private fun BentoSection(modifier: Modifier = Modifier) {
+private fun BentoSection(modifier: Modifier = Modifier, bentoData: List<BentoSectionData>) {
     val gradientBrush = Brush.verticalGradient(
         0.5f to Color.Transparent, 1F to Color.Black.copy(alpha = 0.5f)
     )
@@ -271,92 +274,99 @@ private fun BentoSection(modifier: Modifier = Modifier) {
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier
-        ) {
-            Box {
-                Image(
-                    painter = painterResource(id = R.drawable.wallpaperflare_com_wallpaper),
-                    contentDescription = "Food image",
-                    modifier = Modifier
-                        .clip(shape = RoundedCornerShape(16.dp))
-                        .drawWithCache {
-                            onDrawWithContent {
-                                drawContent()
-                                drawRect(gradientBrush)
-                            }
-                        },
-                )
-                Column(
-                    Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(10.dp)
-                ) {
-                    Text(text = "Candy", style = TextStyle(color = Color.White, fontSize = 20.sp))
-                    Text("Sweet tooth!", style = TextStyle(color = Color.White, fontSize = 16.sp))
-
-                }
-            }
-            Row(
-                horizontalArrangement = Arrangement.Absolute.spacedBy(16.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Box(Modifier.weight(1f)) {
-                    Image(
-                        painter = painterResource(id = R.drawable.wallpaperflare_com_wallpaper),
-                        contentDescription = "Food image",
-                        Modifier
-                            .height(160.dp)
-                            .clip(shape = RoundedCornerShape(16.dp))
-                            .drawWithCache {
-                                onDrawWithContent {
-                                    drawContent()
-                                    drawRect(gradientBrush)
-                                }
-                            },
-                        contentScale = ContentScale.Crop
-                    )
-                    Column(
-                        Modifier
-                            .align(Alignment.BottomStart)
-                            .padding(10.dp)
-                    ) {
-                        Text("Salty", style = TextStyle(color = Color.White, fontSize = 20.sp))
-                        Text(
-                            "Fill up on Sodium!",
-                            style = TextStyle(color = Color.White, fontSize = 16.sp)
-                        )
-
-                    }
-                }
-                Box(Modifier.weight(1f)) {
-                    Image(
-                        painter = painterResource(id = R.drawable.wallpaperflare_com_wallpaper),
-                        contentDescription = "Food image",
-                        Modifier
-                            .height(160.dp)
-                            .clip(shape = RoundedCornerShape(16.dp))
-                            .drawWithCache {
-                                onDrawWithContent {
-                                    drawContent()
-                                    drawRect(gradientBrush)
-                                }
-                            },
-                        contentScale = ContentScale.Crop
-                    )
-                    Column(
-                        Modifier
-                            .align(Alignment.BottomStart)
-                            .padding(10.dp)
-                    ) {
-                        Text("Salty", style = TextStyle(color = Color.White, fontSize = 20.sp))
-                        Text(
-                            "Fill up on Sodium!",
-                            style = TextStyle(color = Color.White, fontSize = 16.sp)
-                        )
-
-                    }
-                }
+        ){
+            bentoData.forEach{
+                Text(it.sectionTitle)
             }
         }
+//        Column(
+//            verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier
+//        ) {
+//            Box {
+//                Image(
+//                    painter = painterResource(id = R.drawable.wallpaperflare_com_wallpaper),
+//                    contentDescription = "Food image",
+//                    modifier = Modifier
+//                        .clip(shape = RoundedCornerShape(16.dp))
+//                        .drawWithCache {
+//                            onDrawWithContent {
+//                                drawContent()
+//                                drawRect(gradientBrush)
+//                            }
+//                        },
+//                )
+//                Column(
+//                    Modifier
+//                        .align(Alignment.BottomStart)
+//                        .padding(10.dp)
+//                ) {
+//                    Text(text = "Candy", style = TextStyle(color = Color.White, fontSize = 20.sp))
+//                    Text("Sweet tooth!", style = TextStyle(color = Color.White, fontSize = 16.sp))
+//
+//                }
+//            }
+//            Row(
+//                horizontalArrangement = Arrangement.Absolute.spacedBy(16.dp),
+//                modifier = Modifier.fillMaxWidth()
+//            ) {
+//                Box(Modifier.weight(1f)) {
+//                    Image(
+//                        painter = painterResource(id = R.drawable.wallpaperflare_com_wallpaper),
+//                        contentDescription = "Food image",
+//                        Modifier
+//                            .height(160.dp)
+//                            .clip(shape = RoundedCornerShape(16.dp))
+//                            .drawWithCache {
+//                                onDrawWithContent {
+//                                    drawContent()
+//                                    drawRect(gradientBrush)
+//                                }
+//                            },
+//                        contentScale = ContentScale.Crop
+//                    )
+//                    Column(
+//                        Modifier
+//                            .align(Alignment.BottomStart)
+//                            .padding(10.dp)
+//                    ) {
+//                        Text("Salty", style = TextStyle(color = Color.White, fontSize = 20.sp))
+//                        Text(
+//                            "Fill up on Sodium!",
+//                            style = TextStyle(color = Color.White, fontSize = 16.sp)
+//                        )
+//
+//                    }
+//                }
+//                Box(Modifier.weight(1f)) {
+//                    Image(
+//                        painter = painterResource(id = R.drawable.wallpaperflare_com_wallpaper),
+//                        contentDescription = "Food image",
+//                        Modifier
+//                            .height(160.dp)
+//                            .clip(shape = RoundedCornerShape(16.dp))
+//                            .drawWithCache {
+//                                onDrawWithContent {
+//                                    drawContent()
+//                                    drawRect(gradientBrush)
+//                                }
+//                            },
+//                        contentScale = ContentScale.Crop
+//                    )
+//                    Column(
+//                        Modifier
+//                            .align(Alignment.BottomStart)
+//                            .padding(10.dp)
+//                    ) {
+//                        Text("Salty", style = TextStyle(color = Color.White, fontSize = 20.sp))
+//                        Text(
+//                            "Fill up on Sodium!",
+//                            style = TextStyle(color = Color.White, fontSize = 16.sp)
+//                        )
+//
+//                    }
+//                }
+//            }
+//        }
     }
 }
 
