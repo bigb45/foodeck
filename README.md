@@ -11,9 +11,6 @@ A multi-module Android application for restaurant ordering, built with Jetpack C
 - Retrofit for API calls
 - Coroutines + Flow
 
-## Architecture
-[Insert simple diagram or bullet points about module structure]
-
 ## Features
 - Browse menu with categories
 - Add items to cart with offline persistence
